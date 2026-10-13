@@ -106,16 +106,9 @@ function handleSuccess(res: any) {
 }
 
 function beforeUpload(rawFile: File) {
-  if (!fileType.includes(rawFile.type)) {
-    msg.error(`只允许上传：${fileType.join(', ')}`)
-    return false
-  }
-  if (fileSize < rawFile.size) {
-    msg.error(`只允许上传${fileSize}字节大小的文件`)
-    return false
-  }
-
-  return true
+  // 只负责拦截上传请求；提示与清理统一交给下面的 watch
+  // （before-upload 阶段 fileList 还没稳定，在这里早删会把提示吞掉，表现为「点击无反应」）
+  return fileType.includes(rawFile.type) && fileSize >= rawFile.size
 }
 
 function handleExceed() {
@@ -163,7 +156,6 @@ watch(
       fileList.value = []
       return false
     }
-
     if (isArray(val)) {
       fileList.value = val.map((item: string) => {
         return {
@@ -177,6 +169,27 @@ watch(
     }
   },
   { immediate: true, deep: true },
+)
+
+// 上传校验不通过的文件会被 element-plus 短暂放进 fileList，残留后会渲染出空预览，
+// 并把上传按钮 v-show 掉（组件看起来像消失了）。这里统一做「提示 + 剔除」，
+// 注意提示要放在这个 watch 里而不是 before-upload，否则会被提前剔除吞掉。
+watch(
+  () => fileList.value,
+  (list) => {
+    const invalid = list.filter((item: any) => item.raw && (!fileType.includes(item.raw.type) || fileSize < item.raw.size))
+    if (invalid.length > 0) {
+      invalid.forEach((item: any) => {
+        msg.error(
+          !fileType.includes(item.raw.type)
+            ? `只允许上传：${fileType.join(', ')}`
+            : `只允许上传${fileSize}字节大小的文件`,
+        )
+      })
+      fileList.value = list.filter((item: any) => !invalid.includes(item))
+    }
+  },
+  { deep: true },
 )
 </script>
 

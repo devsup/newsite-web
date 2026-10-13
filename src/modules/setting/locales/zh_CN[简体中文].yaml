@@ -1,0 +1,7 @@
+settingMenu:
+  index: 站点管理
+  setting:
+    name: 系统设置
+    index: 站点设置列表
+    save: 站点设置保存
+    delete: 站点设置删除

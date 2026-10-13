@@ -1,0 +1,7 @@
+settingMenu:
+  index: Site
+  setting:
+    name: System Settings
+    index: Settings List
+    save: Settings Save
+    delete: Settings Delete

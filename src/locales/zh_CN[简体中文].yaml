@@ -182,3 +182,8 @@ dictionary:
     self: 本人数据权限
     customDept: 自选部门数据权限
     customFunc: 自定义函数数据权限
+
+add: 添加
+parse: 解析
+parse_data: 解析数据
+parse_success: 解析成功

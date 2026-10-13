@@ -9,20 +9,32 @@
  */
 import type { Resources } from '#/global'
 import { uploadLocal } from '@/utils/uploadLocal.ts'
+import { useMessage } from '@/hooks/useMessage.ts'
+
+/**
+ * 统一的资源上传处理：无论成功还是失败都给用户一个提示。
+ * 之前成功只刷新列表、失败直接抛错，界面上毫无反馈，用户会误以为「不能上传」。
+ */
+function handleResourceUpload(files: FileList, args: Resources.Args) {
+  const msg = useMessage()
+  const options = { file: files[0] }
+
+  uploadLocal(options)
+    .then(() => {
+      msg.success('上传成功')
+      args?.getResourceList?.()
+    })
+    .catch((e: any) => {
+      msg.error(e?.message || '上传失败，请重试')
+    })
+}
 
 const resourceDefaultButtons: Resources.Button[] = [
   {
     name: 'local-image-upload',
     label: '图片上传',
     icon: 'solar:upload-square-broken',
-    upload: (files: FileList, args: Resources.Args) => {
-      const options = { file: files[0] }
-      uploadLocal(options).then(() => {
-        args?.getResourceList?.()
-      }).catch((e) => {
-        throw new Error(e)
-      })
-    },
+    upload: handleResourceUpload,
     uploadConfig: {
       accept: 'image/*',
       limit: 1,
@@ -33,16 +45,10 @@ const resourceDefaultButtons: Resources.Button[] = [
     name: 'local-file-upload',
     label: '文件上传',
     icon: 'hugeicons:file-upload',
-    upload: (files: FileList, args: Resources.Args) => {
-      const options = { file: files[0] }
-      uploadLocal(options).then(() => {
-        args?.getResourceList?.()
-      }).catch((e) => {
-        throw new Error(e)
-      })
-    },
+    upload: handleResourceUpload,
     uploadConfig: {
-      accept: '.doc,.xls,.ppt,.txt,.pdf',
+      // 文档 + 压缩包 + 视频 + 音频（后端不限类型，只是选择器按这里过滤，别漏了视频）
+      accept: '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.pdf,.zip,.rar,.7z,.mp4,.mov,.avi,.mkv,.webm,.flv,.m4v,.mp3,.wav,.aac,.flac,.m4a',
       limit: 1,
     },
     order: 1,

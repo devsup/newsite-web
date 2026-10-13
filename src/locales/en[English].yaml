@@ -182,3 +182,8 @@ dictionary:
     self: Personal data permissions
     customDept: Custom department selection data permissions
     customFunc: Custom function data permissions
+
+add: Add
+parse: Parse
+parse_data: Parse data
+parse_success: Parsed successfully
