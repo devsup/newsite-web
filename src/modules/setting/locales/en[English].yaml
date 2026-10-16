@@ -5,3 +5,41 @@ settingMenu:
     index: Settings List
     save: Settings Save
     delete: Settings Delete
+  ipWhitelist:
+    name: IP Whitelist
+    index: IP Whitelist List
+    save: IP Whitelist Save
+    delete: IP Whitelist Delete
+  ipBlacklist:
+    name: IP Blacklist
+    index: IP Blacklist List
+    save: IP Blacklist Save
+    delete: IP Blacklist Delete
+ipWhitelist:
+  mainTitle: IP Whitelist
+  subTitle: Disabled when empty; once configured, only the listed single IPs or CIDR ranges can access the admin
+  ip: IP / CIDR
+  remark: Remark
+  remarkPlaceholder: e.g. "John - office network", to identify this IP later
+  currentIp: Current IP
+  updatedBy: Updated by
+  ipPlaceholder: e.g. 192.168.1.5 or 10.0.0.0/24
+  ipBatchPlaceholder: One per line, single IP or CIDR range, batch supported
+  ipInvalid: Please enter a valid IP or CIDR range
+  ipBatchInvalid: Every line must be a valid IP or CIDR range
+  addResult: Added {created} entr(ies) successfully
+  addResultSkip: Added {created} entr(ies), skipped {skipped} existing
+ipBlacklist:
+  mainTitle: IP Ban Management
+  subTitle: Add, edit or remove banned IP addresses; matched IPs will be denied access to the admin
+  ip: IP / CIDR
+  banReason: Ban reason
+  banReasonPlaceholder: e.g. "API abuse" or "malicious scanning", for future reference
+  currentIp: Current IP
+  updatedBy: Updated by
+  ipPlaceholder: e.g. 192.168.1.5 or 10.0.0.0/24
+  ipBatchPlaceholder: One per line, single IP or CIDR range, batch supported
+  ipInvalid: Please enter a valid IP or CIDR range
+  ipBatchInvalid: Every line must be a valid IP or CIDR range
+  addResult: Added {created} entr(ies) successfully
+  addResultSkip: Added {created} entr(ies), skipped {skipped} existing

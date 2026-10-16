@@ -5,3 +5,41 @@ settingMenu:
     index: 站點設置列表
     save: 站點設置保存
     delete: 站點設置刪除
+  ipWhitelist:
+    name: IP白名單
+    index: IP白名單列表
+    save: IP白名單保存
+    delete: IP白名單刪除
+  ipBlacklist:
+    name: IP黑名單
+    index: IP黑名單列表
+    save: IP黑名單保存
+    delete: IP黑名單刪除
+ipWhitelist:
+  mainTitle: IP白名單
+  subTitle: 白名單為空時不啟用；配置後僅列表內的單 IP 或 CIDR 網段可訪問後台
+  ip: IP / 網段
+  remark: 備註
+  remarkPlaceholder: 請填寫備註，如「張三-公司辦公網」，便於日後識別該 IP 歸屬
+  currentIp: 當前訪問 IP
+  updatedBy: 更新人
+  ipPlaceholder: 如 192.168.1.5 或 10.0.0.0/24
+  ipBatchPlaceholder: 一行一個，支持單 IP 或 CIDR 網段，可批量添加
+  ipInvalid: 請輸入合法的 IP 或 CIDR 網段
+  ipBatchInvalid: 每一行都需填寫合法的 IP 或 CIDR 網段
+  addResult: 成功添加 {created} 條
+  addResultSkip: 成功添加 {created} 條，跳過 {skipped} 條已存在
+ipBlacklist:
+  mainTitle: IP封禁管理
+  subTitle: 提供被封禁 IP 地址的添加、編輯、刪除功能；命中的 IP 將被拒絕訪問後台
+  ip: IP / 網段
+  banReason: 封禁原因
+  banReasonPlaceholder: 請填寫封禁原因，如「惡意刷接口」「異常掃描」，便於日後追溯
+  currentIp: 當前訪問 IP
+  updatedBy: 更新人
+  ipPlaceholder: 如 192.168.1.5 或 10.0.0.0/24
+  ipBatchPlaceholder: 一行一個，支持單 IP 或 CIDR 網段，可批量添加
+  ipInvalid: 請輸入合法的 IP 或 CIDR 網段
+  ipBatchInvalid: 每一行都需填寫合法的 IP 或 CIDR 網段
+  addResult: 成功添加 {created} 條
+  addResultSkip: 成功添加 {created} 條，跳過 {skipped} 條已存在

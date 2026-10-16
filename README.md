@@ -439,10 +439,10 @@ router.isReady() → app.mount('#app')
 
 ```typescript
 interface Provider {
-  name: string           // 提供者名称
-  init?(): any | void    // 初始化（在 setProvider 之前执行）
-  setProvider(app): void // 向 App 注入服务
-  getProvider(): T       // 获取注入的服务
+  name: string // 提供者名称
+  init?: () => any | void // 初始化（在 setProvider 之前执行）
+  setProvider: (app) => void // 向 App 注入服务
+  getProvider: () => T // 获取注入的服务
 }
 ```
 
@@ -512,6 +512,7 @@ if (!isEmpty(to.meta.user) && !hasUser(to.meta.user)) → 跳转 /403
 
 ```typescript
 import hasAuth from '@/utils/permission/hasAuth'
+
 if (hasAuth('user:add')) { /* 显示按钮 */ }
 ```
 
@@ -602,23 +603,23 @@ if (hasAuth('user:add')) { /* 显示按钮 */ }
 
 ```typescript
 interface PluginConfig {
-  install: (app: App) => void                    // 插件安装函数
+  install: (app: App) => void // 插件安装函数
   config: {
-    info: { name, version, author, description, order }  // 插件信息
-    enable: boolean                                // 是否启用
+    info: { name, version, author, description, order } // 插件信息
+    enable: boolean // 是否启用
   }
-  views?: Views[]                                  // 可选的路由视图
+  views?: Views[] // 可选的路由视图
   hooks?: {
-    start                                          // 启动时触发
-    setup                                          // 系统初始化完毕后
-    registerRoute                                  // 注册路由时
-    loginBefore                                    // 登录前
-    login                                          // 登录时
-    logout                                         // 登出时
-    getUserInfo                                    // 获取用户信息时
-    routerRedirect                                 // 路由跳转时
-    networkRequest                                 // 网络请求时
-    networkResponse                                // 网络返回后
+    start // 启动时触发
+    setup // 系统初始化完毕后
+    registerRoute // 注册路由时
+    loginBefore // 登录前
+    login // 登录时
+    logout // 登出时
+    getUserInfo // 获取用户信息时
+    routerRedirect // 路由跳转时
+    networkRequest // 网络请求时
+    networkResponse // 网络返回后
   }
 }
 ```
@@ -772,18 +773,24 @@ const { showViewer } = useImageViewer()
 ### 10.6 权限控制示例
 
 ```vue
-<template>
-  <!-- 指令方式 -->
-  <button v-auth="['user:add']">添加用户</button>
-  <button v-role="['Admin']">管理员操作</button>
-
-  <!-- 函数方式 -->
-  <button v-if="hasAuth('user:edit')">编辑用户</button>
-</template>
-
 <script setup>
 import hasAuth from '@/utils/permission/hasAuth'
 </script>
+
+<template>
+  <!-- 指令方式 -->
+  <button v-auth="['user:add']">
+    添加用户
+  </button>
+  <button v-role="['Admin']">
+    管理员操作
+  </button>
+
+  <!-- 函数方式 -->
+  <button v-if="hasAuth('user:edit')">
+    编辑用户
+  </button>
+</template>
 ```
 
 ### 10.7 代码规范

@@ -21,6 +21,7 @@ zh_TW:
   city: 請選擇地級市/市轄區
   area: 請選擇區縣
 </i18n>
+
 <script setup lang="ts">
 import jsonData from './lib/cn.json'
 import type { Area, ModelType } from './type.ts'
@@ -77,7 +78,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-3 gap-x-2 w-full" v-bind="$attrs">
+  <div class="grid grid-cols-3 w-full gap-x-2" v-bind="$attrs">
     <el-select
       v-model="model.province"
       class="w-full"

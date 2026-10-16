@@ -5,3 +5,41 @@ settingMenu:
     index: 站点设置列表
     save: 站点设置保存
     delete: 站点设置删除
+  ipWhitelist:
+    name: IP白名单
+    index: IP白名单列表
+    save: IP白名单保存
+    delete: IP白名单删除
+  ipBlacklist:
+    name: IP黑名单
+    index: IP黑名单列表
+    save: IP黑名单保存
+    delete: IP黑名单删除
+ipWhitelist:
+  mainTitle: IP白名单
+  subTitle: 白名单为空时不启用；配置后仅列表内的单 IP 或 CIDR 网段可访问后台
+  ip: IP / 网段
+  remark: 备注
+  remarkPlaceholder: 请填写备注，如「张三-公司办公网」，便于日后识别该 IP 归属
+  currentIp: 当前访问 IP
+  updatedBy: 更新人
+  ipPlaceholder: 如 192.168.1.5 或 10.0.0.0/24
+  ipBatchPlaceholder: 一行一个，支持单 IP 或 CIDR 网段，可批量添加
+  ipInvalid: 请输入合法的 IP 或 CIDR 网段
+  ipBatchInvalid: 每一行都需填写合法的 IP 或 CIDR 网段
+  addResult: 成功添加 {created} 条
+  addResultSkip: 成功添加 {created} 条，跳过 {skipped} 条已存在
+ipBlacklist:
+  mainTitle: IP封禁管理
+  subTitle: 提供被封禁 IP 地址的添加、编辑、删除功能；命中的 IP 将被拒绝访问后台
+  ip: IP / 网段
+  banReason: 封禁原因
+  banReasonPlaceholder: 请填写封禁原因，如「恶意刷接口」「异常扫描」，便于日后追溯
+  currentIp: 当前访问 IP
+  updatedBy: 更新人
+  ipPlaceholder: 如 192.168.1.5 或 10.0.0.0/24
+  ipBatchPlaceholder: 一行一个，支持单 IP 或 CIDR 网段，可批量添加
+  ipInvalid: 请输入合法的 IP 或 CIDR 网段
+  ipBatchInvalid: 每一行都需填写合法的 IP 或 CIDR 网段
+  addResult: 成功添加 {created} 条
+  addResultSkip: 成功添加 {created} 条，跳过 {skipped} 条已存在

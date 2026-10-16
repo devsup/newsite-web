@@ -16,7 +16,7 @@ const carouselItems = Array.from({ length: 5 }, (_, index) => index + 1)
 const visibleRoutes = computed(() =>
   router.getRoutes()
     .filter((v: any) => /^(?!\/$)(?!.*\/uc)(?!.*\/login)(?!.*\/:pathMatch\([^)]*\)).*$/.test(v.path) && v.components)
-    .slice(0, 12)
+    .slice(0, 12),
 )
 </script>
 

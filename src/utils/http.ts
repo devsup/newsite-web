@@ -162,7 +162,7 @@ http.interceptors.response.use(
           }
         }
         case ResultCode.DISABLED: {
-          Message.error(response?.data?.message ?? '账号已被禁用', {zIndex: 9999})
+          Message.error(response?.data?.message ?? '账号已被禁用', { zIndex: 9999 })
           await useUserStore().logout()
           break
         }
