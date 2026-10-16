@@ -434,6 +434,8 @@ onMounted(refreshAll)
             v-model="certKey"
             type="textarea"
             :rows="6"
+            autocomplete="off"
+            spellcheck="false"
             :placeholder="t('baota.sslKeyPlaceholder')"
           />
         </el-form-item>
@@ -443,6 +445,8 @@ onMounted(refreshAll)
             v-model="certPem"
             type="textarea"
             :rows="6"
+            autocomplete="off"
+            spellcheck="false"
             :placeholder="t('baota.sslPemPlaceholder')"
           />
         </el-form-item>

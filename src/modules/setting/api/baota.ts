@@ -36,15 +36,13 @@ export interface BaoTaConfigOption {
   api_url?: string
 }
 
-/** 面板网站（后端 BaoTaService::normalizeSites 归一化后的结构） */
+/** 面板网站（后端 BaoTaService::normalizeSites 归一化后的结构；不含站点根目录，后端不返回） */
 export interface BaoTaSiteVo {
   id?: number
   /** 站点主域名 */
   name?: string
   /** 站点备注 */
   ps?: string
-  /** 站点根目录 */
-  path?: string
   /** 绑定域名数量 */
   domain_count?: number
   /** 状态：1 运行中 / 0 已停止 */
