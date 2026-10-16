@@ -346,9 +346,9 @@ onMounted(refreshAll)
     </el-card>
 
     <!--
-      证书操作：按用途分成三行，左侧「图标 + 分组名」定宽、右侧控件，行间细线分隔；
-      只让主操作（申请部署）用实心主色、危险操作（关闭SSL）用红色，其余保持默认，
-      避免一堆彩色按钮挤在一起显得杂乱。
+      证书操作：按用途分成三行，左侧「图标 + 分组名」定宽、右侧控件，行间细线分隔。
+      按钮按业务语义配色：申请部署=主色实心（主操作）、开启强制HTTPS=蓝色描边（启用）、
+      关闭强制HTTPS=橙色描边（可逆的停用）、续签=绿色描边（续期）、关闭SSL=红色描边（销毁性操作）。
     -->
     <el-card class="mb-3" shadow="never">
       <template #header>
@@ -392,10 +392,10 @@ onMounted(refreshAll)
           {{ t('baota.httpsGroup') }}
         </span>
         <div class="ssl-action__body">
-          <el-button v-auth="['baota:sslSave']" @click="doForceHttps(true)">
+          <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
             {{ t('baota.forceHttpsOn') }}
           </el-button>
-          <el-button v-auth="['baota:sslSave']" @click="doForceHttps(false)">
+          <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
             {{ t('baota.forceHttpsOff') }}
           </el-button>
         </div>
@@ -407,7 +407,7 @@ onMounted(refreshAll)
           {{ t('baota.maintainGroup') }}
         </span>
         <div class="ssl-action__body">
-          <el-button v-auth="['baota:sslSave']" @click="doRenew">
+          <el-button v-auth="['baota:sslSave']" type="success" plain @click="doRenew">
             {{ t('baota.renewSsl') }}
           </el-button>
           <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
