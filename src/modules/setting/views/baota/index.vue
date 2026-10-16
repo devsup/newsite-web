@@ -16,6 +16,7 @@ import type { BaoTaConfigOption } from '~/setting/api/baota.ts'
 import { configOptions, siteList } from '~/setting/api/baota.ts'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
+import { useMessage } from '@/hooks/useMessage.ts'
 import useDialog from '@/hooks/useDialog.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
@@ -27,6 +28,10 @@ defineOptions({ name: 'setting:baota' })
 
 const proTableRef = ref<MaProTableExpose>() as Ref<MaProTableExpose>
 const t = useTrans().globalTrans
+const msg = useMessage()
+
+// 防止「列表失败 → 刷新配置下拉 → 再次失败」形成请求环
+let configSyncing = false
 
 // 启用中的 API 配置（页面顶部下拉）与当前选中项
 const configList = ref<BaoTaConfigOption[]>([])
@@ -35,7 +40,7 @@ const currentConfigId = ref<number>()
 // API 配置管理：内容自带搜索与表格，所以关掉弹窗底部按钮
 const configDialog: UseDialogExpose = useDialog({ width: '1150px', footer: false })
 const domainDialog: UseDialogExpose = useDialog({ width: '820px', footer: false })
-const sslDialog: UseDialogExpose = useDialog({ width: '1000px', footer: false })
+const sslDialog: UseDialogExpose = useDialog({ width: '1080px', footer: false })
 
 const options = ref<MaProTableOptions>({
   adaptionOffsetBottom: 161,
@@ -58,7 +63,24 @@ const options = ref<MaProTableOptions>({
   requestOptions: {
     // 必须先把 API 配置选出来：没有配置时后端不知道该调哪个面板
     autoRequest: false,
-    api: (params: any) => siteList({ ...params, config_id: params.config_id || currentConfigId.value }),
+    api: async (params: any) => {
+      const response = await siteList({ ...params, config_id: params.config_id || currentConfigId.value })
+
+      // MaProTable 会吞掉 api 的异常，列表会静默变空，所以这里主动把失败原因提示出来；
+      // 失败常见于「当前配置已被删除或禁用」（例如在别的标签页改过），此时顺带同步一次
+      // 配置下拉并回落到可用配置，让页面自愈，而不是停在一个已经不存在的配置上。
+      if (response.code !== ResultCode.SUCCESS) {
+        msg.error(response.message)
+        if (!configSyncing) {
+          configSyncing = true
+          loadConfigList().finally(() => {
+            configSyncing = false
+          })
+        }
+      }
+
+      return response
+    },
   },
 })
 

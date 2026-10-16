@@ -174,4 +174,11 @@ baota:
   rawResponse: 原始响应
   rawResponseTip: 已自动隐藏私钥与证书全文
   updatedBy: 更新人
+  sslActions: 证书操作
+  applyGroup: 申请与部署
+  httpsGroup: HTTPS访问
+  maintainGroup: 证书维护
+  sslAuthType: 验证方式
+  sslExpiringTip: 证书将在 {day} 天后到期，建议尽快续签
+  dayUnit: 天
   notConfigured: 未配置

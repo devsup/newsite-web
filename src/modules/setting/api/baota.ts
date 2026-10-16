@@ -98,8 +98,17 @@ export interface BaoTaQuery {
   [key: string]: any
 }
 
+/** API 配置列表查询条件 */
+export interface BaoTaConfigSearch {
+  name?: string
+  api_url?: string
+  status?: number
+  page?: number
+  page_size?: number
+}
+
 /** GET /admin/baota/list - API 配置分页列表 */
-export function configPage(data: { name?: string, api_url?: string, status?: number }): Promise<ResponseStruct<PageList<BaoTaConfigVo>>> {
+export function configPage(data: BaoTaConfigSearch): Promise<ResponseStruct<PageList<BaoTaConfigVo>>> {
   return useHttp().get('/admin/baota/list', { params: data })
 }
 

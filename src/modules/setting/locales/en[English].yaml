@@ -174,4 +174,11 @@ baota:
   rawResponse: Raw Response
   rawResponseTip: Private key and certificate are hidden automatically
   updatedBy: Updated By
+  sslActions: Certificate Actions
+  applyGroup: Apply
+  httpsGroup: HTTPS Access
+  maintainGroup: Maintenance
+  sslAuthType: Validation
+  sslExpiringTip: The certificate expires in {day} day(s), please renew it soon
+  dayUnit: days
   notConfigured: Not configured

@@ -48,7 +48,6 @@ export default function getTableColumns(
     { label: () => t('baota.siteId'), prop: 'id', width: '90px' },
     { label: () => t('baota.siteName'), prop: 'name', minWidth: '180px' },
     { label: () => t('baota.siteRemark'), prop: 'ps', minWidth: '110px' },
-    { label: () => t('baota.sitePath'), prop: 'path', minWidth: '200px', showOverflowTooltip: true },
     { label: () => t('baota.domainCount'), prop: 'domain_count', width: '100px' },
     { label: () => t('baota.phpVersion'), prop: 'php_version', width: '110px' },
     {

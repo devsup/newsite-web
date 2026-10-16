@@ -53,14 +53,20 @@ const remainingDays = computed<number | null>(() => {
   return value === undefined || value === null || value === '' ? null : Number(value)
 })
 
-/** 剩余天数对应的展示颜色：≤15 天红、≤30 天橙，其余绿 */
-const remainingType = computed<'primary' | 'success' | 'warning' | 'info' | 'danger'>(() => {
+/**
+ * 剩余天数对应的语义色：≤15 天红（临期）、≤30 天橙（提醒）、其余绿。
+ * 同时用于「剩余天数」数字的配色与临期告警条。
+ */
+const remainingType = computed<'success' | 'warning' | 'danger' | 'info'>(() => {
   const days = remainingDays.value
   if (days === null) {
     return 'info'
   }
   return days <= 15 ? 'danger' : (days <= 30 ? 'warning' : 'success')
 })
+
+/** 是否处于临期（用于顶部告警条） */
+const isExpiringSoon = computed<boolean>(() => remainingDays.value !== null && remainingDays.value <= 15)
 
 /** 拉取 SSL 状态与证书信息 */
 async function refreshSsl(): Promise<void> {
@@ -246,95 +252,121 @@ onMounted(refreshAll)
 
 <template>
   <div v-loading="loading || actionLoading" class="ssl-config">
+    <!-- 证书状态 -->
     <el-card class="mb-3" shadow="never">
       <template #header>
-        <div class="flex flex-wrap items-center gap-2">
-          <el-select
-            v-model="selectedDomain"
-            class="w-64"
-            filterable
-            :placeholder="t('baota.selectApplyDomain')"
-          >
-            <el-option
-              v-for="item in domainOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          <el-button
-            v-auth="['baota:sslSave']"
-            type="success"
-            :loading="applyLoading"
-            :disabled="!selectedDomain"
-            @click="doApplyAndDeploy"
-          >
-            {{ t('baota.applyAndDeploy') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="primary" @click="doForceHttps(true)">
-            {{ t('baota.forceHttpsOn') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="warning" @click="doForceHttps(false)">
-            {{ t('baota.forceHttpsOff') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="info" @click="doRenew">
-            {{ t('baota.renewSsl') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="danger" @click="doCloseSsl">
-            {{ t('baota.closeSsl') }}
-          </el-button>
-          <el-button plain @click="refreshAll">
+        <div class="flex items-center justify-between">
+          <span class="font-medium">{{ t('baota.sslCert') }}</span>
+          <el-button size="small" plain @click="refreshAll">
             {{ t('baota.refreshSsl') }}
           </el-button>
         </div>
       </template>
 
-      <el-descriptions :column="2" border>
-        <el-descriptions-item :label="t('baota.sslStatus')">
-          <el-tag :type="sslData.status ? 'success' : 'info'">
-            {{ sslData.status ? t('baota.sslEnabled') : t('baota.sslDisabled') }}
-          </el-tag>
-        </el-descriptions-item>
+      <!-- 临期告警：只在剩余 ≤15 天时出现，避免平时占地方 -->
+      <el-alert
+        v-if="isExpiringSoon"
+        class="mb-3"
+        type="warning"
+        show-icon
+        :closable="false"
+        :title="t('baota.sslExpiringTip', { day: remainingDays })"
+      />
 
-        <el-descriptions-item :label="t('baota.sslIssuer')">
-          {{ sslData.cert_data?.issuer_O || '-' }}（{{ sslData.cert_data?.issuer || '-' }}）
-        </el-descriptions-item>
+      <div class="ssl-head">
+        <el-tag :type="sslData.status ? 'success' : 'info'" size="large" effect="light">
+          {{ sslData.status ? t('baota.sslEnabled') : t('baota.sslDisabled') }}
+        </el-tag>
 
-        <el-descriptions-item :label="t('baota.sslValidPeriod')">
-          {{ sslData.cert_data?.notBefore || '-' }} ~ {{ sslData.cert_data?.notAfter || '-' }}
-        </el-descriptions-item>
+        <div class="ssl-head__days">
+          <span class="ssl-head__label">{{ t('baota.sslRemainingDays') }}</span>
+          <span class="ssl-head__value" :class="`is-${remainingType}`">
+            {{ remainingDays === null ? '-' : remainingDays }}
+          </span>
+          <span v-if="remainingDays !== null" class="ssl-head__unit">{{ t('baota.dayUnit') }}</span>
+        </div>
 
-        <el-descriptions-item :label="t('baota.sslRemainingDays')">
-          <el-tag v-if="remainingDays !== null" :type="remainingType">
-            {{ t('baota.sslRemaining', { day: remainingDays }) }}
-          </el-tag>
-          <span v-else>-</span>
-        </el-descriptions-item>
+        <el-tag :type="sslData.httpTohttps ? 'success' : 'danger'" effect="light">
+          {{ t('baota.forceHttps') }}：{{ sslData.httpTohttps ? t('baota.sslEnabled') : t('baota.sslDisabled') }}
+        </el-tag>
+      </div>
 
+      <el-descriptions class="mt-3" :column="2" border>
         <el-descriptions-item :label="t('baota.sslSubject')">
           {{ sslData.cert_data?.subject || '-' }}
         </el-descriptions-item>
-
-        <el-descriptions-item :label="t('baota.forceHttps')">
-          <el-tag :type="sslData.httpTohttps ? 'success' : 'danger'">
-            {{ sslData.httpTohttps ? t('baota.sslEnabled') : t('baota.sslDisabled') }}
-          </el-tag>
+        <el-descriptions-item :label="t('baota.sslIssuer')">
+          {{ sslData.cert_data?.issuer_O || '-' }}
+          <span v-if="sslData.cert_data?.issuer" class="text-[var(--el-text-color-secondary)]">
+            （{{ sslData.cert_data.issuer }}）
+          </span>
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('baota.sslValidPeriod')">
+          {{ sslData.cert_data?.notBefore || '-' }} ~ {{ sslData.cert_data?.notAfter || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('baota.sslAuthType')">
+          {{ sslData.auth_type || '-' }}
         </el-descriptions-item>
       </el-descriptions>
-
-      <el-collapse class="mt-3">
-        <el-collapse-item :title="t('baota.rawResponse')" name="raw">
-          <p class="mb-2 text-xs text-[var(--el-text-color-secondary)]">
-            {{ t('baota.rawResponseTip') }}
-          </p>
-          <pre class="whitespace-pre-wrap text-xs">{{ JSON.stringify(sslData, null, 2) }}</pre>
-        </el-collapse-item>
-      </el-collapse>
     </el-card>
 
+    <!-- 证书操作：按用途分行，一行一件事，避免挤成一条长按钮带 -->
+    <el-card class="mb-3" shadow="never">
+      <template #header>
+        <span class="font-medium">{{ t('baota.sslActions') }}</span>
+      </template>
+
+      <div class="ssl-action-row">
+        <span class="ssl-action-row__label">{{ t('baota.applyGroup') }}</span>
+        <el-select
+          v-model="selectedDomain"
+          class="w-64"
+          filterable
+          :placeholder="t('baota.selectApplyDomain')"
+        >
+          <el-option
+            v-for="item in domainOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <el-button
+          v-auth="['baota:sslSave']"
+          type="success"
+          :loading="applyLoading"
+          :disabled="!selectedDomain"
+          @click="doApplyAndDeploy"
+        >
+          {{ t('baota.applyAndDeploy') }}
+        </el-button>
+      </div>
+
+      <div class="ssl-action-row">
+        <span class="ssl-action-row__label">{{ t('baota.httpsGroup') }}</span>
+        <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
+          {{ t('baota.forceHttpsOn') }}
+        </el-button>
+        <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
+          {{ t('baota.forceHttpsOff') }}
+        </el-button>
+      </div>
+
+      <div class="ssl-action-row">
+        <span class="ssl-action-row__label">{{ t('baota.maintainGroup') }}</span>
+        <el-button v-auth="['baota:sslSave']" plain @click="doRenew">
+          {{ t('baota.renewSsl') }}
+        </el-button>
+        <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
+          {{ t('baota.closeSsl') }}
+        </el-button>
+      </div>
+    </el-card>
+
+    <!-- 手动部署证书 -->
     <el-card shadow="never">
       <template #header>
-        {{ t('baota.setSsl') }}
+        <span class="font-medium">{{ t('baota.setSsl') }}</span>
       </template>
 
       <el-form label-width="100px">
@@ -363,14 +395,87 @@ onMounted(refreshAll)
         </el-form-item>
       </el-form>
     </el-card>
+
+    <!-- 原始响应：默认折叠，私钥与证书已由后端剔除 -->
+    <el-collapse class="mt-3">
+      <el-collapse-item :title="t('baota.rawResponse')" name="raw">
+        <p class="mb-2 text-xs text-[var(--el-text-color-secondary)]">
+          {{ t('baota.rawResponseTip') }}
+        </p>
+        <pre class="whitespace-pre-wrap text-xs">{{ JSON.stringify(sslData, null, 2) }}</pre>
+      </el-collapse-item>
+    </el-collapse>
   </div>
 </template>
 
 <style scoped lang="scss">
 .ssl-config {
   // 弹窗内固定高度 + 内部滚动，长证书内容不会把弹窗越撑越高
-  height: 62vh;
-  min-height: 420px;
+  max-height: 68vh;
+  padding-right: 4px;
   overflow-y: auto;
+}
+
+.ssl-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+
+  &__days {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+  }
+
+  &__value {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+
+    &.is-success {
+      color: var(--el-color-success);
+    }
+
+    &.is-warning {
+      color: var(--el-color-warning);
+    }
+
+    &.is-danger {
+      color: var(--el-color-danger);
+    }
+
+    &.is-info {
+      color: var(--el-text-color-secondary);
+    }
+  }
+
+  &__unit {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+.ssl-action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  & + & {
+    margin-top: 12px;
+  }
+
+  // 固定标签宽度，让三行的控件左边缘对齐
+  &__label {
+    flex: none;
+    width: 76px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
 }
 </style>
