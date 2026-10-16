@@ -198,9 +198,11 @@ useTable('configTable').then((table: MaTableExpose) => {
     { label: () => t('baota.updatedBy'), prop: 'updated_by_name', width: '110px' },
     {
       label: () => t('crud.operation'),
-      width: '110px',
+      // 放「编辑 / 删除」两个文字按钮：110px 会把「删除」挤到贴边甚至被单元格裁掉，
+      // 这里给到 150px，并沿用 el-button 相邻按钮自带的 12px 间距（不再叠加 gap，避免撑宽）
+      width: '150px',
       cellRender: ({ row }): any => (
-        <div class="flex items-center gap-x-3">
+        <div class="flex items-center">
           <el-button
             link
             type="primary"

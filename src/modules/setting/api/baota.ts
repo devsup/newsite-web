@@ -171,6 +171,15 @@ export function sslInfo(data: BaoTaQuery): Promise<ResponseStruct<Record<string,
   return useHttp().get('/admin/baota/ssl', { params: data })
 }
 
+/**
+ * GET /admin/baota/ssl/certificate - 取当前站点证书内容（私钥 + 证书全文）
+ *
+ * 与 sslInfo 分开：状态查询返回体不含私钥，只有证书编辑表单回显时才调这个接口。
+ */
+export function sslCertificate(data: BaoTaQuery): Promise<ResponseStruct<{ key: string, csr: string }>> {
+  return useHttp().get('/admin/baota/ssl/certificate', { params: data })
+}
+
 /** POST /admin/baota/ssl - 部署手动粘贴的证书 */
 export function sslDeploy(data: BaoTaQuery): Promise<ResponseStruct<{ updated: boolean }>> {
   return useHttp().post('/admin/baota/ssl', data)

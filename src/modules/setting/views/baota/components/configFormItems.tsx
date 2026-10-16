@@ -72,6 +72,8 @@ export default function getConfigFormItems(formType: 'add' | 'edit', t: any, mod
         rules: formType === 'add'
           ? [{ required: true, message: t('form.requiredInput', { msg: t('baota.apiKey') }) }]
           : [],
+        // 编辑时密钥框必然是空的（接口不回显明文），在字段下方说明原因，避免用户以为密钥丢了
+        help: formType === 'edit' ? t('baota.apiKeySavedTip') : '',
       },
     },
     {

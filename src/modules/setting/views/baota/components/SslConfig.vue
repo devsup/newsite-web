@@ -10,7 +10,8 @@
 <script setup lang="tsx">
 import type { BaoTaDomainVo } from '~/setting/api/baota.ts'
 
-import { domainList, sslApply, sslClose, sslDeploy, sslForceHttps, sslInfo, sslRenew } from '~/setting/api/baota.ts'
+import { domainList, sslApply, sslCertificate, sslClose, sslDeploy, sslForceHttps, sslInfo, sslRenew } from '~/setting/api/baota.ts'
+import MaJsonViewer from '@/components/ma-json-viewer/index.vue'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
@@ -36,10 +37,10 @@ const loading = ref(false)
 const actionLoading = ref(false)
 const applyLoading = ref(false)
 
-// 面板 GetSSL 的响应体（后端已剔除私钥与证书全文）
+// 面板 GetSSL 的状态响应（后端已剔除私钥与证书全文，只用于展示）
 const sslData = ref<Record<string, any>>({})
 
-// 手动部署证书用
+// 手动部署证书用：打开弹窗时会自动载入当前证书内容（见 loadCertificate）
 const certKey = ref('')
 const certPem = ref('')
 
@@ -68,7 +69,7 @@ const remainingType = computed<'success' | 'warning' | 'danger' | 'info'>(() => 
 /** 是否处于临期（用于顶部告警条） */
 const isExpiringSoon = computed<boolean>(() => remainingDays.value !== null && remainingDays.value <= 15)
 
-/** 拉取 SSL 状态与证书信息 */
+/** 拉取 SSL 状态与证书信息（不含私钥，只用于展示） */
 async function refreshSsl(): Promise<void> {
   if (!props.webname) {
     return
@@ -86,6 +87,24 @@ async function refreshSsl(): Promise<void> {
   }
   finally {
     loading.value = false
+  }
+}
+
+/**
+ * 载入当前证书内容到编辑表单。
+ *
+ * 走独立接口取私钥与证书全文（状态接口刻意不返回私钥）：这样「看一眼状态」不会碰到私钥，
+ * 只有真的打开证书表单时才取一次。域名没部署证书时面板返回空串，表单保持空白。
+ */
+async function loadCertificate(): Promise<void> {
+  if (!props.webname) {
+    return
+  }
+
+  const res = await sslCertificate({ config_id: props.configId, site_name: props.webname })
+  if (res.code === ResultCode.SUCCESS) {
+    certKey.value = res.data?.key || ''
+    certPem.value = res.data?.csr || ''
   }
 }
 
@@ -110,9 +129,9 @@ async function loadDomains(): Promise<void> {
   }
 }
 
-/** 刷新 SSL 信息与域名列表 */
+/** 刷新状态、域名与证书内容（三者互不依赖，并行请求） */
 async function refreshAll(): Promise<void> {
-  await Promise.all([refreshSsl(), loadDomains()])
+  await Promise.all([refreshSsl(), loadDomains(), loadCertificate()])
 }
 
 /**
@@ -137,7 +156,7 @@ async function doApplyAndDeploy(): Promise<void> {
       })
       if (res.code === ResultCode.SUCCESS) {
         msg.success(t('crud.updateSuccess'))
-        await refreshSsl()
+        await refreshAll()
         emit('changed')
       }
       else {
@@ -203,7 +222,7 @@ async function doCloseSsl(): Promise<void> {
       const res = await sslClose({ config_id: props.configId, site_name: props.webname })
       if (res.code === ResultCode.SUCCESS) {
         msg.success((res.data?.msg as string) || t('crud.updateSuccess'))
-        await refreshSsl()
+        await refreshAll()
         emit('changed')
       }
       else {
@@ -216,7 +235,7 @@ async function doCloseSsl(): Promise<void> {
   })
 }
 
-/** 部署手动粘贴的证书（私钥 + 证书链） */
+/** 部署手动粘贴（或直接修改后）的证书：私钥 + 证书链 */
 async function doSetSsl(): Promise<void> {
   if (!certKey.value.trim() || !certPem.value.trim()) {
     msg.error(t('baota.sslKeyPemRequired'))
@@ -233,9 +252,7 @@ async function doSetSsl(): Promise<void> {
     })
     if (res.code === ResultCode.SUCCESS) {
       msg.success(t('crud.updateSuccess'))
-      certKey.value = ''
-      certPem.value = ''
-      await refreshSsl()
+      await refreshAll()
       emit('changed')
     }
     else {
@@ -252,6 +269,24 @@ onMounted(refreshAll)
 
 <template>
   <div v-loading="loading || actionLoading" class="ssl-config">
+    <!-- 原始响应：与其它卡片一样带边框，放在最前面，不必滚动到底部才能展开 -->
+    <el-card class="mb-3" shadow="never">
+      <el-collapse>
+        <el-collapse-item name="raw">
+          <!-- 提示与标题同一行：不展开也能看到「已经隐藏了私钥与证书」 -->
+          <template #title>
+            <div class="flex items-center gap-2">
+              <span>{{ t('baota.rawResponse') }}</span>
+              <span class="text-xs text-[var(--el-text-color-secondary)]">
+                {{ t('baota.rawResponseTip') }}
+              </span>
+            </div>
+          </template>
+          <MaJsonViewer :data="sslData" :default-expand-depth="2" />
+        </el-collapse-item>
+      </el-collapse>
+    </el-card>
+
     <!-- 证书状态 -->
     <el-card class="mb-3" shadow="never">
       <template #header>
@@ -310,63 +345,83 @@ onMounted(refreshAll)
       </el-descriptions>
     </el-card>
 
-    <!-- 证书操作：按用途分行，一行一件事，避免挤成一条长按钮带 -->
+    <!--
+      证书操作：与下面「手动部署证书」一样用 el-form 组织，
+      label 右对齐、控件左对齐，三组操作摊成三行，不再挤成一条长短不一的按钮带。
+    -->
     <el-card class="mb-3" shadow="never">
       <template #header>
         <span class="font-medium">{{ t('baota.sslActions') }}</span>
       </template>
 
-      <div class="ssl-action-row">
-        <span class="ssl-action-row__label">{{ t('baota.applyGroup') }}</span>
-        <el-select
-          v-model="selectedDomain"
-          class="w-64"
-          filterable
-          :placeholder="t('baota.selectApplyDomain')"
-        >
-          <el-option
-            v-for="item in domainOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-        <el-button
-          v-auth="['baota:sslSave']"
-          type="success"
-          :loading="applyLoading"
-          :disabled="!selectedDomain"
-          @click="doApplyAndDeploy"
-        >
-          {{ t('baota.applyAndDeploy') }}
-        </el-button>
+      <div class="ssl-action">
+        <div class="ssl-action__title">
+          {{ t('baota.applyGroup') }}
+        </div>
+        <div class="ssl-action__body">
+          <el-select
+            v-model="selectedDomain"
+            class="w-64"
+            filterable
+            :placeholder="t('baota.selectApplyDomain')"
+          >
+            <el-option
+              v-for="item in domainOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <el-button
+            v-auth="['baota:sslSave']"
+            type="primary"
+            :loading="applyLoading"
+            :disabled="!selectedDomain"
+            @click="doApplyAndDeploy"
+          >
+            {{ t('baota.applyAndDeploy') }}
+          </el-button>
+        </div>
       </div>
 
-      <div class="ssl-action-row">
-        <span class="ssl-action-row__label">{{ t('baota.httpsGroup') }}</span>
-        <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
-          {{ t('baota.forceHttpsOn') }}
-        </el-button>
-        <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
-          {{ t('baota.forceHttpsOff') }}
-        </el-button>
+      <div class="ssl-action">
+        <div class="ssl-action__title">
+          {{ t('baota.httpsGroup') }}
+        </div>
+        <div class="ssl-action__body">
+          <el-button v-auth="['baota:sslSave']" @click="doForceHttps(true)">
+            {{ t('baota.forceHttpsOn') }}
+          </el-button>
+          <el-button v-auth="['baota:sslSave']" @click="doForceHttps(false)">
+            {{ t('baota.forceHttpsOff') }}
+          </el-button>
+        </div>
       </div>
 
-      <div class="ssl-action-row">
-        <span class="ssl-action-row__label">{{ t('baota.maintainGroup') }}</span>
-        <el-button v-auth="['baota:sslSave']" plain @click="doRenew">
-          {{ t('baota.renewSsl') }}
-        </el-button>
-        <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
-          {{ t('baota.closeSsl') }}
-        </el-button>
+      <div class="ssl-action">
+        <div class="ssl-action__title">
+          {{ t('baota.maintainGroup') }}
+        </div>
+        <div class="ssl-action__body">
+          <el-button v-auth="['baota:sslSave']" @click="doRenew">
+            {{ t('baota.renewSsl') }}
+          </el-button>
+          <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
+            {{ t('baota.closeSsl') }}
+          </el-button>
+        </div>
       </div>
     </el-card>
 
-    <!-- 手动部署证书 -->
+    <!-- 手动部署证书：打开弹窗时已自动载入当前证书，可直接改后再部署 -->
     <el-card shadow="never">
       <template #header>
-        <span class="font-medium">{{ t('baota.setSsl') }}</span>
+        <div class="flex items-center justify-between">
+          <span class="font-medium">{{ t('baota.setSsl') }}</span>
+          <span v-if="certKey && certPem" class="text-xs text-[var(--el-text-color-secondary)]">
+            {{ t('baota.sslLoadedTip') }}
+          </span>
+        </div>
       </template>
 
       <el-form label-width="100px">
@@ -395,16 +450,6 @@ onMounted(refreshAll)
         </el-form-item>
       </el-form>
     </el-card>
-
-    <!-- 原始响应：默认折叠，私钥与证书已由后端剔除 -->
-    <el-collapse class="mt-3">
-      <el-collapse-item :title="t('baota.rawResponse')" name="raw">
-        <p class="mb-2 text-xs text-[var(--el-text-color-secondary)]">
-          {{ t('baota.rawResponseTip') }}
-        </p>
-        <pre class="whitespace-pre-wrap text-xs">{{ JSON.stringify(sslData, null, 2) }}</pre>
-      </el-collapse-item>
-    </el-collapse>
   </div>
 </template>
 
@@ -414,6 +459,36 @@ onMounted(refreshAll)
   max-height: 68vh;
   padding-right: 4px;
   overflow-y: auto;
+
+  // 折叠面板由外层卡片提供边框，去掉它自带的上下边框，避免出现「双线」
+  :deep(.el-collapse) {
+    border-top: none;
+    border-bottom: none;
+  }
+}
+
+// 三组操作各占一个浅色块：标题在上、控件在下，分区明确，不再是一排按钮并列
+.ssl-action {
+  padding: 12px 16px;
+  background: var(--el-fill-color-lighter);
+  border-radius: 6px;
+
+  & + & {
+    margin-top: 12px;
+  }
+
+  &__title {
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+  }
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
 }
 
 .ssl-head {
@@ -457,24 +532,6 @@ onMounted(refreshAll)
 
   &__unit {
     font-size: 12px;
-    color: var(--el-text-color-secondary);
-  }
-}
-
-.ssl-action-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  & + & {
-    margin-top: 12px;
-  }
-
-  // 固定标签宽度，让三行的控件左边缘对齐
-  &__label {
-    flex: none;
-    width: 76px;
-    font-size: 13px;
     color: var(--el-text-color-secondary);
   }
 }

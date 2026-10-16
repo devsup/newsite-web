@@ -29,6 +29,8 @@ const msg = useMessage()
 const configForm = ref<MaFormExpose>()
 const model = ref<BaoTaConfigVo>({})
 const testing = ref(false)
+// 连通性测试的内联结果：成功显示「连接正常」，失败直接把面板/网络的错误摆出来
+const testResult = ref<{ ok: boolean, text: string } | null>(null)
 
 /**
  * ma-form 挂载后初始化：编辑时把传入的行数据灌进 model。
@@ -77,6 +79,7 @@ function edit(): Promise<any> {
  *
  * 密钥框为空时传 id，后端会用库里已存的那份密钥去测；地址始终以表单当前值为准，
  * 这样「改了地址、没改密钥」也能直接验证新地址是否通。
+ * 结果除了 toast 之外还在按钮右侧内联显示，避免弹窗一多就看不到提示。
  */
 async function testConnection(): Promise<void> {
   if (!model.value.api_url) {
@@ -85,6 +88,7 @@ async function testConnection(): Promise<void> {
   }
 
   testing.value = true
+  testResult.value = null
   try {
     const res = await configTest({
       id: model.value.id,
@@ -92,12 +96,14 @@ async function testConnection(): Promise<void> {
       api_key: model.value.api_key,
     })
     if (res.code === ResultCode.SUCCESS) {
+      testResult.value = { ok: true, text: t('baota.testOk') }
       msg.success(t('baota.testSuccess', {
         system: res.data?.system || '-',
         version: res.data?.version || '-',
       }))
     }
     else {
+      testResult.value = { ok: false, text: res.message }
       msg.error(res.message)
     }
   }
@@ -114,22 +120,47 @@ defineExpose({
 </script>
 
 <template>
-  <div>
+  <div class="config-form">
     <ma-form ref="configForm" v-model="model" />
 
-    <div class="mt-2 flex items-center gap-3">
-      <el-button :loading="testing" @click="testConnection">
+    <!-- 与上面的字段左对齐（ma-form 的 labelWidth 是 100px），不再孤零零挂在最左边 -->
+    <div class="config-form__actions">
+      <el-button type="primary" plain :loading="testing" @click="testConnection">
+        <ma-svg-icon name="material-symbols:lan-outline" :size="16" class="mr-1" />
         {{ t('baota.testConnection') }}
       </el-button>
+
       <span
-        v-if="formType === 'edit'"
-        class="text-xs text-[var(--el-text-color-secondary)]"
+        v-if="testResult"
+        class="config-form__result"
+        :class="testResult.ok ? 'is-ok' : 'is-fail'"
       >
-        {{ t('baota.apiKeySavedTip') }}
+        {{ testResult.text }}
       </span>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.config-form {
+  &__actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    // 与 ma-form 的 labelWidth 保持一致，让按钮和上方输入框左对齐
+    padding-left: 100px;
+  }
+
+  &__result {
+    font-size: 12px;
+
+    &.is-ok {
+      color: var(--el-color-success);
+    }
+
+    &.is-fail {
+      color: var(--el-color-danger);
+    }
+  }
+}
 </style>

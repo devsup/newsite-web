@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Form: typeof import('./../src/components/ma-key-value/components/form.vue')['default']
+    JsonNode: typeof import('./../src/components/ma-json-viewer/components/JsonNode.vue')['default']
     MaAuth: typeof import('./../src/components/ma-auth/index.vue')['default']
     MaCitySelect: typeof import('./../src/components/ma-city-select/index.vue')['default']
     MaColCard: typeof import('./../src/components/ma-col-card/index.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     MaFormOpen: typeof import('./../src/components/ma-form-open/index.vue')['default']
     MaIconPanel: typeof import('./../src/components/ma-icon-picker/ma-icon-panel.vue')['default']
     MaIconPicker: typeof import('./../src/components/ma-icon-picker/index.vue')['default']
+    MaJsonViewer: typeof import('./../src/components/ma-json-viewer/index.vue')['default']
     MaKeyValue: typeof import('./../src/components/ma-key-value/index.vue')['default']
     MaRemoteSelect: typeof import('./../src/components/ma-remote-select/index.vue')['default']
     MaRemoteSfcLoader: typeof import('./../src/components/ma-remote-sfc-loader/index.vue')['default']

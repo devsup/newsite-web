@@ -181,4 +181,6 @@ baota:
   sslAuthType: Validation
   sslExpiringTip: The certificate expires in {day} day(s), please renew it soon
   dayUnit: days
+  testOk: Connected
+  sslLoadedTip: The current certificate has been loaded, edit and deploy it again
   notConfigured: Not configured

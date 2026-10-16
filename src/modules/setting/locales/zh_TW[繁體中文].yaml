@@ -181,4 +181,6 @@ baota:
   sslAuthType: 驗證方式
   sslExpiringTip: 憑證將在 {day} 天後到期，建議盡快續簽
   dayUnit: 天
+  testOk: 連線正常
+  sslLoadedTip: 已載入目前憑證，可直接修改後重新部署
   notConfigured: 未設定
