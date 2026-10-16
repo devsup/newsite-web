@@ -270,7 +270,7 @@ onMounted(refreshAll)
 <template>
   <div v-loading="loading || actionLoading" class="ssl-config">
     <!-- 原始响应：与其它卡片一样带边框，放在最前面，不必滚动到底部才能展开 -->
-    <el-card class="mb-3" shadow="never">
+    <el-card class="ssl-raw mb-3" shadow="never">
       <el-collapse>
         <el-collapse-item name="raw">
           <!-- 提示与标题同一行：不展开也能看到「已经隐藏了私钥与证书」 -->
@@ -346,8 +346,9 @@ onMounted(refreshAll)
     </el-card>
 
     <!--
-      证书操作：与下面「手动部署证书」一样用 el-form 组织，
-      label 右对齐、控件左对齐，三组操作摊成三行，不再挤成一条长短不一的按钮带。
+      证书操作：按用途分成三行，左侧「图标 + 分组名」定宽、右侧控件，行间细线分隔；
+      只让主操作（申请部署）用实心主色、危险操作（关闭SSL）用红色，其余保持默认，
+      避免一堆彩色按钮挤在一起显得杂乱。
     -->
     <el-card class="mb-3" shadow="never">
       <template #header>
@@ -355,9 +356,10 @@ onMounted(refreshAll)
       </template>
 
       <div class="ssl-action">
-        <div class="ssl-action__title">
+        <span class="ssl-action__label">
+          <ma-svg-icon name="material-symbols:add-circle-outline" :size="16" />
           {{ t('baota.applyGroup') }}
-        </div>
+        </span>
         <div class="ssl-action__body">
           <el-select
             v-model="selectedDomain"
@@ -385,9 +387,10 @@ onMounted(refreshAll)
       </div>
 
       <div class="ssl-action">
-        <div class="ssl-action__title">
+        <span class="ssl-action__label">
+          <ma-svg-icon name="material-symbols:lock-outline" :size="16" />
           {{ t('baota.httpsGroup') }}
-        </div>
+        </span>
         <div class="ssl-action__body">
           <el-button v-auth="['baota:sslSave']" @click="doForceHttps(true)">
             {{ t('baota.forceHttpsOn') }}
@@ -399,9 +402,10 @@ onMounted(refreshAll)
       </div>
 
       <div class="ssl-action">
-        <div class="ssl-action__title">
+        <span class="ssl-action__label">
+          <ma-svg-icon name="material-symbols:settings-outline" :size="16" />
           {{ t('baota.maintainGroup') }}
-        </div>
+        </span>
         <div class="ssl-action__body">
           <el-button v-auth="['baota:sslSave']" @click="doRenew">
             {{ t('baota.renewSsl') }}
@@ -467,20 +471,41 @@ onMounted(refreshAll)
   }
 }
 
-// 三组操作各占一个浅色块：标题在上、控件在下，分区明确，不再是一排按钮并列
-.ssl-action {
-  padding: 12px 16px;
-  background: var(--el-fill-color-lighter);
-  border-radius: 6px;
-
-  & + & {
-    margin-top: 12px;
+// 原始响应卡片：卡片体只承载折叠标题，上下留白收窄，别让一条标题占掉太多高度
+.ssl-raw {
+  :deep(.el-card__body) {
+    padding: 0 16px;
   }
 
-  &__title {
-    margin-bottom: 8px;
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
+  :deep(.el-collapse-item__header) {
+    height: 40px;
+    line-height: 40px;
+  }
+
+  :deep(.el-collapse-item__content) {
+    padding-bottom: 12px;
+  }
+}
+
+// 三行操作：左侧「图标 + 分组名」定宽，右侧控件，行间用细线分隔
+.ssl-action {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+
+  & + & {
+    border-top: 1px solid var(--el-border-color-lighter);
+  }
+
+  &__label {
+    display: flex;
+    flex: none;
+    gap: 6px;
+    align-items: center;
+    width: 116px;
+    font-size: 13px;
+    color: var(--el-text-color-regular);
   }
 
   &__body {
