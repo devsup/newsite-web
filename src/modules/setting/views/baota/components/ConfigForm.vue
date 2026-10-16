@@ -96,11 +96,13 @@ async function testConnection(): Promise<void> {
       api_key: model.value.api_key,
     })
     if (res.code === ResultCode.SUCCESS) {
-      testResult.value = { ok: true, text: t('baota.testOk') }
-      msg.success(t('baota.testSuccess', {
+      // 系统信息既内联显示在按钮右侧，也弹一次 toast（关掉弹窗后仍能回看到结果）
+      const info = t('baota.testOk', {
         system: res.data?.system || '-',
         version: res.data?.version || '-',
-      }))
+      })
+      testResult.value = { ok: true, text: info }
+      msg.success(info)
     }
     else {
       testResult.value = { ok: false, text: res.message }
@@ -145,6 +147,7 @@ defineExpose({
 .config-form {
   &__actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
     align-items: center;
     // 与 ma-form 的 labelWidth 保持一致，让按钮和上方输入框左对齐

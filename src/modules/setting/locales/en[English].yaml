@@ -134,7 +134,6 @@ baota:
   enabled: Enabled
   disabled: Disabled
   testConnection: Test Connection
-  testSuccess: 'Connected: {system} (panel {version})'
   domainList: Domain List
   refreshDomains: Refresh
   domain: Domain
@@ -181,6 +180,6 @@ baota:
   sslAuthType: Validation
   sslExpiringTip: The certificate expires in {day} day(s), please renew it soon
   dayUnit: days
-  testOk: Connected
+  testOk: 'Connected: {system} (panel {version})'
   sslLoadedTip: The current certificate has been loaded, edit and deploy it again
   notConfigured: Not configured

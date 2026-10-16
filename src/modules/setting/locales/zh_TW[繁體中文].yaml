@@ -134,7 +134,6 @@ baota:
   enabled: 啟用
   disabled: 停用
   testConnection: 測試連線
-  testSuccess: 連線成功：{system}（面板 {version}）
   domainList: 網域列表
   refreshDomains: 重新整理
   domain: 網域
@@ -181,6 +180,6 @@ baota:
   sslAuthType: 驗證方式
   sslExpiringTip: 憑證將在 {day} 天後到期，建議盡快續簽
   dayUnit: 天
-  testOk: 連線正常
+  testOk: 連線正常：{system}（面板 {version}）
   sslLoadedTip: 已載入目前憑證，可直接修改後重新部署
   notConfigured: 未設定
