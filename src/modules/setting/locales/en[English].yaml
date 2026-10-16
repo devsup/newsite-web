@@ -20,6 +20,15 @@ settingMenu:
     index: Theme List
     save: Theme Save
     delete: Theme Delete
+  baota:
+    name: aaPanel
+    index: aaPanel List
+    save: aaPanel Config Save
+    delete: aaPanel Config Delete
+    domain: aaPanel Domain View
+    domainSave: aaPanel Domain Save
+    ssl: aaPanel SSL View
+    sslSave: aaPanel SSL Save
 ipWhitelist:
   mainTitle: IP Whitelist
   subTitle: Disabled when empty; once configured, only the listed single IPs or CIDR ranges can access the admin
@@ -82,3 +91,87 @@ theme:
   button_text_color: Button text
   double_column_title_text_color: Two-column title text
   double_column_bg_color: Two-column background
+baota:
+  mainTitle: aaPanel
+  subTitle: Manage websites, domains and SSL certificates of an aaPanel server
+  apiConfig: API Config
+  selectApiConfig: Select an API config
+  searchPlaceholder: Keyword (site name / remark)
+  apiConfigManager: API Configs
+  refreshSites: Refresh Sites
+  noConfigTitle: No aaPanel configured yet
+  noConfigTip: Add an aaPanel API config first, then the website list will show up
+  siteId: Site ID
+  siteName: Site Name
+  siteRemark: Remark
+  domainCount: Domains
+  phpVersion: PHP Version
+  projectType: Project Type
+  sitePath: Site Path
+  siteStatus: Status
+  running: Running
+  stopped: Stopped
+  sslCert: SSL Certificate
+  sslNoCert: Not deployed
+  sslRemaining: '{day} days left'
+  sslExpired: Expired
+  domains: Domains
+  sslConfig: SSL
+  domainManagerTitle: Domains - {name}
+  sslConfigTitle: SSL - {name}
+  configTitle: API Configs
+  configSearchPlaceholder: Name or API URL
+  configAdd: Add API Config
+  configName: Config Name
+  configNamePlaceholder: e.g. "Primary panel", to tell multiple panels apart
+  apiUrl: API URL
+  apiUrlPlaceholder: e.g. https://1.2.3.4:8888/
+  apiKey: API Key
+  apiKeyPlaceholder: The key shown in panel "Settings - API"
+  apiKeyEditPlaceholder: Leave empty to keep the current key, or paste a new one
+  apiKeySavedTip: The saved key is never sent back to the browser
+  weight: Weight
+  enabled: Enabled
+  disabled: Disabled
+  testConnection: Test Connection
+  testSuccess: 'Connected: {system} (panel {version})'
+  domainList: Domain List
+  refreshDomains: Refresh
+  domain: Domain
+  port: Port
+  addDomains: Add Domains
+  addDomainsTip: One per line, "domain" or "domain:port"
+  domainsPlaceholder: e.g. example.com, one per line
+  addDomainSubmit: Add
+  domainsEmpty: Please fill in the domains to add
+  domainTotal: '{total} domain(s)'
+  refreshSsl: Refresh
+  sslStatus: SSL Status
+  sslEnabled: Enabled
+  sslDisabled: Disabled
+  sslIssuer: Issuer
+  sslValidPeriod: Validity
+  sslRemainingDays: Days Left
+  sslSubject: Certificate Domain
+  forceHttps: Force HTTPS
+  selectApplyDomain: Domain to apply the certificate for
+  applyAndDeploy: Apply & Deploy Certificate
+  applyAndDeployConfirm: A Let's Encrypt certificate will be applied for {domain} and deployed to this site; the domain must already resolve to the server. Continue?
+  applyDomainRequired: Please select the domain to apply the certificate for
+  forceHttpsOn: Enable Force HTTPS
+  forceHttpsOff: Disable Force HTTPS
+  closeSsl: Close SSL
+  closeSslConfirm: The site will no longer be reachable over https after closing SSL. Continue?
+  renewSsl: Renew Certificate
+  renewSslConfirm: Renew the certificate for this domain?
+  setSsl: Deploy Certificate Manually
+  sslKey: Private Key
+  sslKeyPlaceholder: Paste the private key (-----BEGIN PRIVATE KEY-----)
+  sslPem: Certificate
+  sslPemPlaceholder: Paste the certificate (-----BEGIN CERTIFICATE-----), including the chain if possible
+  setSslSubmit: Deploy Certificate
+  sslKeyPemRequired: Please fill in both the private key and the certificate
+  rawResponse: Raw Response
+  rawResponseTip: Private key and certificate are hidden automatically
+  updatedBy: Updated By
+  notConfigured: Not configured

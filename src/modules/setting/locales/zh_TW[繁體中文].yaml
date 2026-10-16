@@ -20,6 +20,15 @@ settingMenu:
     index: 主題管理列表
     save: 主題管理保存
     delete: 主題管理刪除
+  baota:
+    name: 寶塔資訊
+    index: 寶塔資訊列表
+    save: 寶塔設定保存
+    delete: 寶塔設定刪除
+    domain: 寶塔網域查詢
+    domainSave: 寶塔網域保存
+    ssl: 寶塔SSL查詢
+    sslSave: 寶塔SSL保存
 ipWhitelist:
   mainTitle: IP白名單
   subTitle: 白名單為空時不啟用；配置後僅列表內的單 IP 或 CIDR 網段可訪問後台
@@ -82,3 +91,87 @@ theme:
   button_text_color: 按鈕文本顏色
   double_column_title_text_color: 兩列標題文字顏色
   double_column_bg_color: 兩列背景顏色
+baota:
+  mainTitle: 寶塔管理
+  subTitle: 提供網站、網域與 SSL 管理功能
+  apiConfig: API設定
+  selectApiConfig: 請選擇API設定
+  searchPlaceholder: 輸入關鍵字（網站名 / 備註）
+  apiConfigManager: API設定管理
+  refreshSites: 重新整理網站列表
+  noConfigTitle: 尚未設定寶塔面板
+  noConfigTip: 請先新增一個寶塔面板 API 設定，再查看網站列表
+  siteId: 網站ID
+  siteName: 網站名稱
+  siteRemark: 備註
+  domainCount: 網域數量
+  phpVersion: PHP版本
+  projectType: 專案類型
+  sitePath: 站點目錄
+  siteStatus: 狀態
+  running: 執行中
+  stopped: 已停止
+  sslCert: SSL憑證
+  sslNoCert: 未部署
+  sslRemaining: 剩餘 {day} 天
+  sslExpired: 已過期
+  domains: 網域管理
+  sslConfig: SSL設定
+  domainManagerTitle: 網域管理 - {name}
+  sslConfigTitle: SSL設定 - {name}
+  configTitle: API設定管理
+  configSearchPlaceholder: 輸入名稱或API位址
+  configAdd: 新增API設定
+  configName: 設定名稱
+  configNamePlaceholder: 如「本站面板」，便於區分多個面板
+  apiUrl: API位址
+  apiUrlPlaceholder: 如 https://1.2.3.4:8888/
+  apiKey: API金鑰
+  apiKeyPlaceholder: 面板「設定 - API介面」中查看或產生的金鑰
+  apiKeyEditPlaceholder: 留空表示不修改；需更換時貼上新金鑰
+  apiKeySavedTip: 已保存金鑰，出於安全考量不回顯
+  weight: 權重
+  enabled: 啟用
+  disabled: 停用
+  testConnection: 測試連線
+  testSuccess: 連線成功：{system}（面板 {version}）
+  domainList: 網域列表
+  refreshDomains: 重新整理
+  domain: 網域
+  port: 埠
+  addDomains: 新增網域
+  addDomainsTip: 一行一個，支援「網域」或「網域:埠」
+  domainsPlaceholder: 如 example.com，多個請換行分隔
+  addDomainSubmit: 新增
+  domainsEmpty: 請填寫要新增的網域
+  domainTotal: 共 {total} 個網域
+  refreshSsl: 重新整理
+  sslStatus: SSL狀態
+  sslEnabled: 已啟用
+  sslDisabled: 未啟用
+  sslIssuer: 簽發機構
+  sslValidPeriod: 有效期
+  sslRemainingDays: 剩餘天數
+  sslSubject: 憑證網域
+  forceHttps: 強制HTTPS
+  selectApplyDomain: 選擇申請憑證的網域
+  applyAndDeploy: 一鍵申請並部署憑證
+  applyAndDeployConfirm: 將為 {domain} 申請 Let's Encrypt 憑證並部署到該站點；需網域已解析到伺服器。確認繼續？
+  applyDomainRequired: 請先選擇要申請憑證的網域
+  forceHttpsOn: 開啟強制HTTPS
+  forceHttpsOff: 關閉強制HTTPS
+  closeSsl: 關閉SSL
+  closeSslConfirm: 關閉後站點將無法透過 https 存取，確認繼續？
+  renewSsl: 續簽憑證
+  renewSslConfirm: 確認為該網域續簽憑證？
+  setSsl: 手動部署憑證
+  sslKey: 憑證私鑰
+  sslKeyPlaceholder: 貼上憑證私鑰（-----BEGIN PRIVATE KEY-----）
+  sslPem: 憑證內容
+  sslPemPlaceholder: 貼上憑證內容（-----BEGIN CERTIFICATE-----），含中繼憑證更佳
+  setSslSubmit: 部署憑證
+  sslKeyPemRequired: 請同時填寫憑證私鑰與憑證內容
+  rawResponse: 原始回應
+  rawResponseTip: 已自動隱藏私鑰與憑證全文
+  updatedBy: 更新人
+  notConfigured: 未設定

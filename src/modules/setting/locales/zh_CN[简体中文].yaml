@@ -20,6 +20,15 @@ settingMenu:
     index: 主题管理列表
     save: 主题管理保存
     delete: 主题管理删除
+  baota:
+    name: 宝塔信息
+    index: 宝塔信息列表
+    save: 宝塔配置保存
+    delete: 宝塔配置删除
+    domain: 宝塔域名查询
+    domainSave: 宝塔域名保存
+    ssl: 宝塔SSL查询
+    sslSave: 宝塔SSL保存
 ipWhitelist:
   mainTitle: IP白名单
   subTitle: 白名单为空时不启用；配置后仅列表内的单 IP 或 CIDR 网段可访问后台
@@ -82,3 +91,87 @@ theme:
   button_text_color: 按钮文本颜色
   double_column_title_text_color: 两列标题文字颜色
   double_column_bg_color: 两列背景颜色
+baota:
+  mainTitle: 宝塔管理
+  subTitle: 提供网站、域名与 SSL 管理功能
+  apiConfig: API配置
+  selectApiConfig: 请选择API配置
+  searchPlaceholder: 输入关键词（网站名 / 备注）
+  apiConfigManager: API配置管理
+  refreshSites: 刷新网站列表
+  noConfigTitle: 尚未配置宝塔面板
+  noConfigTip: 请先添加一个宝塔面板 API 配置，再查看网站列表
+  siteId: 网站ID
+  siteName: 网站名称
+  siteRemark: 备注
+  domainCount: 域名数量
+  phpVersion: PHP版本
+  projectType: 项目类型
+  sitePath: 站点目录
+  siteStatus: 状态
+  running: 运行中
+  stopped: 已停止
+  sslCert: SSL证书
+  sslNoCert: 未部署
+  sslRemaining: 剩余 {day} 天
+  sslExpired: 已过期
+  domains: 域名管理
+  sslConfig: SSL配置
+  domainManagerTitle: 域名管理 - {name}
+  sslConfigTitle: SSL配置 - {name}
+  configTitle: API配置管理
+  configSearchPlaceholder: 输入名称或API地址
+  configAdd: 新增API配置
+  configName: 配置名称
+  configNamePlaceholder: 如「本站面板」，便于区分多个面板
+  apiUrl: API地址
+  apiUrlPlaceholder: 如 https://1.2.3.4:8888/
+  apiKey: API密钥
+  apiKeyPlaceholder: 面板「设置 - API接口」中查看或生成的密钥
+  apiKeyEditPlaceholder: 留空表示不修改；需更换时粘贴新密钥
+  apiKeySavedTip: 已保存密钥，出于安全考虑不回显
+  weight: 权重
+  enabled: 启用
+  disabled: 禁用
+  testConnection: 测试连接
+  testSuccess: 连接成功：{system}（面板 {version}）
+  domainList: 域名列表
+  refreshDomains: 刷新
+  domain: 域名
+  port: 端口
+  addDomains: 添加域名
+  addDomainsTip: 一行一个，支持「域名」或「域名:端口」
+  domainsPlaceholder: 如 example.com，多个用换行分隔
+  addDomainSubmit: 添加
+  domainsEmpty: 请填写要添加的域名
+  domainTotal: 共 {total} 个域名
+  refreshSsl: 刷新
+  sslStatus: SSL状态
+  sslEnabled: 已启用
+  sslDisabled: 未启用
+  sslIssuer: 签发机构
+  sslValidPeriod: 有效期
+  sslRemainingDays: 剩余天数
+  sslSubject: 证书域名
+  forceHttps: 强制HTTPS
+  selectApplyDomain: 选择申请证书的域名
+  applyAndDeploy: 一键申请并部署证书
+  applyAndDeployConfirm: 将为 {domain} 申请 Let's Encrypt 证书并部署到该站点；需域名已解析到服务器。确认继续？
+  applyDomainRequired: 请先选择要申请证书的域名
+  forceHttpsOn: 开启强制HTTPS
+  forceHttpsOff: 关闭强制HTTPS
+  closeSsl: 关闭SSL
+  closeSslConfirm: 关闭后站点将无法通过 https 访问，确认继续？
+  renewSsl: 续签证书
+  renewSslConfirm: 确认为该域名续签证书？
+  setSsl: 手动部署证书
+  sslKey: 证书私钥
+  sslKeyPlaceholder: 粘贴证书私钥（-----BEGIN PRIVATE KEY-----）
+  sslPem: 证书内容
+  sslPemPlaceholder: 粘贴证书内容（-----BEGIN CERTIFICATE-----），含中间证书更佳
+  setSslSubmit: 部署证书
+  sslKeyPemRequired: 请同时填写证书私钥与证书内容
+  rawResponse: 原始响应
+  rawResponseTip: 已自动隐藏私钥与证书全文
+  updatedBy: 更新人
+  notConfigured: 未配置
