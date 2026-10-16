@@ -15,6 +15,11 @@ settingMenu:
     index: IP Blacklist List
     save: IP Blacklist Save
     delete: IP Blacklist Delete
+  theme:
+    name: Theme
+    index: Theme List
+    save: Theme Save
+    delete: Theme Delete
 ipWhitelist:
   mainTitle: IP Whitelist
   subTitle: Disabled when empty; once configured, only the listed single IPs or CIDR ranges can access the admin
@@ -43,3 +48,37 @@ ipBlacklist:
   ipBatchInvalid: Every line must be a valid IP or CIDR range
   addResult: Added {created} entr(ies) successfully
   addResultSkip: Added {created} entr(ies), skipped {skipped} existing
+
+theme:
+  mainTitle: Theme Management
+  subTitle: Manage front-end color schemes with enable switch, weight and live preview
+  name: Theme name
+  namePlaceholder: e.g. "Spring Red" or "Dark mode"
+  palette: Palette
+  colorsHint: Leave a color empty to use the front-end default
+  applyPreset: Apply sample palette
+  presetApplied: Sample palette applied
+  weight: Weight
+  updatedBy: Updated by
+  groupBasic: Basic
+  groupHeader: Header
+  groupTabbar: Bottom menu
+  groupCard: Card
+  groupButton: Button
+  groupColumn: Two-column
+  text_color: Text color
+  bg_color: Background color
+  header_bg_color: Header background
+  header_text_color: Header text
+  text_selected_color: Selected text
+  bottom_menu_bg: Bottom menu background
+  bottom_menu_text: Bottom menu text
+  bottom_menu_selected_color: Bottom menu selected
+  card_bg_color: Card background
+  card_border_color: Card border
+  card_title_text_color: Card title text
+  card_title_bg_color: Card title background
+  button_bg_color: Button background
+  button_text_color: Button text
+  double_column_title_text_color: Two-column title text
+  double_column_bg_color: Two-column background

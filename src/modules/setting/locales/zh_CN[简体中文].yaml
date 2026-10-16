@@ -15,6 +15,11 @@ settingMenu:
     index: IP黑名单列表
     save: IP黑名单保存
     delete: IP黑名单删除
+  theme:
+    name: 主题管理
+    index: 主题管理列表
+    save: 主题管理保存
+    delete: 主题管理删除
 ipWhitelist:
   mainTitle: IP白名单
   subTitle: 白名单为空时不启用；配置后仅列表内的单 IP 或 CIDR 网段可访问后台
@@ -43,3 +48,37 @@ ipBlacklist:
   ipBatchInvalid: 每一行都需填写合法的 IP 或 CIDR 网段
   addResult: 成功添加 {created} 条
   addResultSkip: 成功添加 {created} 条，跳过 {skipped} 条已存在
+
+theme:
+  mainTitle: 主题管理
+  subTitle: 配置前端配色方案，支持启用、权重排序与实时预览
+  name: 主题名称
+  namePlaceholder: 如「新春红」「夜间模式」
+  palette: 配色预览
+  colorsHint: 16 个颜色留空则前端使用自身默认色
+  applyPreset: 套用示例配色
+  presetApplied: 已套用示例配色
+  weight: 权重
+  updatedBy: 更新人
+  groupBasic: 基础配色
+  groupHeader: 头部
+  groupTabbar: 底部菜单
+  groupCard: 卡片
+  groupButton: 按钮
+  groupColumn: 两列布局
+  text_color: 文本颜色
+  bg_color: 背景颜色
+  header_bg_color: 头部背景颜色
+  header_text_color: 头部文本颜色
+  text_selected_color: 文本选中颜色
+  bottom_menu_bg: 底部菜单背景
+  bottom_menu_text: 底部菜单文本
+  bottom_menu_selected_color: 底部菜单选中色
+  card_bg_color: 卡片背景颜色
+  card_border_color: 卡片边框颜色
+  card_title_text_color: 卡片标题文本
+  card_title_bg_color: 卡片标题背景
+  button_bg_color: 按钮背景颜色
+  button_text_color: 按钮文本颜色
+  double_column_title_text_color: 两列标题文字颜色
+  double_column_bg_color: 两列背景颜色
