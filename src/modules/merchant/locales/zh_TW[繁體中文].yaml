@@ -1,0 +1,64 @@
+merchantMenu:
+  index: 商戶管理
+  categoryType: 類目管理
+  category: 頂部Tab
+  tabFooter: 底部Tab
+  categoryTypeIndex: 類目列表
+  categoryTypeSave: 類目儲存
+  categoryTypeDelete: 類目刪除
+  categoryIndex: 頂部Tab列表
+  categorySave: 頂部Tab儲存
+  categoryDelete: 頂部Tab刪除
+  tabFooterIndex: 底部Tab列表
+  tabFooterSave: 底部Tab儲存
+  tabFooterDelete: 底部Tab刪除
+
+category:
+  mainTitle: 頂部Tab
+  subTitle: 配置導航頁頂部標籤；日統計後續隨數據中心統一接入
+  name: 名稱
+  namePlaceholder: 請輸入頂部Tab名稱
+  weight: 排序值
+  weightTip: 數值越小越靠前
+  weightSaved: 排序值已更新
+  updatedBy: 更新人
+  remarkPlaceholder: 備註該頂部Tab的用途
+
+categoryType:
+  mainTitle: 類目管理
+  subTitle: 維護商戶類目；統計欄位暫為佔位，後續隨數據中心統一接入
+  name: 類目名稱
+  namePlaceholder: 請輸入類目名稱
+  weight: 排序值
+  weightTip: 數值越小越靠前
+  weightSaved: 排序值已更新
+  merchantNumber: 商戶數量
+  merchantPv: 商戶PV
+  merchantUv: 商戶UV
+  clickRate: 點擊率
+  statsPlaceholder: 統計功能將在數據中心統一接入
+  updatedBy: 更新人
+  remarkPlaceholder: 備註該類目的用途
+
+tabFooter:
+  mainTitle: 底部Tab
+  subTitle: 維護導航頁底部入口，並綁定對應的頂部Tab
+  name: 名稱
+  namePlaceholder: 請輸入底部Tab名稱
+  icon: 圖標
+  iconOn: 選中圖標
+  weight: 排序值
+  weightTip: 數值越小越靠前
+  weightSaved: 排序值已更新
+  updatedBy: 更新人
+  remarkPlaceholder: 備註該底部Tab的用途
+  bindTop: 綁定頂部Tab
+  bindTitle: 綁定頂部Tab【{name}】
+  bindCategory: 頂部Tab
+  bindPlaceholder: 選擇要綁定的頂部Tab
+  bindAction: 新增綁定
+  bindSuccess: 已新增 {count} 個綁定
+  noAvailable: 暫無可綁定的頂部Tab
+  unbind: 解綁
+  unbindConfirm: 確定解綁頂部Tab「{name}」嗎？
+  unbindSuccess: 已解綁

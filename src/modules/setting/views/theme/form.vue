@@ -107,6 +107,9 @@ defineExpose({
         <div class="theme-form__meta">
           <el-form-item :label="t('theme.weight')" prop="weight">
             <el-input-number v-model="model.weight" :min="0" :max="9999" controls-position="right" class="w-full" />
+            <div class="theme-form__tip">
+              {{ t('theme.weightTip') }}
+            </div>
           </el-form-item>
           <el-form-item :label="t('crud.status')" prop="status">
             <el-radio-group v-model="model.status">
@@ -178,6 +181,14 @@ defineExpose({
 .theme-form__main {
   flex: 1;
   min-width: 0;
+}
+
+.theme-form__tip {
+  width: 100%;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--el-text-color-secondary);
 }
 
 .theme-form__meta {

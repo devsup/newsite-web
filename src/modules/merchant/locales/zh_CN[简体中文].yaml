@@ -1,0 +1,64 @@
+merchantMenu:
+  index: 商户管理
+  categoryType: 类目管理
+  category: 顶部Tab
+  tabFooter: 底部Tab
+  categoryTypeIndex: 类目列表
+  categoryTypeSave: 类目保存
+  categoryTypeDelete: 类目删除
+  categoryIndex: 顶部Tab列表
+  categorySave: 顶部Tab保存
+  categoryDelete: 顶部Tab删除
+  tabFooterIndex: 底部Tab列表
+  tabFooterSave: 底部Tab保存
+  tabFooterDelete: 底部Tab删除
+
+category:
+  mainTitle: 顶部Tab
+  subTitle: 配置导航页顶部标签；日统计后续随数据中心统一接入
+  name: 名称
+  namePlaceholder: 请输入顶部Tab名称
+  weight: 排序值
+  weightTip: 数值越小越靠前
+  weightSaved: 排序值已更新
+  updatedBy: 更新人
+  remarkPlaceholder: 备注该顶部Tab的用途
+
+categoryType:
+  mainTitle: 类目管理
+  subTitle: 维护商户类目；统计字段暂为占位，后续随数据中心统一接入
+  name: 类目名称
+  namePlaceholder: 请输入类目名称
+  weight: 排序值
+  weightTip: 数值越小越靠前
+  weightSaved: 排序值已更新
+  merchantNumber: 商户数量
+  merchantPv: 商户PV
+  merchantUv: 商户UV
+  clickRate: 点击率
+  statsPlaceholder: 统计功能将在数据中心统一接入
+  updatedBy: 更新人
+  remarkPlaceholder: 备注该类目的用途
+
+tabFooter:
+  mainTitle: 底部Tab
+  subTitle: 维护导航页底部入口，并绑定对应的顶部Tab
+  name: 名称
+  namePlaceholder: 请输入底部Tab名称
+  icon: 图标
+  iconOn: 选中图标
+  weight: 排序值
+  weightTip: 数值越小越靠前
+  weightSaved: 排序值已更新
+  updatedBy: 更新人
+  remarkPlaceholder: 备注该底部Tab的用途
+  bindTop: 绑定顶部Tab
+  bindTitle: 绑定顶部Tab【{name}】
+  bindCategory: 顶部Tab
+  bindPlaceholder: 选择要绑定的顶部Tab
+  bindAction: 添加绑定
+  bindSuccess: 已新增 {count} 个绑定
+  noAvailable: 暂无可绑定的顶部Tab
+  unbind: 解绑
+  unbindConfirm: 确定解绑顶部Tab「{name}」吗？
+  unbindSuccess: 已解绑

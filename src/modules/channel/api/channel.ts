@@ -18,7 +18,7 @@ export interface ChannelVo {
   kl_ratio?: number
   /** 状态：1 启用 / 2 禁用 */
   status?: number
-  /** 排序值（越大越靠前） */
+  /** 排序值（越小越靠前） */
   weight?: number
   /** 渠道自定义 JS 代码 */
   js_code?: string

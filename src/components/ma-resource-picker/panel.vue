@@ -28,6 +28,7 @@ en:
   confirm: Confirm
   imageUpload: Upload image
   fileUpload: Upload file
+  videoPreview: Preview video
 zh_CN:
   searchPlaceholder: 搜索此分类下的资源
   tips: 你确定要删除这条数据吗？
@@ -48,6 +49,7 @@ zh_CN:
   confirm: 确认
   imageUpload: 上传图片
   fileUpload: 上传文件
+  videoPreview: 预览视频
 
 zh_TW:
   searchPlaceholder: 搜索此分類下的資源
@@ -69,6 +71,7 @@ zh_TW:
   confirm: 確認
   imageUpload: 上載圖片
   fileUpload: 上載文件
+  videoPreview: 預覽視頻
 </i18n>
 
 <script setup lang="ts">
@@ -146,6 +149,79 @@ const queryParams = ref<Record<string, any>>({
   suffix: [],
 })
 
+/** 列表滚动容器（用来按可视区算「一屏能装多少张」） */
+const listRef = ref<HTMLElement>()
+/** 视频预览地址（空串表示弹窗关闭） */
+const videoPreviewUrl = ref('')
+
+/**
+ * 按容器可视区算每页数量，让一屏装满再翻页（原来固定 30 张，宽屏下底部会空出一大块）。
+ *
+ * 列表项是正方形，尺寸取 CSS 变量 `--resource-item-size`；间距取 el-space 的 `fill-ratio`（9%）。
+ * @returns 每页数量是否变化（只有变化时才需要重新请求，避免和 getResourceList 互相触发）
+ */
+function recalcPageSize(): boolean {
+  const el = listRef.value
+  if (!el) {
+    return false
+  }
+  const width = el.clientWidth
+  const height = el.clientHeight
+  if (width <= 0 || height <= 0) {
+    return false
+  }
+
+  const style = getComputedStyle(el)
+  const size = Number.parseFloat(style.getPropertyValue('--resource-item-size')) || 120
+  const gap = size * 0.09
+  const step = size + gap
+  const cols = Math.max(1, Math.floor((width + gap) / step))
+  const rows = Math.max(1, Math.floor((height + gap) / step))
+  const next = cols * rows
+
+  // 一屏至少 1 行；上限 10×10=100（再大一次要解密/拉取的图片太多，首屏会明显变慢）
+  const safe = Math.min(Math.max(next, cols), 100)
+  if (safe === queryParams.value.page_size) {
+    return false
+  }
+  queryParams.value.page_size = safe
+  queryParams.value.page = 1
+
+  return true
+}
+
+/** 尺寸变化后重算每页数量，变了才重新拉数据 */
+function syncPageSize(): void {
+  if (recalcPageSize()) {
+    getResourceList(queryParams.value)
+  }
+}
+
+/** 是否视频（视频没有封面，展示播放按钮、支持预览播放） */
+function isVideo(resource: Resource): boolean {
+  return !!resource?.mime_type?.startsWith('video')
+}
+
+function openVideoPreview(resource: Resource): void {
+  videoPreviewUrl.value = resource.url || ''
+}
+
+let listResizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  syncPageSize()
+  // 侧栏折叠 / 窗口缩放都会改变可视区，跟着重算
+  listResizeObserver = new ResizeObserver(() => syncPageSize())
+  if (listRef.value) {
+    listResizeObserver.observe(listRef.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  listResizeObserver?.disconnect()
+  listResizeObserver = null
+})
+
 async function getResourceList(params: Resource = {}) {
   loading.value = true
   const { data } = await useHttp().get(
@@ -205,7 +281,7 @@ function getFileTypeLabel(item: unknown): string {
  * 资源库上传按钮的文案映射。
  *
  * store 里的按钮 label 是中文兜底（插件/外部也可能读取），面板展示时按 name 走本文件的多语言，
- * 否则附件管理页底部上传按钮的 tooltip 始终是中文。
+ * 否则资源管理页底部上传按钮的 tooltip 始终是中文。
  */
 const buttonI18nKeys: Record<string, string> = {
   'local-image-upload': 'imageUpload',
@@ -225,6 +301,10 @@ function getButtonLabel(btn: Resources.Button): string {
 function getCover(resource: Resource): string | undefined {
   if (resource?.mime_type?.startsWith('image')) {
     return resource.url
+  }
+  // 视频有首帧缩略图就显示封面（没有则退回显示文件名 + 播放按钮）
+  if (resource?.mime_type?.startsWith('video')) {
+    return resource.thumb_url || undefined
   }
   return undefined
 }
@@ -519,7 +599,7 @@ onUnmounted(() => {
         </el-input>
       </div>
     </div>
-    <div class="mt-2 min-h-0 flex-1">
+    <div ref="listRef" class="mt-2 min-h-0 flex-1">
       <OverlayScrollbarsComponent
         v-if="loading || resources.length" class="max-h-full"
         :options="{ scrollbars: { autoHide: 'leave', autoHideDelay: 100 } }"
@@ -533,17 +613,19 @@ onUnmounted(() => {
               >
                 <div class="resource-item__cover">
                   <template v-if="getCover(resource)">
-                    <el-image :src="getCover(resource)" fit="cover" class="h-full w-full" lazy>
-                      <template #error>
-                        <div
-                          class="relative m-[8px] h-[calc(100%-16px)] w-[calc(100%-16px)] flex items-center justify-center overflow-hidden"
-                        >
-                          <div class="cursor-default overflow-hidden text-ellipsis whitespace-pre-wrap">
-                            {{ resource.origin_name }}
-                          </div>
-                        </div>
-                      </template>
-                    </el-image>
+                    <!--
+                      用原生 img 而不是 el-image：
+                      ① el-image 的 lazy 依赖 IntersectionObserver 认滚动容器，在 OverlayScrollbars 内层失效、图片请求根本不发（列表一片空白）；
+                      ② 原生 loading="lazy" 由浏览器实现，无论外层谁滚动都按视口加载，一页 100 张时只请求可见的那些。
+                    -->
+                    <img
+                      :src="getCover(resource)"
+                      class="h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      alt=""
+                      @error="($event.target as HTMLImageElement).style.display = 'none'"
+                    >
                   </template>
                   <template v-else>
                     <div
@@ -558,6 +640,16 @@ onUnmounted(() => {
                 <div v-if="getCover(resource)" class="resource-item__name cursor-default">
                   {{ resource.origin_name }}
                 </div>
+                <!-- 视频没有封面：盖一层播放按钮，点它预览播放（单击/双击依旧是选中/确认） -->
+                <button
+                  v-if="isVideo(resource)"
+                  class="resource-item__play"
+                  type="button"
+                  :title="t('videoPreview')"
+                  @click.stop="openVideoPreview(resource)"
+                >
+                  <ma-svg-icon name="solar:play-circle-bold" :size="38" />
+                </button>
                 <div class="resource-item__selected">
                   <ma-svg-icon class="resource-item__selected-icon" name="gravity-ui:circle-check-fill" :size="18" />
                 </div>
@@ -609,6 +701,24 @@ onUnmounted(() => {
         </slot>
       </div>
     </div>
+
+    <!-- 视频预览：直接播放，不走下载 -->
+    <el-dialog
+      :model-value="!!videoPreviewUrl"
+      :title="t('videoPreview')"
+      width="720px"
+      destroy-on-close
+      @close="videoPreviewUrl = ''"
+    >
+      <video
+        v-if="videoPreviewUrl"
+        :src="videoPreviewUrl"
+        class="w-full rounded"
+        controls
+        autoplay
+        playsinline
+      />
+    </el-dialog>
 
     <div class="ma-resource-dock">
       <template v-for="btn in resourceStore.getAllButton()">
@@ -673,41 +783,35 @@ onUnmounted(() => {
     }
 
     .res-app-icon {
-      @apply w-55px h-55px !text-2xl transform-all duration-300 text-dark-1 dark-text-gray-2 cursor-pointer
+      @apply w-55px h-55px !text-2xl text-dark-1 dark-text-gray-2 cursor-pointer
       ;
+      transition: transform .28s ease;
+      will-change: transform;
     }
 
-    // 主放大效果
+    // 悬停效果：只做「轻微缩放 + 上移」，不改容器宽高（改宽高会挤压相邻按钮、整排跳动）
     .main-effect {
-      width: 80px;
-      height: 80px;
-      transform: translateY(-40px);
-    }
-
-    .main-effect .res-app-icon {
-      @apply w-80px h-80px !text-[60px];
-    }
-
-    // 次放大效果
-    .second-effect {
-      width: 60px;
-      height: 60px;
-      transform: translateY(-20px);
-    }
-
-    .second-effect .res-app-icon {
-      @apply w-60px h-60px !text-[40px];
-    }
-
-    // 最次放大效果
-    .third-effect {
-      width: 50px;
-      height: 50px;
       transform: translateY(-10px);
     }
 
+    .main-effect .res-app-icon {
+      transform: scale(1.08);
+    }
+
+    .second-effect {
+      transform: translateY(-6px);
+    }
+
+    .second-effect .res-app-icon {
+      transform: scale(1.04);
+    }
+
+    .third-effect {
+      transform: translateY(-3px);
+    }
+
     .third-effect .res-app-icon {
-      @apply w-50px h-50px !text-[30px];
+      transform: scale(1.02);
     }
   }
 }
@@ -727,6 +831,12 @@ onUnmounted(() => {
   @apply absolute top--30px right--30px w-40px h-40px;
   //transition: all 0.1s ease-in-out;
   background-image: linear-gradient(to top right, transparent 50%, rgb(var(--ui-primary)) 50%);
+}
+.resource-item__play{
+  @apply absolute inset-0 flex items-center justify-center border-0 bg-black/25 text-white opacity-80 transition-opacity duration-200;
+}
+.resource-item__play:hover{
+  @apply opacity-100;
 }
 .resource-item__selected-icon{
   @apply absolute top-0 right-0 p-2px c-white;

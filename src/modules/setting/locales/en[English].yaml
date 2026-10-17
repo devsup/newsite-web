@@ -68,6 +68,7 @@ theme:
   applyPreset: Apply sample palette
   presetApplied: Sample palette applied
   weight: Weight
+  weightTip: Smaller values come first
   updatedBy: Updated by
   groupBasic: Basic
   groupHeader: Header
@@ -131,6 +132,7 @@ baota:
   apiKeyEditPlaceholder: Leave empty to keep the current key, or paste a new one
   apiKeySavedTip: The saved key is never sent back to the browser
   weight: Weight
+  weightTip: Smaller values come first
   enabled: Enabled
   disabled: Disabled
   testConnection: Test Connection

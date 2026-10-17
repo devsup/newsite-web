@@ -85,6 +85,9 @@ export default function getConfigFormItems(formType: 'add' | 'edit', t: any, mod
         max: 9999,
         controlsPosition: 'right',
       },
+      itemProps: {
+        help: t('baota.weightTip'),
+      },
     },
     {
       label: () => t('crud.status'),

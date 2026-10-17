@@ -23,7 +23,7 @@ channel:
   klRatioTip: 0-1, 1 means 100% deduction
   status: Status
   weight: Sort
-  weightTip: The larger, the higher
+  weightTip: Smaller values come first
   jsCode: JS Code
   jsCodePlaceholder: Full script code including the script tag (inserted as-is, not wrapped)
   botLinkType: Push Type

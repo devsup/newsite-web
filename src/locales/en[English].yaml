@@ -148,6 +148,7 @@ menu:
   dashboard: Dashboard
 crud:
   cancel: Cancel
+  close: Close
   save: Save
   ok: OK
   add: Add

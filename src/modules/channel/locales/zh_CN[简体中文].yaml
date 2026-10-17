@@ -23,7 +23,7 @@ channel:
   klRatioTip: 0~1，1 代表 100% 扣量
   status: 状态
   weight: 排序值
-  weightTip: 越大越靠前
+  weightTip: 数值越小越靠前
   jsCode: JS代码
   jsCodePlaceholder: 完整脚本代码，需自带 script 标签（后端原样插入，不做加工）
   botLinkType: 推送类型

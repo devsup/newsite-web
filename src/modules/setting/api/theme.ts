@@ -25,7 +25,7 @@ export interface ThemeVo {
   double_column_bg_color?: string
   /** 状态：1 启用 / 2 禁用 */
   status?: number
-  /** 权重（越大越靠前） */
+  /** 权重（越小越靠前） */
   weight?: number
   /** 备注 */
   remark?: string
@@ -53,7 +53,7 @@ export interface ThemeSearchVo {
   [key: string]: any
 }
 
-/** GET /admin/theme/list - 分页列表（按权重倒序） */
+/** GET /admin/theme/list - 分页列表（按权重升序，数值越小越靠前） */
 export function page(data: ThemeSearchVo): Promise<ResponseStruct<PageList<ThemeVo>>> {
   return useHttp().get('/admin/theme/list', { params: data })
 }

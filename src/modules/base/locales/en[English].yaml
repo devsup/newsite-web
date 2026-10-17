@@ -156,7 +156,7 @@ basePost:
     userOperationLogDelete: User Operation Log Delete
   dataCenter:
     index: Data Center
-    attachment: Attachment
-    attachmentList: Attachment List
-    attachmentUpload: Attachment Upload
-    attachmentDelete: Attachment Delete
+    attachment: Resources
+    attachmentList: Resource List
+    attachmentUpload: Resource Upload
+    attachmentDelete: Resource Delete

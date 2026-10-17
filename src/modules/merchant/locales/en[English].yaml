@@ -1,0 +1,64 @@
+merchantMenu:
+  index: Merchants
+  categoryType: Categories
+  category: Top Tabs
+  tabFooter: Bottom Tabs
+  categoryTypeIndex: Category list
+  categoryTypeSave: Category save
+  categoryTypeDelete: Category delete
+  categoryIndex: Top tab list
+  categorySave: Top tab save
+  categoryDelete: Top tab delete
+  tabFooterIndex: Bottom tab list
+  tabFooterSave: Bottom tab save
+  tabFooterDelete: Bottom tab delete
+
+category:
+  mainTitle: Top Tabs
+  subTitle: Configure the tabs at the top of the navigation page. Daily statistics will be provided by the Data Center later.
+  name: Name
+  namePlaceholder: Please enter the top tab name
+  weight: Sort
+  weightTip: Smaller values come first
+  weightSaved: Sort value updated
+  updatedBy: Updated By
+  remarkPlaceholder: Note the purpose of this top tab
+
+categoryType:
+  mainTitle: Categories
+  subTitle: Maintain merchant categories. Statistics are placeholders until the Data Center is connected.
+  name: Category Name
+  namePlaceholder: Please enter the category name
+  weight: Sort
+  weightTip: Smaller values come first
+  weightSaved: Sort value updated
+  merchantNumber: Merchants
+  merchantPv: Merchant PV
+  merchantUv: Merchant UV
+  clickRate: Click Rate
+  statsPlaceholder: Statistics will be provided by the Data Center later
+  updatedBy: Updated By
+  remarkPlaceholder: Note the purpose of this category
+
+tabFooter:
+  mainTitle: Bottom Tabs
+  subTitle: Maintain the bottom entries of the navigation page and bind top tabs
+  name: Name
+  namePlaceholder: Please enter the bottom tab name
+  icon: Icon
+  iconOn: Active Icon
+  weight: Sort
+  weightTip: Smaller values come first
+  weightSaved: Sort value updated
+  updatedBy: Updated By
+  remarkPlaceholder: Note the purpose of this bottom tab
+  bindTop: Bind Top Tabs
+  bindTitle: Bind Top Tabs [{name}]
+  bindCategory: Top Tab
+  bindPlaceholder: Select top tabs to bind
+  bindAction: Add Binding
+  bindSuccess: Added {count} binding(s)
+  noAvailable: No top tabs available to bind
+  unbind: Unbind
+  unbindConfirm: Unbind top tab "{name}"?
+  unbindSuccess: Unbound

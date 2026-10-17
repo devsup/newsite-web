@@ -156,7 +156,7 @@ basePost:
     userOperationLogDelete: 用戶操作日志刪除
   dataCenter:
     index: 數據中心
-    attachment: 附件管理
+    attachment: 資源管理
     attachmentList: 附件列表
     attachmentUpload: 上傳附件
     attachmentDelete: 刪除附件

@@ -12,7 +12,7 @@ export interface BaoTaConfigVo {
   api_key?: string
   /** 状态：1 启用 / 2 禁用 */
   status?: number
-  /** 权重（越大越靠前） */
+  /** 权重（越小越靠前） */
   weight?: number
   /** 备注 */
   remark?: string

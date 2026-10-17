@@ -68,6 +68,7 @@ theme:
   applyPreset: 套用示例配色
   presetApplied: 已套用示例配色
   weight: 權重
+  weightTip: 數值越小越靠前
   updatedBy: 更新人
   groupBasic: 基礎配色
   groupHeader: 頭部
@@ -131,6 +132,7 @@ baota:
   apiKeyEditPlaceholder: 留空表示不修改；需更換時貼上新金鑰
   apiKeySavedTip: 已保存金鑰，出於安全考量不回顯
   weight: 權重
+  weightTip: 數值越小越靠前
   enabled: 啟用
   disabled: 停用
   testConnection: 測試連線
