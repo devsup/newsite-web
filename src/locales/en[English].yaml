@@ -129,16 +129,12 @@ mineAdmin:
   mark: out of the box
 menu:
   uc:index: Home
-  dashboard:analysis: Analysis Page
   pageError: The page error
   appstore: App store
-  dashboard:workbench: Workbench
-  dashboard:report: Statistics reports
   uc:logs: Logs
   login: Login
   uc:message: Message
   welcome: Welcome Page
-  dashboard: Dashboard
 crud:
   cancel: Cancel
   close: Close

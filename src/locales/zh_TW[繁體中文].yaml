@@ -129,16 +129,12 @@ mineAdmin:
   mark: 開箱即用
 menu:
   uc:index: 首頁
-  dashboard:analysis: 分析頁
   pageError: 頁面出現了錯誤
   appstore: 應用商店
-  dashboard:workbench: 工作臺
-  dashboard:report: 統計報表
   uc:logs: 日志
   login: 登錄
   uc:message: 消息
   welcome: 歡迎頁
-  dashboard: 儀表盤
 crud:
   cancel: 放棄
   close: 關閉

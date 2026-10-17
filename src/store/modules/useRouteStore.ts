@@ -9,7 +9,6 @@ import type { Plugin, SystemSettings } from '#/global'
  * @Link   https://github.com/mineadmin
  */
 import type { Router, RouteRecordRaw } from 'vue-router'
-import dashboardRoute from '@/router/static-routes/dashboardRoute'
 import welcomeRoute from '@/router/static-routes/welcomeRoute'
 import usePluginStore from '@/store/modules/usePluginStore.ts'
 
@@ -72,7 +71,6 @@ const useRouteStore = defineStore(
               cache: true,
             },
           }),
-          toRecordRawRoute(dashboardRoute),
           toRecordRawRoute({
             path: '/:pathMatch(.*)*',
             name: 'MineSystemError',
