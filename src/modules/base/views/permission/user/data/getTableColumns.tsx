@@ -14,7 +14,7 @@ import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import defaultAvatar from '@/assets/images/defaultAvatar.jpg'
 import { ElTag } from 'element-plus'
 import { useMessage } from '@/hooks/useMessage.ts'
-import { deleteByIds, resetPassword } from '~/base/api/user.ts'
+import { deleteByIds, resetPassword, resetTotp } from '~/base/api/user.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 
@@ -24,6 +24,25 @@ export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t
 
   const showBtn = (auth: string | string[], row: UserVo) => {
     return hasAuth(auth) && row.id !== 1
+  }
+
+  /**
+   * 重置某个用户的 TOTP。
+   *
+   * 列表「双因素认证」列和操作菜单共用：列内重置后直接改 row.totp_enabled，
+   * 操作菜单则刷新表格，避免两处逻辑不一致。
+   */
+  function confirmResetTotp(row: UserVo, proxy?: MaProTableExpose): void {
+    msg.confirm(t('baseUserManage.resetTotpConfirm')).then(async () => {
+      const response = await resetTotp(row.id as number)
+      if (response.code === ResultCode.SUCCESS) {
+        msg.success(t('baseUserManage.resetTotpSuccess'))
+        row.totp_enabled = false
+        if (proxy) {
+          await proxy.refresh()
+        }
+      }
+    })
   }
 
   return [
@@ -57,6 +76,14 @@ export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t
       cellRender: ({ row }) => (
         <ElTag type={dictStore.t('system-status', row.status, 'color')}>
           {t(dictStore.t('system-status', row.status, 'i18n'))}
+        </ElTag>
+      ),
+    },
+    // 只读展示：后端按 totp_secret 是否存在计算，不提供单独的开关字段
+    { label: () => t('baseUserManage.totp'), prop: 'totp_enabled', width: '120px',
+      cellRender: ({ row }) => (
+        <ElTag type={row.totp_enabled ? 'success' : 'info'}>
+          {row.totp_enabled ? t('baseUserManage.totpEnabled') : t('baseUserManage.totpDisabled')}
         </ElTag>
       ),
     },
@@ -99,6 +126,13 @@ export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t
                 }
               })
             },
+          },
+          {
+            name: 'resetTotp',
+            show: ({ row }) => showBtn('permission:user:save', row),
+            icon: 'material-symbols:lock-reset',
+            text: () => t('baseUserManage.resetTotp'),
+            onClick: ({ row }, proxy: MaProTableExpose) => confirmResetTotp(row, proxy),
           },
           {
             name: 'del',

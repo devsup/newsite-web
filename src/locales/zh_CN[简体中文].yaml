@@ -6,6 +6,18 @@ loginForm:
   codePlaceholder: 请输入验证码
   usernamePlaceholder: 请输入账户
   passwordLabel: 密码
+  totpVerifyTitle: 请输入动态验证码
+  totpVerifyDesc: 打开身份验证器 App，输入当前 6 位动态验证码
+  totpCodeHint: 请输入动态验证码（最多 6 位）
+  totpPlaceholder: 请输入 6 位动态验证码
+  totpSubmitButton: 验证
+  totpError: 动态验证码错误
+  totpHintTitle: 安全提示
+  totpHintMessage: 当前账号未启用双因素认证，建议尽快启用!
+  totpHintMessage2: 个人中心 → 账号设置 → 双因素认证
+  totpKnow: 知道了
+  totpCancel: 取消
+  loginFailed: 登录失败
 mineAdmin:
   goHome: 回到首页
   settings:
@@ -54,14 +66,6 @@ mineAdmin:
     close: 关闭
     exitMax: 退出最大化
     toMax: 进入最大化
-  runtime:
-    devDependencies: 开发依赖
-    pluginList: 插件列表
-    pluginCount: 插件总数
-    systemVersion: 系统版本
-    coreInfo: 核心信息
-    dependencies: 生产依赖
-    lastBuildTime: 最后构建时间
   sys:
     notComponent: 没有找到页面，无法跳转
     unknown: 未知
@@ -70,12 +74,26 @@ mineAdmin:
     backControl: 返回控制面板
     setAllRead: 全部设为已读
     title: 用户中心
-  notification:
-    todo: 待办
-    allRead: 全部已读
-    gotoTheList: 转到列表
-    message: 消息
-    notice: 通知
+  preview:
+    title: 发布预览
+    modeApp: APP
+    modeH5: H5
+    modeTablet: 平板
+    modePc: PC
+    loading: 预览加载中…
+    empty: 暂无可预览地址
+    emptyHint: 请先在「站点管理 → 系统设置」中配置导航域名，保存后回到这里刷新即可。
+    loadFailed: 获取预览地址失败
+    retry: 重试
+    goSetting: 前往系统设置
+    refresh: 刷新预览
+    copyLink: 复制链接
+    copied: 已复制
+    copyFailed: 复制失败，请手动复制地址
+    openNewWindow: 新窗口打开
+    close: 关闭
+    urlHint: 地址来源：系统设置 → 导航域名
+    iframeHint: 预览空白可能是目标站点禁止嵌入，请用「新窗口打开」
   search:
     placeholder: 搜索页面，支持名称、标识以及URL的模糊查询
     noNameMenu: 未命名菜单
@@ -83,7 +101,6 @@ mineAdmin:
   userBar:
     showState: 显示用户栏
     hideState: 隐藏用户栏
-    systemInfo: 系统信息
     logout: 退出系统
     shortcuts: 快捷键介绍
     clearCache: 清除缓存
@@ -109,7 +126,7 @@ mineAdmin:
     close: 关闭标签页
   slogan: 一款开箱即用的后台管理系统
   toolbars:
-    notification: 通知
+    preview: 发布预览
     settings: 设置
     search: 搜索
     fullscreen: 全屏

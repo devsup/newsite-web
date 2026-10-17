@@ -6,6 +6,18 @@ loginForm:
   codePlaceholder: please input captcha
   usernamePlaceholder: please input account
   passwordLabel: Password
+  totpVerifyTitle: Enter your authenticator code
+  totpVerifyDesc: Open your authenticator app and enter the current 6-digit code
+  totpCodeHint: Enter the code (up to 6 digits)
+  totpPlaceholder: Please input 6-digit code
+  totpSubmitButton: Verify
+  totpError: Invalid authenticator code
+  totpHintTitle: Security Notice
+  totpHintMessage: Two-factor authentication is not enabled. Please enable it soon!
+  totpHintMessage2: Profile → Account settings → Two-factor authentication
+  totpKnow: Got it
+  totpCancel: Cancel
+  loginFailed: Login failed
 mineAdmin:
   goHome: Back to Home
   settings:
@@ -54,14 +66,6 @@ mineAdmin:
     close: Close
     exitMax: Exit max
     toMax: Enter max
-  runtime:
-    devDependencies: Development dependencies
-    pluginList: Plugins list
-    pluginCount: Plugins count
-    systemVersion: System version
-    coreInfo: Core information
-    dependencies: Production dependencies
-    lastBuildTime: Last build time
   sys:
     notComponent: Page not found, unable to redirect
     unknown: unknown
@@ -70,12 +74,26 @@ mineAdmin:
     backControl: Back to control panel
     setAllRead: Set all to read
     title: User Center
-  notification:
-    todo: Todo
-    allRead: All read
-    gotoTheList: Go to the list
-    message: Message
-    notice: Notice
+  preview:
+    title: Publish preview
+    modeApp: APP
+    modeH5: H5
+    modeTablet: Tablet
+    modePc: PC
+    loading: Loading preview…
+    empty: No preview address
+    emptyHint: Configure the navigation domain in Site management → System settings, then come back and refresh.
+    loadFailed: Failed to load the preview address
+    retry: Retry
+    goSetting: Go to settings
+    refresh: Refresh preview
+    copyLink: Copy link
+    copied: Copied
+    copyFailed: Copy failed, please copy the address manually
+    openNewWindow: Open in new window
+    close: Close
+    urlHint: 'Source: System settings → Navigation domain'
+    iframeHint: If the preview is blank, the target site may block embedding. Please open it in a new window.
   search:
     placeholder: Search page, supporting queries for name, identifier, and URL
     noNameMenu: Unnamed menu
@@ -83,7 +101,6 @@ mineAdmin:
   userBar:
     showState: Show User bar
     hideState: Hidden User bar
-    systemInfo: System information
     logout: Logout
     shortcuts: Introduction to shortcuts
     clearCache: Clear cache
@@ -109,7 +126,7 @@ mineAdmin:
     close: Close tab
   slogan: An out of the box backend management system
   toolbars:
-    notification: Notification
+    preview: Publish preview
     settings: Settings
     search: Search
     fullscreen: Full screen

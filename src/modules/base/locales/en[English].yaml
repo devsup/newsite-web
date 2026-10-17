@@ -17,6 +17,12 @@ baseUserManage:
   initPassword: Init password
   setPassword: Whether to reset the password to 123456?
   setPasswordSuccess: The password was reset successfully
+  totp: Two-factor auth
+  totpEnabled: Enabled
+  totpDisabled: Not enabled
+  resetTotp: Reset 2FA
+  resetTotpConfirm: After resetting, this user will no longer be asked for a code at login. Continue?
+  resetTotpSuccess: Two-factor authentication reset
 baseRoleManage:
   mainTitle: Role Rule
   subTitle: Provide user roles and permission settings

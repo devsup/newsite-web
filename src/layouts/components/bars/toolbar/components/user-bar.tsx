@@ -10,7 +10,6 @@
 import { useI18n } from 'vue-i18n'
 import Message from 'vue-m-message'
 import MineShortcutsDesc from './dropdownMenuComponents/shortcuts-desc.tsx'
-import MineSystemInfo from './dropdownMenuComponents/system-info.tsx'
 
 export default defineComponent({
   name: 'UserBar',
@@ -39,11 +38,6 @@ export default defineComponent({
         label: 'mineAdmin.userBar.shortcuts',
         icon: 'i-material-symbols:keyboard-keys',
         handle: () => userStore.setDropdownMenuState('shortcuts', true),
-      },
-      {
-        label: 'mineAdmin.userBar.systemInfo',
-        icon: 'i-bi:info-circle',
-        handle: () => userStore.setDropdownMenuState('systemInfo', true),
       },
       { label: 'divider' },
       {
@@ -95,7 +89,6 @@ export default defineComponent({
             }}
           />
 
-          <MineSystemInfo />
           <MineShortcutsDesc />
         </div>
       )

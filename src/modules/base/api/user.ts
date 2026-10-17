@@ -36,6 +36,8 @@ export interface CurrentUserInfo {
   signed?: string | null
   dashboard?: string
   backend_setting?: Record<string, any> | any[] | null
+  /** 是否已绑定 TOTP（有 totp_secret 即 true） */
+  totp_enabled?: boolean
   departments: CurrentUserDepartmentVo[]
   positions: CurrentUserPositionVo[]
   roles: CurrentUserRoleVo[]
@@ -55,6 +57,8 @@ export interface UserVo {
   login_ip?: string
   login_time?: string
   backend_setting?: Record<string, any> | any[] | null
+  /** 是否已绑定 TOTP（后端按 totp_secret 计算） */
+  totp_enabled?: boolean
   remark?: string
   password?: string
   policy?: any
@@ -91,6 +95,11 @@ export function deleteByIds(ids: number[]): Promise<ResponseStruct<null>> {
 
 export function resetPassword(id: number): Promise<ResponseStruct<null>> {
   return useHttp().put('/admin/user/password', { id })
+}
+
+/** DELETE /admin/user/{id}/totp - 重置用户 TOTP（清空 totp_secret，超管可重置所有用户） */
+export function resetTotp(id: number): Promise<ResponseStruct<null>> {
+  return useHttp().delete(`/admin/user/${id}/totp`)
 }
 
 export function updateInfo(data: UserVo): Promise<ResponseStruct<null>> {

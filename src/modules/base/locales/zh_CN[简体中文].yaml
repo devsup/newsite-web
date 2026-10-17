@@ -19,6 +19,12 @@ baseUserManage:
   initPassword: 初始化密码
   setPassword: 是否将用户密码重置为[123456]?
   setPasswordSuccess: 密码重置成功
+  totp: 双因素认证
+  totpEnabled: 已启用
+  totpDisabled: 未启用
+  resetTotp: 重置双因素
+  resetTotpConfirm: 重置后该用户下次登录不再要求动态码，确定重置吗？
+  resetTotpSuccess: 双因素认证已重置
 baseRoleManage:
   mainTitle: 角色管理
   subTitle: 提供用户角色、权限设置

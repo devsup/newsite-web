@@ -17,18 +17,18 @@ export default function toolbars() {
   const state = ref(true)
   const defaultToolbars = ref<MineToolbar[]>([
     {
+      name: 'preview',
+      title: 'mineAdmin.toolbars.preview',
+      icon: 'mdi:devices',
+      show: true,
+      component: () => import(('@/layouts/components/bars/toolbar/components/preview.tsx')),
+    },
+    {
       name: 'search',
       title: 'mineAdmin.toolbars.search',
       icon: 'heroicons:magnifying-glass-20-solid',
       show: true,
       component: () => import(('@/layouts/components/bars/toolbar/components/search.tsx')),
-    },
-    {
-      name: 'notification',
-      title: 'mineAdmin.toolbars.notification',
-      icon: 'heroicons:bell',
-      show: true,
-      component: () => import(('@/layouts/components/bars/toolbar/components/notification.tsx')),
     },
     {
       name: 'translate',
