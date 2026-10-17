@@ -4,11 +4,12 @@ channelMenu:
   delete: 通路刪除
 channel:
   mainTitle: 通路管理
-  subTitle: 提供通路新增、編輯、刪除功能；通路編碼用於拼接落地頁 / 導航頁 / 自動跳轉三條推廣連結
+  subTitle: 提供通路新增、編輯、刪除功能
   name: 通路名稱
   namePlaceholder: 如 A7返回量-steve
   code: 通路編碼
-  codePlaceholder: 僅允許字母、數字，建立後不可修改
+  codePlaceholder: 編碼會拼進落地頁 / 導航頁 / 自動跳轉連結，建立後不可修改
+  codeInvalid: 僅允許字母、數字
   codeLocked: 通路編碼建立後不可修改
   loginName: 登入帳號
   loginNamePlaceholder: 該通路登入自有後台的帳號
@@ -24,7 +25,7 @@ channel:
   weight: 排序值
   weightTip: 越大越靠前
   jsCode: JS代碼
-  jsCodePlaceholder: 投放到該通路頁面時附加執行的 JS 代碼
+  jsCodePlaceholder: 完整腳本代碼，需自帶 script 標籤（後端原樣插入，不做加工）
   botLinkType: 推送類型
   botLinkTypeTip: 機器人推送給該通路時使用哪種連結
   openMode: 開啟方式
@@ -36,9 +37,9 @@ channel:
   naviUrl: 導航頁
   autoUrl: 自動跳轉
   urlEmpty: 未設定域名
-  urlEmptyTip: 該連結缺少域名，請先到「站點管理 → 系統設定」設定落地 / 導航 / 自動識別頁域名
   copySuccess: 連結已複製
   copyFail: 複製失敗，請手動複製
+  urlEmptyTip: 該連結缺少域名，請先到「站點管理 → 系統設定」設定落地 / 導航 / 自動識別頁域名
   updatedBy: 更新人
   groupBasic: 基本資訊
   groupDeduct: 扣量與排序
@@ -47,4 +48,21 @@ channel:
   modeLand: 落地頁
   modeNavi: 導航頁
   modeAuto: 自適應
+  rebuildLandingNotice: 通路落地頁是靜態檔案：改動系統設定裡的落地頁背景圖 / 安裝包位址 / 下載開關後，需點右上「重建落地頁」重新生成才會生效
+  rebuildLanding: 重建落地頁
+  rebuildLandingSuccess: 已重建 {generated}/{total} 個落地頁
+  landingFailed: 通路已保存，但落地頁檔案生成失敗，請檢查落地頁目錄權限後點「重建落地頁」
+  rebuildLandingTipTitle: 以下改動需要重建落地頁：
+  rebuildLandingTip1: · 系統設定裡的落地頁背景圖 / APP 預設圖示 / 落地頁名稱
+  rebuildLandingTip2: · 系統設定裡的蘋果包 / 安卓包下載位址
+  rebuildLandingTip3: · 系統設定裡的「落地頁App自動下載」「下載彈窗」開關
+  rebuildLandingTipFooter: 通路自身的改動（如 JS代碼）儲存時會自動重新生成，無需手動重建
+  rebuildLandingConfirm: 將按目前系統設定重新生成所有通路的落地頁（改過背景圖 / 安裝包位址 / 下載開關後才需要執行），是否繼續？
+  rebuildLandingSelected: 批次重建
+  rebuildLandingSelectedConfirm: 將重新生成所選 {count} 個通路的落地頁，是否繼續？
+  rebuildLandingOne: 重建
+  rebuildLandingOneSuccess: 落地頁已重新生成
+  rebuildLandingOneFailed: 落地頁生成失敗，請檢查落地頁目錄權限
+  statusDisabledTip: 已停用，落地頁已下線
+  rebuildLandingDisabled: 通路已停用，落地頁已下線，無需重建
   weightSaved: 排序值已更新

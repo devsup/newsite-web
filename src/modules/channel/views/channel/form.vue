@@ -35,7 +35,7 @@ const rules = computed<FormRules>(() => ({
   code: [
     { required: true, message: t('form.requiredInput', { msg: t('channel.code') }), trigger: 'blur' },
     { max: 10, message: t('form.maxLength', { msg: t('channel.code'), max: 10 }), trigger: 'blur' },
-    { pattern: CODE_PATTERN, message: t('channel.codePlaceholder'), trigger: 'blur' },
+    { pattern: CODE_PATTERN, message: t('channel.codeInvalid'), trigger: 'blur' },
   ],
   login_name: [
     { required: true, message: t('form.requiredInput', { msg: t('channel.loginName') }), trigger: 'blur' },

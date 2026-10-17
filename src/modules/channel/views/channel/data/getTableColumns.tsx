@@ -14,7 +14,7 @@ import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
 import { useDebounceFn } from '@vueuse/core'
 import { ElInputNumber, ElSwitch, ElTag, ElTooltip } from 'element-plus'
-import { deleteByIds, updateStatus, updateWeight } from '~/channel/api/channel.ts'
+import { deleteByIds, rebuildLanding, updateStatus, updateWeight } from '~/channel/api/channel.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
@@ -40,7 +40,11 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
     statusLoading.value = row.id
     updateStatus(row.id as number, status).then((response) => {
       if (response.code === ResultCode.SUCCESS) {
-        msg.success(t('crud.updateSuccess'))
+        // 状态与落地页同步：禁用会把文件删掉（推广链接随即 404），提示里说清楚
+        msg.success(status === 2 ? t('channel.statusDisabledTip') : t('crud.updateSuccess'))
+        if (status === 1 && response.data?.landing === false) {
+          msg.error(t('channel.landingFailed'))
+        }
       }
       else {
         msg.error(response.message)
@@ -113,7 +117,7 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
    * 链接信息列：三行「落地页 / 导航页 / 自动跳转」，点链接即复制。
    *
    * 链接由后端按渠道编码 + 站点设置的域名拼出；域名没配时后端返回的是半截地址
-   *（如 `/A70001.html`），这里用红色 + 悬浮提示引导去系统设置补配置，避免运营对着点不开的链接干瞪眼。
+   *（如 `/A70001.html`），这里用红色 + 悬浮提示引导去系统设置补配置。
    * 链接较长，单行截断（`truncate`）+ 悬浮显示完整地址，避免换行把行高撑得乱七八糟。
    */
   function renderLinks(row: ChannelVo) {
@@ -233,9 +237,12 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
       ),
     },
     {
-      // 链接较长，列宽可拖：默认 360px，显示不下的部分单行截断、悬浮可看全并点击复制
+      // 链接较长，列宽可拖：默认 360px，显示不下的部分单行截断、点击复制完整地址
+      // 必须关掉表格自带的列 tooltip：它会把「落地页 / 导航页 / 自动跳转」三行内容拼成一个超长气泡，
+      // 叠在每行自己的 URL 气泡上面，又长又挡视线（只保留下面 renderLinks 里那个单条 URL 的短气泡）
       label: () => t('channel.linkInfo'),
       minWidth: '360px',
+      showOverflowTooltip: false,
       cellRender: ({ row }) => renderLinks(row as ChannelVo),
     },
     { label: () => t('crud.remark'), prop: 'remark', minWidth: '140px', showOverflowTooltip: true },
@@ -245,11 +252,34 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
     {
       type: 'operation',
       label: () => t('crud.operation'),
-      // 与宝塔信息列表一致：图标 + 文字两个动作，200px 不会把「删除」挤到贴边
-      width: '200px',
+      // 三个动作（重建 / 编辑 / 删除）：图标 + 文字，200px 会把「删除」挤到贴边，给到 260px
+      width: '260px',
       operationConfigure: {
         type: 'tile',
         actions: [
+          {
+            name: 'rebuild',
+            icon: 'material-symbols:sync-rounded',
+            text: () => t('channel.rebuildLandingOne'),
+            onClick: ({ row }) => {
+              // 禁用渠道本来就没有落地页（后端也会把文件删掉），这里直接拦掉：
+              // 否则请求回来 generated=0，前端会误报成「生成失败，请检查目录权限」
+              if (Number((row as ChannelVo).status) !== 1) {
+                msg.warning(t('channel.rebuildLandingDisabled'))
+                return
+              }
+              // 单个重建是幂等操作、无副作用，不做二次确认；失败时把原因提示出来
+              rebuildLanding([row.id as number]).then((response) => {
+                if (response.code !== ResultCode.SUCCESS) {
+                  msg.error(response.message)
+                  return
+                }
+                response.data?.generated
+                  ? msg.success(t('channel.rebuildLandingOneSuccess'))
+                  : msg.error(t('channel.rebuildLandingOneFailed'))
+              })
+            },
+          },
           {
             name: 'edit',
             icon: 'material-symbols:edit-outline-rounded',

@@ -11,6 +11,8 @@
 en:
   title: System Settings
   subtitle: Edit values in the form directly; add or modify a setting with the buttons above
+  goChannel: Go to Channel →
+  landingRebuildTip: Changing the landing background, package URLs or download switches does not refresh the generated landing pages — go to Channel and click Rebuild Landings
   save: Save
   create: Add setting
   edit: Edit
@@ -39,6 +41,8 @@ en:
 zh_CN:
   title: 系统设置
   subtitle: 直接在表单里修改配置值，新增或修改配置项请用上方按钮
+  goChannel: 去渠道管理 →
+  landingRebuildTip: 改动「落地页背景图 / 苹果包 / 安卓包 / 下载开关」后，已生成的渠道落地页不会自动更新，需到「渠道管理」点「重建落地页」重新生成
   save: 保存
   create: 新增配置项
   edit: 编辑
@@ -67,6 +71,8 @@ zh_CN:
 zh_TW:
   title: 系統設置
   subtitle: 直接在表單裡修改配置值，新增或修改配置項請用上方按鈕
+  goChannel: 去通路管理 →
+  landingRebuildTip: 改動「落地頁背景圖 / 蘋果包 / 安卓包 / 下載開關」後，已生成的通路落地頁不會自動更新，需到「通路管理」點「重建落地頁」重新生成
   save: 保存
   create: 新增配置項
   edit: 編輯
@@ -107,6 +113,12 @@ import { ResultCode } from '@/utils/ResultCode.ts'
 defineOptions({ name: 'setting' })
 
 const msg = useMessage()
+const router = useRouter()
+
+/** 一键直达「渠道管理」：提示条上的快捷入口，省得用户自己到左侧菜单里翻 */
+function goChannel(): void {
+  router.push('/channel')
+}
 const { globalTrans, localTrans: t } = useTrans()
 
 const loading = ref(false)
@@ -329,6 +341,15 @@ useEventListener(window, 'resize', syncCardHeight)
         </div>
       </template>
 
+      <!-- 落地页是静态文件：这些配置改完不会自动反映到已生成的渠道落地页上，所以常驻一条紧凑提示 -->
+      <div class="landing-tip">
+        <ma-svg-icon name="material-symbols:info-outline-rounded" :size="16" class="landing-tip__icon" />
+        <span class="landing-tip__text">{{ t('landingRebuildTip') }}</span>
+        <el-button link type="primary" class="landing-tip__action" @click="goChannel">
+          {{ t('goChannel') }}
+        </el-button>
+      </div>
+
       <el-form class="site-setting__form" label-width="150px">
         <div class="site-setting__grid">
           <el-form-item v-for="(item, index) in items" :key="item.key || index">
@@ -504,5 +525,40 @@ useEventListener(window, 'resize', syncCardHeight)
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+// 落地页「重建」提示条：比 el-alert 紧凑（12px、单行、细边框），不把表单顶部撑得臃肿
+.landing-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 9px 12px;
+  // 浅底 + 细边框放在白色表单里太"平"，改成更深一档的底色 + 左侧 3px 实心橙条，一眼能看到
+  border: 1px solid var(--el-color-warning-light-5);
+  border-left: 4px solid var(--el-color-warning);
+  border-radius: 6px;
+  background: var(--el-color-warning-light-8);
+  font-weight: 500;
+  // 与 el-alert 标题字号保持一致。
+  // 注意 `--el-alert-title-font-size` 是 element-plus 定义在 `.el-alert` 作用域里的（14px），
+  // 这个 div 不在 .el-alert 内部、取不到它，所以要带一个全局变量兜底，否则会退回默认的 16px。
+  font-size: var(--el-alert-title-font-size, var(--el-font-size-base));
+  line-height: 1.6;
+  color: var(--el-color-warning-dark-2);
+
+  &__icon {
+    flex: none;
+    color: var(--el-color-warning);
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__action {
+    flex: none;
+  }
 }
 </style>

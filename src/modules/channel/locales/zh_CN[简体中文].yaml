@@ -4,11 +4,12 @@ channelMenu:
   delete: 渠道删除
 channel:
   mainTitle: 渠道管理
-  subTitle: 提供渠道添加、编辑、删除功能；渠道编码用于拼接落地页 / 导航页 / 自动跳转三条推广链接
+  subTitle: 提供渠道添加、编辑、删除功能
   name: 渠道名称
   namePlaceholder: 如 A7返回量-steve
   code: 渠道编码
-  codePlaceholder: 只允许字母、数字，创建后不可修改
+  codePlaceholder: 编码会拼进落地页 / 导航页 / 自动跳转链接，创建后不可修改
+  codeInvalid: 只允许字母、数字
   codeLocked: 渠道编码创建后不可修改
   loginName: 登陆账户
   loginNamePlaceholder: 该渠道登录自有后台的账户
@@ -24,7 +25,7 @@ channel:
   weight: 排序值
   weightTip: 越大越靠前
   jsCode: JS代码
-  jsCodePlaceholder: 投放到该渠道页面时附加执行的 JS 代码
+  jsCodePlaceholder: 完整脚本代码，需自带 script 标签（后端原样插入，不做加工）
   botLinkType: 推送类型
   botLinkTypeTip: 机器人给该渠道推送时使用哪种链接
   openMode: 打开方式
@@ -36,9 +37,9 @@ channel:
   naviUrl: 导航页
   autoUrl: 自动跳转
   urlEmpty: 未配置域名
-  urlEmptyTip: 该链接缺少域名，请先到「站点管理 → 系统设置」配置落地 / 导航 / 自动识别页域名
   copySuccess: 链接已复制
   copyFail: 复制失败，请手动复制
+  urlEmptyTip: 该链接缺少域名，请先到「站点管理 → 系统设置」配置落地 / 导航 / 自动识别页域名
   updatedBy: 更新人
   groupBasic: 基本信息
   groupDeduct: 扣量与排序
@@ -47,4 +48,21 @@ channel:
   modeLand: 落地页
   modeNavi: 导航页
   modeAuto: 自适应
+  rebuildLandingNotice: 渠道落地页是静态文件：改动系统设置里的落地页背景图 / 安装包地址 / 下载开关后，需点右上「重建落地页」重新生成才会生效
+  rebuildLanding: 重建落地页
+  rebuildLandingSuccess: 已重建 {generated}/{total} 个落地页
+  landingFailed: 渠道已保存，但落地页文件生成失败，请检查落地页目录权限后点「重建落地页」
+  rebuildLandingTipTitle: 以下改动需要重建落地页：
+  rebuildLandingTip1: · 系统设置里的落地页背景图 / APP 默认图标 / 落地页名称
+  rebuildLandingTip2: · 系统设置里的苹果包 / 安卓包下载地址
+  rebuildLandingTip3: · 系统设置里的「落地页App自动下载」「下载弹窗」开关
+  rebuildLandingTipFooter: 渠道自身的改动（如 JS代码）保存时会自动重新生成，无需手动重建
+  rebuildLandingConfirm: 将按当前系统设置重新生成所有渠道的落地页（改过背景图 / 安装包地址 / 下载开关后才需要执行），是否继续？
+  rebuildLandingSelected: 批量重建
+  rebuildLandingSelectedConfirm: 将重新生成所选 {count} 个渠道的落地页，是否继续？
+  rebuildLandingOne: 重建
+  rebuildLandingOneSuccess: 落地页已重新生成
+  rebuildLandingOneFailed: 落地页生成失败，请检查落地页目录权限
+  statusDisabledTip: 已禁用，落地页已下线
+  rebuildLandingDisabled: 渠道已禁用，落地页已下线，无需重建
   weightSaved: 排序值已更新

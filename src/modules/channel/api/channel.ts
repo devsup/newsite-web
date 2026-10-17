@@ -70,18 +70,32 @@ export function options(): Promise<ResponseStruct<Array<{ id: number, name: stri
   return useHttp().get('/admin/channel/options')
 }
 
-/** POST /admin/channel - 新增 */
-export function create(data: ChannelVo): Promise<ResponseStruct<null>> {
+/** POST /admin/channel - 新增（返回 `landing` = 落地页静态文件是否生成成功） */
+export function create(data: ChannelVo): Promise<ResponseStruct<{ landing: boolean }>> {
   return useHttp().post('/admin/channel', data)
 }
 
-/** PUT /admin/channel/{id} - 更新（password 留空则不改密码） */
-export function save(id: number, data: ChannelVo): Promise<ResponseStruct<null>> {
+/** PUT /admin/channel/{id} - 更新（password 留空则不改密码；返回同上） */
+export function save(id: number, data: ChannelVo): Promise<ResponseStruct<{ landing: boolean }>> {
   return useHttp().put(`/admin/channel/${id}`, data)
 }
 
-/** PUT /admin/channel/{id}/status - 切换状态（列表开关，只改 status） */
-export function updateStatus(id: number, status: number): Promise<ResponseStruct<null>> {
+/**
+ * POST /admin/channel/rebuild-landing - 按当前系统设置重建落地页静态文件
+ *
+ * 不传 `ids` 重建全部；传 `ids` 只重建这些渠道（列表顶部「批量重建」）。
+ */
+export function rebuildLanding(ids?: number[]): Promise<ResponseStruct<{ total: number, generated: number }>> {
+  return useHttp().post('/admin/channel/rebuild-landing', ids ? { ids } : {})
+}
+
+/**
+ * PUT /admin/channel/{id}/status - 切换状态（列表开关）
+ *
+ * 后端会同步落地页：启用即生成文件、禁用即删文件。
+ * 返回 `landing`：`true` 已生成 / `false` 生成失败 / `null` 禁用（无需落地页）。
+ */
+export function updateStatus(id: number, status: number): Promise<ResponseStruct<{ landing: boolean | null }>> {
   return useHttp().put(`/admin/channel/${id}/status`, { status })
 }
 

@@ -12,7 +12,7 @@ import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@min
 import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
-import { deleteByIds, page } from '~/channel/api/channel'
+import { deleteByIds, page, rebuildLanding } from '~/channel/api/channel'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
@@ -43,6 +43,10 @@ const maDialog: UseDialogExpose = useDialog({
       request.then((res: any) => {
         if (res.code === ResultCode.SUCCESS) {
           msg.success(formType === 'edit' ? t('crud.updateSuccess') : t('crud.createSuccess'))
+          // 落地页静态文件生成失败时额外提示：渠道已经保存好了，点「重建落地页」可以补
+          if (res.data && res.data.landing === false) {
+            msg.error(t('channel.landingFailed'))
+          }
         }
         else {
           msg.error(res.message)
@@ -110,6 +114,46 @@ function openAdd(): void {
   maDialog.open({ formType: 'add' })
 }
 
+/**
+ * 重建全部落地页：落地页内容是从系统设置「烘焙」进静态文件的
+ *（背景图 / 安装包地址 / 自动下载开关），所以改完系统设置点一次即可全量刷新。
+ */
+function handleRebuildLanding(): void {
+  msg.confirm(t('channel.rebuildLandingConfirm')).then(async () => {
+    const response = await rebuildLanding()
+    if (response.code === ResultCode.SUCCESS) {
+      msg.success(t('channel.rebuildLandingSuccess', {
+        generated: response.data?.generated ?? 0,
+        total: response.data?.total ?? 0,
+      }))
+    }
+    else {
+      msg.error(response.message)
+    }
+  })
+}
+
+/**
+ * 批量重建所选渠道的落地页：勾选几条就只重建这几条，
+ * 比「全部重建」更适合「只改了某几个渠道的 JS 代码 / 只想刷新某几个」的场景。
+ */
+function handleRebuildSelected(): void {
+  const ids = selections.value.map((item: any) => item.id)
+  msg.confirm(t('channel.rebuildLandingSelectedConfirm', { count: ids.length })).then(async () => {
+    const response = await rebuildLanding(ids)
+    if (response.code === ResultCode.SUCCESS) {
+      msg.success(t('channel.rebuildLandingSuccess', {
+        generated: response.data?.generated ?? 0,
+        total: response.data?.total ?? 0,
+      }))
+      proTableRef.value.refresh()
+    }
+    else {
+      msg.error(response.message)
+    }
+  })
+}
+
 // 批量删除
 function handleDelete(): void {
   const ids = selections.value.map((item: any) => item.id)
@@ -125,8 +169,42 @@ function handleDelete(): void {
 
 <template>
   <div class="mine-layout pt-3">
+    <!-- 落地页是静态文件：改完系统设置不会自动生效，这条提示常驻显示（副标题放不下这么长的说明） -->
+    <el-alert
+      class="mb-3"
+      type="warning"
+      :closable="false"
+      show-icon
+      :title="t('channel.rebuildLandingNotice')"
+    />
+
     <MaProTable ref="proTableRef" :options="options" :schema="schema">
       <template #actions>
+        <!-- 落地页是「烘焙」出来的静态文件，系统设置改了不会自动生效，所以这个按钮用醒目的 warning 色，
+             并用悬浮说明列清楚「哪些改动需要重建」——否则很容易改了背景图/安装包却忘了点 -->
+        <el-tooltip placement="bottom" :show-after="120">
+          <template #content>
+            <div style="line-height: 1.7;">
+              <div style="font-weight: 600;">
+                {{ t('channel.rebuildLandingTipTitle') }}
+              </div>
+              <div>{{ t('channel.rebuildLandingTip1') }}</div>
+              <div>{{ t('channel.rebuildLandingTip2') }}</div>
+              <div>{{ t('channel.rebuildLandingTip3') }}</div>
+              <div style="margin-top: 4px; font-size: 12px; opacity: .85;">
+                {{ t('channel.rebuildLandingTipFooter') }}
+              </div>
+            </div>
+          </template>
+          <el-button
+            v-auth="['channel:save']"
+            type="warning"
+            @click="handleRebuildLanding"
+          >
+            <ma-svg-icon name="material-symbols:sync-rounded" :size="16" class="mr-1" />
+            {{ t('channel.rebuildLanding') }}
+          </el-button>
+        </el-tooltip>
         <el-button
           v-auth="['channel:save']"
           type="primary"
@@ -145,6 +223,16 @@ function handleDelete(): void {
           @click="handleDelete"
         >
           {{ t('crud.delete') }}
+        </el-button>
+        <!-- 与「删除」并排：列表有多选，勾几条就只重建这几条 -->
+        <el-button
+          v-auth="['channel:save']"
+          type="warning"
+          plain
+          :disabled="selections.length < 1"
+          @click="handleRebuildSelected"
+        >
+          {{ t('channel.rebuildLandingSelected') }}
         </el-button>
       </template>
       <!-- 数据为空时 -->

@@ -4,11 +4,12 @@ channelMenu:
   delete: Channel Delete
 channel:
   mainTitle: Channel
-  subTitle: Add, edit and delete channels; the channel code builds the landing / navigation / auto-redirect links
+  subTitle: Add, edit and delete channels
   name: Channel Name
   namePlaceholder: e.g. A7-steve
   code: Channel Code
-  codePlaceholder: Letters and digits only, cannot be changed after creation
+  codePlaceholder: The code is part of the landing / navigation / auto-redirect URLs and cannot be changed later
+  codeInvalid: Letters and digits only
   codeLocked: The channel code cannot be changed after creation
   loginName: Login Account
   loginNamePlaceholder: Account used to log in to the channel backend
@@ -24,7 +25,7 @@ channel:
   weight: Sort
   weightTip: The larger, the higher
   jsCode: JS Code
-  jsCodePlaceholder: Extra JS executed on this channel's pages
+  jsCodePlaceholder: Full script code including the script tag (inserted as-is, not wrapped)
   botLinkType: Push Type
   botLinkTypeTip: Which link the bot pushes for this channel
   openMode: Open Mode
@@ -36,9 +37,9 @@ channel:
   naviUrl: Navigation
   autoUrl: Auto Redirect
   urlEmpty: Domain not configured
-  urlEmptyTip: The domain is missing, configure the landing / navigation / auto-redirect domains in Settings first
   copySuccess: Link copied
   copyFail: Copy failed, please copy manually
+  urlEmptyTip: The domain is missing, configure the landing / navigation / auto-redirect domains in Settings first
   updatedBy: Updated By
   groupBasic: Basic
   groupDeduct: Deduction & Sort
@@ -47,4 +48,21 @@ channel:
   modeLand: Landing
   modeNavi: Navigation
   modeAuto: Adaptive
+  rebuildLandingNotice: Channel landing pages are static files — after changing the landing background, package URLs or download switches in Settings, click Rebuild Landings at the top right to regenerate them
+  rebuildLanding: Rebuild Landings
+  rebuildLandingSuccess: Rebuilt {generated}/{total} landing pages
+  landingFailed: Channel saved, but the landing page file failed to generate. Check the landing directory permission and click "Rebuild Landings"
+  rebuildLandingTipTitle: 'Rebuild is needed after changing:'
+  rebuildLandingTip1: · landing background / app icon / landing name in Settings
+  rebuildLandingTip2: · iOS or Android package download URL in Settings
+  rebuildLandingTip3: · "auto download" or "download dialog" switch in Settings
+  rebuildLandingTipFooter: Changes on the channel itself (e.g. JS code) regenerate the page automatically on save
+  rebuildLandingConfirm: Regenerate every channel landing page from the current settings? (Only needed after changing the background, package URLs or download switches.)
+  rebuildLandingSelected: Rebuild Selected
+  rebuildLandingSelectedConfirm: Regenerate landing pages for the {count} selected channel(s)?
+  rebuildLandingOne: Rebuild
+  rebuildLandingOneSuccess: Landing page regenerated
+  rebuildLandingOneFailed: Failed to generate the landing page, check the landing directory permission
+  statusDisabledTip: Disabled — landing page taken offline
+  rebuildLandingDisabled: The channel is disabled and its landing page is offline — nothing to rebuild
   weightSaved: Sort value updated
