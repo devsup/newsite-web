@@ -142,6 +142,8 @@ baota:
   addDomainsTip: 一行一個，支援「網域」或「網域:埠」
   domainsPlaceholder: 如 example.com，多個請換行分隔
   addDomainSubmit: 新增
+  addDomainResult: 成功新增 {added} 個網域
+  addDomainPartial: 成功 {added} 個，失敗：{detail}
   domainsEmpty: 請填寫要新增的網域
   domainTotal: 共 {total} 個網域
   refreshSsl: 重新整理
@@ -154,7 +156,7 @@ baota:
   sslSubject: 憑證網域
   forceHttps: 強制HTTPS
   selectApplyDomain: 選擇申請憑證的網域
-  applyAndDeploy: 一鍵申請並部署憑證
+  applyAndDeploy: 申請部署憑證
   applyAndDeployConfirm: 將為 {domain} 申請 Let's Encrypt 憑證並部署到該站點；需網域已解析到伺服器。確認繼續？
   applyDomainRequired: 請先選擇要申請憑證的網域
   forceHttpsOn: 開啟強制HTTPS
@@ -182,4 +184,6 @@ baota:
   dayUnit: 天
   testOk: 連線正常：{system}（面板 {version}）
   sslLoadedTip: 已載入目前憑證，可直接修改後重新部署
+  applyHintIp: IP 將由面板簽發自簽憑證（非 Let's Encrypt）
+  applyHint: Let's Encrypt 免費憑證 · 檔案驗證
   notConfigured: 未設定

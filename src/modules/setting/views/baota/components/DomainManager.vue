@@ -93,7 +93,13 @@ async function removeDomain(row: BaoTaDomainVo): Promise<void> {
   })
 }
 
-/** 批量添加域名：后端会把换行 / 逗号分隔的文本拆开并去重后一次提交给面板 */
+/**
+ * 批量添加域名。
+ *
+ * 输入支持换行 / 逗号 / 空格混用（后端统一拆分去重后按面板要求提交）；
+ * 面板对每个域名单独返回结果，所以要区分「全部成功」「部分失败」「全部失败」，
+ * 否则某个域名失败（如已存在）时用户会误以为全部加上了。
+ */
 async function addDomains(): Promise<void> {
   if (!domainsInput.value.trim()) {
     msg.error(t('baota.domainsEmpty'))
@@ -107,15 +113,33 @@ async function addDomains(): Promise<void> {
     domains: domainsInput.value,
   })
 
-  if (res.code === ResultCode.SUCCESS) {
-    msg.success(t('crud.createSuccess'))
-    domainsInput.value = ''
-    await refresh()
-    emit('changed')
+  if (res.code !== ResultCode.SUCCESS) {
+    msg.error(res.message)
+    return
+  }
+
+  const added = res.data?.added ?? 0
+  const failed = res.data?.failed ?? []
+  const tip = res.data?.tip ?? ''
+
+  if (failed.length > 0) {
+    msg.error(t('baota.addDomainPartial', {
+      added,
+      detail: failed.map((item: { name: string, msg: string }) => `${item.name}（${item.msg}）`).join('；'),
+    }))
   }
   else {
-    msg.error(res.message)
+    msg.success(t('baota.addDomainResult', { added }))
   }
+
+  // 面板的附加提示，如「本站点已启用SSL证书，但本次添加的域名无法匹配当前证书」
+  if (tip) {
+    msg.warning(tip)
+  }
+
+  domainsInput.value = ''
+  await refresh()
+  emit('changed')
 }
 
 useTable('domainTable').then((table: MaTableExpose) => {
@@ -174,7 +198,7 @@ onMounted(refresh)
         :placeholder="t('baota.domainsPlaceholder')"
       />
 
-      <div class="mt-2">
+      <div class="mt-2 flex justify-end">
         <el-button
           v-auth="['baota:domainSave']"
           type="primary"

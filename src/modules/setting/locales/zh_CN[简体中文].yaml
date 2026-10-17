@@ -142,6 +142,8 @@ baota:
   addDomainsTip: 一行一个，支持「域名」或「域名:端口」
   domainsPlaceholder: 如 example.com，多个用换行分隔
   addDomainSubmit: 添加
+  addDomainResult: 成功添加 {added} 个域名
+  addDomainPartial: 成功 {added} 个，失败：{detail}
   domainsEmpty: 请填写要添加的域名
   domainTotal: 共 {total} 个域名
   refreshSsl: 刷新
@@ -154,7 +156,7 @@ baota:
   sslSubject: 证书域名
   forceHttps: 强制HTTPS
   selectApplyDomain: 选择申请证书的域名
-  applyAndDeploy: 一键申请并部署证书
+  applyAndDeploy: 申请部署证书
   applyAndDeployConfirm: 将为 {domain} 申请 Let's Encrypt 证书并部署到该站点；需域名已解析到服务器。确认继续？
   applyDomainRequired: 请先选择要申请证书的域名
   forceHttpsOn: 开启强制HTTPS
@@ -182,4 +184,6 @@ baota:
   dayUnit: 天
   testOk: 连接正常：{system}（面板 {version}）
   sslLoadedTip: 已载入当前证书，可直接修改后重新部署
+  applyHintIp: IP 将由面板签发自签名证书（非 Let's Encrypt）
+  applyHint: Let's Encrypt 免费证书 · 文件验证
   notConfigured: 未配置

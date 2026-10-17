@@ -154,8 +154,15 @@ export function domainList(data: BaoTaQuery): Promise<ResponseStruct<BaoTaDomain
   return useHttp().get('/admin/baota/domains', { params: data })
 }
 
-/** POST /admin/baota/domains - 添加域名（domains 支持换行 / 逗号分隔批量） */
-export function domainAdd(data: BaoTaQuery): Promise<ResponseStruct<{ added: number }>> {
+/** 批量添加域名的结果：成功数、失败明细（面板逐域名返回）、面板附加提示 */
+export interface BaoTaDomainAddResult {
+  added: number
+  failed: Array<{ name: string, msg: string }>
+  tip: string
+}
+
+/** POST /admin/baota/domains - 添加域名（domains 支持换行 / 逗号 / 空格分隔批量） */
+export function domainAdd(data: BaoTaQuery): Promise<ResponseStruct<BaoTaDomainAddResult>> {
   return useHttp().post('/admin/baota/domains', data)
 }
 
@@ -193,12 +200,17 @@ export function sslClose(data: BaoTaQuery): Promise<ResponseStruct<Record<string
   return useHttp().post('/admin/baota/ssl/close', data)
 }
 
-/** POST /admin/baota/ssl/apply - 一键申请并部署 Let's Encrypt 证书 */
+/**
+ * POST /admin/baota/ssl/apply - 一键申请并部署 Let's Encrypt 证书
+ *
+ * 单独放宽超时：申请要走 ACME 文件校验（面板实测 7s 以上），
+ * 用全局默认的 5s 会被前端直接取消（表现为「点了没反应」）。
+ */
 export function sslApply(data: BaoTaQuery): Promise<ResponseStruct<{ applied: boolean }>> {
-  return useHttp().post('/admin/baota/ssl/apply', data)
+  return useHttp().post('/admin/baota/ssl/apply', data, { timeout: 120000 })
 }
 
-/** POST /admin/baota/ssl/renew - 续签证书 */
+/** POST /admin/baota/ssl/renew - 续签证书（同样要走 ACME 交互，放宽超时） */
 export function sslRenew(data: BaoTaQuery): Promise<ResponseStruct<Record<string, any>>> {
-  return useHttp().post('/admin/baota/ssl/renew', data)
+  return useHttp().post('/admin/baota/ssl/renew', data, { timeout: 120000 })
 }

@@ -142,6 +142,8 @@ baota:
   addDomainsTip: One per line, "domain" or "domain:port"
   domainsPlaceholder: e.g. example.com, one per line
   addDomainSubmit: Add
+  addDomainResult: 'Added {added} domain(s)'
+  addDomainPartial: 'Added {added}, failed: {detail}'
   domainsEmpty: Please fill in the domains to add
   domainTotal: '{total} domain(s)'
   refreshSsl: Refresh
@@ -182,4 +184,6 @@ baota:
   dayUnit: days
   testOk: 'Connected: {system} (panel {version})'
   sslLoadedTip: The current certificate has been loaded, edit and deploy it again
+  applyHintIp: The panel issues a self-signed certificate for an IP (not Let's Encrypt)
+  applyHint: Free Let's Encrypt certificate · HTTP file validation
   notConfigured: Not configured

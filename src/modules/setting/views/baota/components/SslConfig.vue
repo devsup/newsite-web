@@ -48,6 +48,23 @@ const certPem = ref('')
 const domainOptions = ref<{ label: string, value: string }[]>([])
 const selectedDomain = ref('')
 
+/**
+ * 是否为 IP 地址。
+ *
+ * 面板允许为 IP 申请证书，只是签发的是**自签名证书**（非 Let's Encrypt、有效期通常只有几天）。
+ * 这里只用于在界面上如实提示，**不做任何拦截**——申请目标由使用者决定。
+ */
+function isIpAddress(value: string): boolean {
+  if (!value) {
+    return false
+  }
+  // IPv4 / IPv6（面板里 IPv6 通常不带方括号）
+  return /^\d{1,3}(?:\.\d{1,3}){3}$/.test(value) || value.includes(':')
+}
+
+/** 当前申请目标是否为 IP（仅用于切换提示文案） */
+const isIpSelected = computed<boolean>(() => isIpAddress(selectedDomain.value))
+
 /** 证书剩余天数（面板 cert_data.endtime 即为剩余天数） */
 const remainingDays = computed<number | null>(() => {
   const value = sslData.value?.cert_data?.endtime
@@ -357,6 +374,34 @@ onMounted(refreshAll)
 
       <div class="ssl-action">
         <span class="ssl-action__label">
+          <ma-svg-icon name="material-symbols:settings-outline" :size="16" />
+          {{ t('baota.maintainGroup') }}
+        </span>
+        <div class="ssl-action__body">
+          <el-button v-auth="['baota:sslSave']" type="success" plain @click="doRenew">
+            {{ t('baota.renewSsl') }}
+          </el-button>
+          <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
+            {{ t('baota.closeSsl') }}
+          </el-button>
+        </div>
+      </div>
+      <div class="ssl-action">
+        <span class="ssl-action__label">
+          <ma-svg-icon name="material-symbols:lock-outline" :size="16" />
+          {{ t('baota.httpsGroup') }}
+        </span>
+        <div class="ssl-action__body">
+          <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
+            {{ t('baota.forceHttpsOn') }}
+          </el-button>
+          <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
+            {{ t('baota.forceHttpsOff') }}
+          </el-button>
+        </div>
+      </div>
+      <div class="ssl-action">
+        <span class="ssl-action__label">
           <ma-svg-icon name="material-symbols:add-circle-outline" :size="16" />
           {{ t('baota.applyGroup') }}
         </span>
@@ -383,36 +428,9 @@ onMounted(refreshAll)
           >
             {{ t('baota.applyAndDeploy') }}
           </el-button>
-        </div>
-      </div>
-
-      <div class="ssl-action">
-        <span class="ssl-action__label">
-          <ma-svg-icon name="material-symbols:lock-outline" :size="16" />
-          {{ t('baota.httpsGroup') }}
-        </span>
-        <div class="ssl-action__body">
-          <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
-            {{ t('baota.forceHttpsOn') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
-            {{ t('baota.forceHttpsOff') }}
-          </el-button>
-        </div>
-      </div>
-
-      <div class="ssl-action">
-        <span class="ssl-action__label">
-          <ma-svg-icon name="material-symbols:settings-outline" :size="16" />
-          {{ t('baota.maintainGroup') }}
-        </span>
-        <div class="ssl-action__body">
-          <el-button v-auth="['baota:sslSave']" type="success" plain @click="doRenew">
-            {{ t('baota.renewSsl') }}
-          </el-button>
-          <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
-            {{ t('baota.closeSsl') }}
-          </el-button>
+          <span class="ssl-action__hint">
+            {{ isIpSelected ? t('baota.applyHintIp') : t('baota.applyHint') }}
+          </span>
         </div>
       </div>
     </el-card>
@@ -451,11 +469,12 @@ onMounted(refreshAll)
           />
         </el-form-item>
 
-        <el-form-item>
+        <!-- 提交按钮靠右，与「添加域名」卡片保持一致 -->
+        <div class="flex justify-end">
           <el-button v-auth="['baota:sslSave']" type="primary" @click="doSetSsl">
             {{ t('baota.setSslSubmit') }}
           </el-button>
-        </el-form-item>
+        </div>
       </el-form>
     </el-card>
   </div>
@@ -517,6 +536,11 @@ onMounted(refreshAll)
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
   }
 }
 
