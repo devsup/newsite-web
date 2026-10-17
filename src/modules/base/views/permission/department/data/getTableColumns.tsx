@@ -88,6 +88,7 @@ export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t
             name: 'del',
             show: () => showBtn('permission:department:delete'),
             icon: 'mdi:delete',
+            linkProps: { type: 'danger' },
             text: () => t('crud.delete'),
             onClick: ({ row }, proxy: MaProTableExpose) => {
               msg.delConfirm(t('crud.delDataMessage')).then(async () => {

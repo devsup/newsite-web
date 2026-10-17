@@ -130,6 +130,9 @@ baseLoginLog:
   status: 登录状态
   message: 提示消息
   login_time: 登录时间
+  startTime: 开始时间
+  endTime: 结束时间
+
 baseOperationLog:
   title: 用户操作日志
   username: 用户名
@@ -139,6 +142,12 @@ baseOperationLog:
   ip: 请求IP
   created_at: 创建时间
   updated_at: 更新时间
+  request_data: 操作参数
+  viewParams: 查看参数（{count} 项）
+  paramsTitle: 操作参数
+  paramsEmpty: 该记录没有请求参数（改造前的历史数据未采集）
+  startTime: 开始时间
+  endTime: 结束时间
 baseDepartment:
   name: 部门名称
   created_at: 创建时间

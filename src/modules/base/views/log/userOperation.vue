@@ -10,51 +10,33 @@
 <script setup lang="ts">
 import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@mineadmin/pro-table'
 import type { Ref } from 'vue'
+import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import getSearchItems from './userOperationLogData/UserOperationLogSearch.tsx'
 import getColumns from './userOperationLogData/UserOperationLogColumn.tsx'
-import type { RequestLogInfoVo } from '~/base/api/log.ts'
 import { UserOperatorLog } from '~/base/api/log.ts'
-import { ResultCode } from '@/utils/ResultCode.ts'
-import { useMessage } from '@/hooks/useMessage.ts'
-import MaBatchActions from '@/components/ma-batch-actions/index.vue'
-import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
-import { clearTableSelection } from '@/utils/table.ts'
+import useDialog from '@/hooks/useDialog.ts'
+import OperationParams from './components/OperationParams.vue'
 
 defineOptions({ name: 'log:userOperation' })
 
 const t = useTrans().globalTrans
 const proTableRef = ref<MaProTableExpose>() as Ref<MaProTableExpose>
-const selections: Ref<RequestLogInfoVo[]> = ref([])
-const msg = useMessage()
 
-/** 批量删除所选操作日志：确认框写明条数，成功后清空勾选 */
-function handleDelete(): void {
-  const ids = selections.value.map((value: RequestLogInfoVo) => value.id)
-  if (ids.length === 0) {
-    return
-  }
-  msg.confirm(t('crud.batchDeleteConfirm', { count: ids.length })).then(async () => {
-    const res = await UserOperatorLog.delete(ids)
-    if (res.code === ResultCode.SUCCESS) {
-      msg.success(t('crud.delSuccess'))
-      clearTableSelection(proTableRef, selections)
-      proTableRef.value.refresh()
-    }
-    else {
-      msg.error(res.message)
-    }
-  })
-}
+/**
+ * 「请求参数」查看弹窗.
+ *
+ * 参数是脱敏后的 JSON，长度不可控，所以只读弹窗、不设 footer（用右上角 × 或 Esc 关闭），
+ * 内容区内部滚动。
+ */
+const maDialog: UseDialogExpose = useDialog({
+  width: '860px',
+  footer: false,
+})
 
-/** 批量操作菜单 */
-const batchActions: BatchAction[] = [
-  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true },
-]
-
-function handleBatchCommand(command: string): void {
-  if (command === 'delete') {
-    handleDelete()
-  }
+/** 点「查看」时把当前行交给弹窗 */
+function openParams(row: any): void {
+  maDialog.setTitle(t('baseOperationLog.paramsTitle'))
+  maDialog.open({ formType: 'params', data: row })
 }
 
 const options = ref<MaProTableOptions>({
@@ -62,13 +44,6 @@ const options = ref<MaProTableOptions>({
   adaptionOffsetBottom: 161,
   header: {
     mainTitle: () => t('baseOperationLog.title'),
-  },
-  // 表格参数
-  tableOptions: {
-    on: {
-      // 表格选择事件
-      onSelectionChange: (selection: any[]) => selections.value = selection,
-    },
   },
   // 搜索参数
   searchOptions: {
@@ -92,17 +67,19 @@ const schema = ref<MaProTableSchema>({
   // 搜索项
   searchItems: getSearchItems(t),
   // 表格列
-  tableColumns: getColumns(t),
+  tableColumns: getColumns(t, openParams),
 })
 </script>
 
 <template>
   <div class="mine-layout pt-3">
-    <MaProTable ref="proTableRef" :options="options" :schema="schema">
-      <template #toolbarLeft>
-        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
+    <MaProTable ref="proTableRef" :options="options" :schema="schema" />
+
+    <component :is="maDialog.Dialog">
+      <template #default="{ formType, data }">
+        <OperationParams v-if="formType === 'params'" :data="data" />
       </template>
-    </MaProTable>
+    </component>
   </div>
 </template>
 

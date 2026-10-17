@@ -7,48 +7,45 @@
  * @Author X.Mo<root@imoi.cn>
  * @Link   https://github.com/mineadmin
  */
-import type { MaProTableColumns, MaProTableExpose } from '@mineadmin/pro-table'
-import { UserOperatorLog } from '~/base/api/log.ts'
-import { ResultCode } from '@/utils/ResultCode.ts'
-import { useMessage } from '@/hooks/useMessage.ts'
+import type { MaProTableColumns } from '@mineadmin/pro-table'
+import { ElButton } from 'element-plus'
 
-export default function getColumns(t: any): MaProTableColumns[] {
-  const msg = useMessage()
+/**
+ * 操作日志列表列.
+ *
+ * 日志只读：没有多选列、也没有删除操作（后端接口与按钮权限已一并移除）。
+ *
+ * @param t 全局翻译函数
+ * @param openParams 打开「请求参数」弹窗的回调（参数 JSON 太长，列表里只给入口）
+ */
+export default function getColumns(t: any, openParams: (row: any) => void): MaProTableColumns[] {
   return [
-    // 多选列
-    { type: 'selection', showOverflowTooltip: false, label: () => t('crud.selection') },
     // 索引序号列
     { type: 'index' },
     // 普通列
     { label: () => t('baseOperationLog.username'), prop: 'username' },
     { label: () => t('baseOperationLog.method'), prop: 'method' },
-    { label: () => t('baseOperationLog.router'), prop: 'router' },
+    { label: () => t('baseOperationLog.router'), prop: 'router', minWidth: 220 },
     { label: () => t('baseOperationLog.service_name'), prop: 'service_name' },
     { label: () => t('baseOperationLog.ip'), prop: 'ip' },
-    { label: () => t('baseOperationLog.created_at'), prop: 'created_at' },
-    // 操作列
     {
-      type: 'operation',
-      label: () => t('crud.operation'),
-      operationConfigure: {
-        type: 'tile',
-        actions: [
-          {
-            name: 'del',
-            icon: 'mdi:delete',
-            text: () => t('crud.delete'),
-            onClick: ({ row }, proxy: MaProTableExpose) => {
-              msg.delConfirm(t('crud.delDataMessage')).then(async () => {
-                const response = await UserOperatorLog.delete([row.id])
-                if (response.code === ResultCode.SUCCESS) {
-                  msg.success(t('crud.delSuccess'))
-                  proxy.refresh()
-                }
-              })
-            },
-          },
-        ],
+      // 参数键名可能很多，列表里只给「N 项 · 查看」，点击后用 JSON 查看器展示完整内容
+      label: () => t('baseOperationLog.request_data'),
+      prop: 'request_data',
+      minWidth: 130,
+      showOverflowTooltip: false,
+      cellRender: ({ row }) => {
+        const data = row?.request_data
+        if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+          return <span class="text-[var(--el-text-color-placeholder)]">-</span>
+        }
+        return (
+          <ElButton link type="primary" onClick={() => openParams(row)}>
+            {t('baseOperationLog.viewParams', { count: Object.keys(data).length })}
+          </ElButton>
+        )
       },
     },
+    { label: () => t('baseOperationLog.created_at'), prop: 'created_at', minWidth: 170 },
   ]
 }

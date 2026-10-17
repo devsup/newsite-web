@@ -35,6 +35,8 @@ export interface RequestLogInfoVo {
   service_name: string
   // 请求的IP地址
   ip: string
+  // 请求参数（已脱敏的 JSON；改造前的历史数据为 null）
+  request_data: Record<string, any> | null
   created_at: string
   updated_at: string
   // 备注信息
@@ -45,18 +47,10 @@ export class UserLoginLog {
   public static page(params: UserLoginVo): Promise<ResponseStruct<UserLoginVo[]>> {
     return useHttp().get('/admin/user-login-log/list', { params })
   }
-
-  public static delete(ids: number[]): Promise<ResponseStruct<null>> {
-    return useHttp().delete('/admin/user-login-log', { data: { ids } })
-  }
 }
 
 export class UserOperatorLog {
   public static page(params: RequestLogInfoVo): Promise<ResponseStruct<RequestLogInfoVo[]>> {
     return useHttp().get('/admin/user-operation-log/list', { params })
-  }
-
-  public static delete(ids: number[]): Promise<ResponseStruct<null>> {
-    return useHttp().delete('/admin/user-operation-log', { data: { ids } })
   }
 }

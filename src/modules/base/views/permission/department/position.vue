@@ -199,6 +199,7 @@ const schema = ref<MaProTableSchema>({
             name: 'del',
             show: () => showBtn('permission:position:delete'),
             icon: 'mdi:delete',
+            linkProps: { type: 'danger' },
             text: () => t('crud.delete'),
             onClick: ({ row }, proxy: MaProTableExpose) => {
               msg.delConfirm(t('crud.delDataMessage')).then(async () => {

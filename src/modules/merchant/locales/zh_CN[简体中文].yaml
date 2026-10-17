@@ -47,6 +47,10 @@ merchantInfo:
   batchValueTooLong: 最多 {max} 个字符
   batchUpdateDone: 已更新 {count} 个商户
   batchDeleteConfirm: 确定要删除选中的 {count} 个商户吗？删除后不可恢复。
+  channel: 所属渠道
+  createdAt: 创建时间
+  startTime: 开始时间
+  endTime: 结束时间
   updatedBy: 更新人
   showName: 展示名称
   merchantPv: 商户PV
