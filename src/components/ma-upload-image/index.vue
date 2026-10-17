@@ -36,19 +36,31 @@ const {
   fileType = ['image/jpeg', 'image/png', 'image/gif'],
   limit = 5,
   multiple = false,
+  showTextInput = false,
+  showTextInputPlaceholder = '',
 } = defineProps<{
-  modelValue: string | string[] | null
+  /** 普通模式传 string / string[]；开了 showTextInput 时传 `{ url, text }[]`（图文成对） */
+  modelValue: string | string[] | UploadTextItem[] | null
   title?: string
   size?: number
   fileSize?: number
   fileType?: string[]
   limit?: number
   multiple?: boolean
+  /** 每个文件下面带一个文本输入框（如「视频图片列表」需要给每张图配视频链接） */
+  showTextInput?: boolean
+  showTextInputPlaceholder?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | string[]): void
+  (e: 'update:modelValue', value: string | string[] | UploadTextItem[]): void
 }>()
+
+/** 图文成对的数据结构（showTextInput 模式） */
+interface UploadTextItem {
+  url: string
+  text: string
+}
 
 const id = uid(5)
 const msg = useMessage()
@@ -91,6 +103,14 @@ function btnRender() {
 const fileList = ref<UploadUserFile[]>([])
 
 function updateModelValue() {
+  if (showTextInput) {
+    emit('update:modelValue', fileList.value.map((file: any) => ({
+      url: file.url || '',
+      text: file.text || '',
+    })) as UploadTextItem[])
+    return
+  }
+
   emit(
     'update:modelValue',
     (multiple ? fileList.value.map(file => file.url!) : fileList.value[0]?.url) as string | string[],
@@ -151,13 +171,27 @@ watch(
 
 watch(
   () => modelValue,
-  (val: string | string[] | null) => {
+  (val: string | string[] | UploadTextItem[] | null) => {
     if (!val) {
       fileList.value = []
       return false
     }
-    if (isArray(val)) {
-      fileList.value = val.map((item: string) => {
+    if (showTextInput && isArray(val)) {
+      // 图文成对：{ url, text }[] → fileList（text 直接挂到元素上，模板里 v-model="file.text"）。
+      // 兼容历史数据：早期 video_image_list 存的是纯 URL 数组，没有 text，这里按空文本回填。
+      fileList.value = (val as Array<UploadTextItem | string>).map((item) => {
+        const url = typeof item === 'string' ? item : (item?.url ?? '')
+        const text = typeof item === 'string' ? '' : (item?.text ?? '')
+
+        return {
+          name: (url || '').split('/').pop() as string,
+          url,
+          text,
+        }
+      }) as any
+    }
+    else if (isArray(val)) {
+      fileList.value = (val as string[]).map((item: string) => {
         return {
           name: item.split('/').pop() as string,
           url: item,
@@ -210,35 +244,48 @@ watch(
       <component :is="btnRender()" v-show="fileList.length === 0" ref="uploadBtnRef" />
     </slot>
     <template #file="{ file, index }">
-      <div class="ma-preview-list ma-upload-container relative" :style="getSize">
-        <div class="ma-preview-mask">
-          <ma-svg-icon
-            name="weui:eyes-on-filled"
-            class="icon"
-            :size="20"
-            @click="openPreview"
-          />
-          <ma-svg-icon
-            name="material-symbols:delete"
-            class="icon"
-            :size="20"
-            @click="() => {
-              fileList.splice(index, 1)
-              updateModelValue()
-            }"
+      <div class="ma-upload-item" :style="showTextInput ? { width: `${size ?? 120}px` } : {}">
+        <div class="ma-preview-list ma-upload-container relative" :style="getSize">
+          <div class="ma-preview-mask">
+            <ma-svg-icon
+              name="weui:eyes-on-filled"
+              class="icon"
+              :size="20"
+              @click="openPreview"
+            />
+            <ma-svg-icon
+              name="material-symbols:delete"
+              class="icon"
+              :size="20"
+              @click="() => {
+                fileList.splice(index, 1)
+                updateModelValue()
+              }"
+            />
+          </div>
+          <el-image
+            ref="elImageRef"
+            :src="file?.url"
+            class="absolute rounded-md"
+            :style="getSize"
+            fit="cover"
+            :zoom-rate="1.2"
+            :max-scale="7"
+            :min-scale="0.2"
+            :preview-src-list="previewList"
+            :initial-index="index"
           />
         </div>
-        <el-image
-          ref="elImageRef"
-          :src="file?.url"
-          class="absolute rounded-md"
-          :style="getSize"
-          fit="cover"
-          :zoom-rate="1.2"
-          :max-scale="7"
-          :min-scale="0.2"
-          :preview-src-list="previewList"
-          :initial-index="index"
+        <!-- 图文成对（showTextInput）：每个文件下面挂一个文本框，比如视频图片列表要填视频链接地址 -->
+        <el-input
+          v-if="showTextInput"
+          v-model="(file as any).text"
+          :placeholder="showTextInputPlaceholder"
+          class="mt-1"
+          size="small"
+          @change="updateModelValue"
+          @click.stop
+          @keydown.stop
         />
       </div>
       <component
@@ -282,6 +329,14 @@ watch(
     @apply flex gap-x-1.5;
   }
 }
+/* 图文成对模式：每个文件是「图片 + 输入框」的竖排块，需要顶部对齐，
+   否则 el-upload-list 的 flex 居中会把不同高度的块错位 */
+.ma-upload-item {
+  @apply inline-flex flex-col items-stretch;
+  vertical-align: top;
+  text-align: left;
+}
+
 .ma-upload-container {
   @apply flex items-center justify-center bg-gray-50 b-1 b-dashed rounded-md b-gray-3 dark-b-dark-50
     transition-all duration-300 text-gray-5 dark-bg-dark-5 relative;

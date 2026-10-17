@@ -11,6 +11,7 @@ declare module 'vue' {
     Form: typeof import('./../src/components/ma-key-value/components/form.vue')['default']
     JsonNode: typeof import('./../src/components/ma-json-viewer/components/JsonNode.vue')['default']
     MaAuth: typeof import('./../src/components/ma-auth/index.vue')['default']
+    MaBatchActions: typeof import('./../src/components/ma-batch-actions/index.vue')['default']
     MaCitySelect: typeof import('./../src/components/ma-city-select/index.vue')['default']
     MaColCard: typeof import('./../src/components/ma-col-card/index.vue')['default']
     MaDialog: typeof import('./../src/components/ma-dialog/index.vue')['default']

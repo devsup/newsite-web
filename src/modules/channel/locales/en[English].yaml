@@ -8,7 +8,7 @@ channel:
   name: Channel Name
   namePlaceholder: e.g. A7-steve
   code: Channel Code
-  codePlaceholder: The code is part of the landing / navigation / auto-redirect URLs and cannot be changed later
+  codePlaceholder: Letters and digits only, cannot be changed later
   codeInvalid: Letters and digits only
   codeLocked: The channel code cannot be changed after creation
   loginName: Login Account

@@ -84,7 +84,6 @@ import { ResultCode } from '@/utils/ResultCode.ts'
 import { useImageViewer } from '@/hooks/useImageViewer.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import type { Resources } from '#/global'
-import useParentNode from '@/hooks/useParentNode.ts'
 
 defineOptions({ name: 'MaResourcePanel' })
 
@@ -92,7 +91,7 @@ const props = withDefaults(defineProps<ResourcePanelProps>(), {
   multiple: false,
   limit: undefined,
   showAction: true,
-  pageSize: 30,
+  pageSize: 100,
   dbClickConfirm: false,
 })
 const emit = defineEmits<{
@@ -149,53 +148,8 @@ const queryParams = ref<Record<string, any>>({
   suffix: [],
 })
 
-/** 列表滚动容器（用来按可视区算「一屏能装多少张」） */
-const listRef = ref<HTMLElement>()
 /** 视频预览地址（空串表示弹窗关闭） */
 const videoPreviewUrl = ref('')
-
-/**
- * 按容器可视区算每页数量，让一屏装满再翻页（原来固定 30 张，宽屏下底部会空出一大块）。
- *
- * 列表项是正方形，尺寸取 CSS 变量 `--resource-item-size`；间距取 el-space 的 `fill-ratio`（9%）。
- * @returns 每页数量是否变化（只有变化时才需要重新请求，避免和 getResourceList 互相触发）
- */
-function recalcPageSize(): boolean {
-  const el = listRef.value
-  if (!el) {
-    return false
-  }
-  const width = el.clientWidth
-  const height = el.clientHeight
-  if (width <= 0 || height <= 0) {
-    return false
-  }
-
-  const style = getComputedStyle(el)
-  const size = Number.parseFloat(style.getPropertyValue('--resource-item-size')) || 120
-  const gap = size * 0.09
-  const step = size + gap
-  const cols = Math.max(1, Math.floor((width + gap) / step))
-  const rows = Math.max(1, Math.floor((height + gap) / step))
-  const next = cols * rows
-
-  // 一屏至少 1 行；上限 10×10=100（再大一次要解密/拉取的图片太多，首屏会明显变慢）
-  const safe = Math.min(Math.max(next, cols), 100)
-  if (safe === queryParams.value.page_size) {
-    return false
-  }
-  queryParams.value.page_size = safe
-  queryParams.value.page = 1
-
-  return true
-}
-
-/** 尺寸变化后重算每页数量，变了才重新拉数据 */
-function syncPageSize(): void {
-  if (recalcPageSize()) {
-    getResourceList(queryParams.value)
-  }
-}
 
 /** 是否视频（视频没有封面，展示播放按钮、支持预览播放） */
 function isVideo(resource: Resource): boolean {
@@ -205,22 +159,6 @@ function isVideo(resource: Resource): boolean {
 function openVideoPreview(resource: Resource): void {
   videoPreviewUrl.value = resource.url || ''
 }
-
-let listResizeObserver: ResizeObserver | null = null
-
-onMounted(() => {
-  syncPageSize()
-  // 侧栏折叠 / 窗口缩放都会改变可视区，跟着重算
-  listResizeObserver = new ResizeObserver(() => syncPageSize())
-  if (listRef.value) {
-    listResizeObserver.observe(listRef.value)
-  }
-})
-
-onBeforeUnmount(() => {
-  listResizeObserver?.disconnect()
-  listResizeObserver = null
-})
 
 async function getResourceList(params: Resource = {}) {
   loading.value = true
@@ -251,7 +189,7 @@ watch(() => selectedKeys.value, (newKeys) => {
  * 加载占位符数量
  */
 const skeletonNum = computed(() => {
-  return loading.value ? queryParams.value.page_size : 30
+  return loading.value ? queryParams.value.page_size : 100
 })
 
 function onfileTypesChange(value: any) {
@@ -490,78 +428,15 @@ function handleFile(ev: Event, btn: Resources.Button) {
   }
 }
 
+/** 顶部上传按钮：先执行按钮自身的 click 逻辑，再打开同卡片里的文件选择框 */
+function handleUploadButton(btn: Resources.Button, event: MouseEvent): void {
+  btn.click?.(btn, selected.value)
+  const input = (event.currentTarget as HTMLElement).querySelector<HTMLInputElement>('input[type="file"]')
+  input?.click()
+}
+
 onMounted(async () => {
   await getResourceList()
-
-  const apps = document.getElementsByClassName('res-app') as HTMLCollectionOf<HTMLDivElement>
-
-  for (let i = 0; i < apps.length; i++) {
-    const app = apps[i] as HTMLDivElement
-    app.addEventListener('click', (e: MouseEvent) => {
-      e.stopPropagation()
-      const node = useParentNode(e, 'div')
-      const fileInput = node.children[0]
-      const btn = resourceStore.getAllButton()?.find(item => item.name === fileInput.getAttribute('name'))
-      if (btn?.click) {
-        btn?.click?.(btn, selected as any)
-      }
-      if (btn?.upload) {
-        fileInput?.click?.()
-      }
-    })
-    app?.parentElement?.addEventListener('mouseover', () => {
-      const index = i
-      app.className = 'res-app main-effect'
-
-      if (index === 0) {
-        if (apps[1]) {
-          apps[1].className = 'res-app second-effect'
-        }
-        if (apps[2]) {
-          apps[2].className = 'res-app third-effect'
-        }
-      }
-      else if (index === apps.length - 1) {
-        if (apps[index - 1]) {
-          apps[index - 1].className = 'res-app second-effect'
-        }
-        if (apps[index - 2]) {
-          apps[index - 2].className = 'res-app third-effect'
-        }
-      }
-      else {
-        if (apps[index - 1]) {
-          apps[index - 1].className = 'res-app second-effect'
-        }
-        if (apps[index + 1]) {
-          apps[index + 1].className = 'res-app second-effect'
-        }
-
-        if (index - 2 > -1 && apps[index - 2]) {
-          apps[index - 2].className = 'res-app third-effect'
-        }
-
-        if (index + 2 < apps.length && apps[index + 2]) {
-          apps[index + 2].className = 'res-app third-effect'
-        }
-      }
-    })
-
-    app?.parentElement?.addEventListener('mouseout', () => {
-      for (const app of apps) {
-        app.className = 'res-app'
-      }
-    })
-  }
-})
-
-onUnmounted(() => {
-  // 取消监听
-  document.querySelectorAll('.ma-resource-dock .res-app').forEach((app) => {
-    app.removeEventListener('mousemove', () => {})
-    app.removeEventListener('mouseout', () => {})
-    app.removeEventListener('click', () => {})
-  })
 })
 </script>
 
@@ -587,7 +462,27 @@ onUnmounted(() => {
         </el-segmented>
       </div>
 
-      <div class="flex justify-end">
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <div class="ma-resource-dock">
+          <div
+            v-for="btn in resourceStore.getAllButton()"
+            :key="btn.name"
+            class="res-app"
+            :class="btn.name === 'local-image-upload' ? 'res-app--image' : 'res-app--file'"
+            @click="handleUploadButton(btn, $event)"
+          >
+            <input
+              type="file"
+              :name="btn.name"
+              class="hidden"
+              v-bind="btn?.uploadConfig ?? {}"
+              @change="handleFile($event, btn)"
+              @click.stop="() => {}"
+            >
+            <ma-svg-icon :name="btn.icon" class="res-app-icon" :size="17" />
+            <span class="res-app-label">{{ getButtonLabel(btn) }}</span>
+          </div>
+        </div>
         <el-input
           v-model="queryParams.origin_name" :placeholder="t('searchPlaceholder')" clearable class="w-full md:w-[180px]" @input="() => {
             getResourceList(queryParams)
@@ -599,7 +494,7 @@ onUnmounted(() => {
         </el-input>
       </div>
     </div>
-    <div ref="listRef" class="mt-2 min-h-0 flex-1">
+    <div class="mt-2 min-h-0 flex-1">
       <OverlayScrollbarsComponent
         v-if="loading || resources.length" class="max-h-full"
         :options="{ scrollbars: { autoHide: 'leave', autoHideDelay: 100 } }"
@@ -640,7 +535,7 @@ onUnmounted(() => {
                 <div v-if="getCover(resource)" class="resource-item__name cursor-default">
                   {{ resource.origin_name }}
                 </div>
-                <!-- 视频没有封面：盖一层播放按钮，点它预览播放（单击/双击依旧是选中/确认） -->
+                <!-- 视频始终显示播放按钮，便于快速和图片区分；点按钮预览播放 -->
                 <button
                   v-if="isVideo(resource)"
                   class="resource-item__play"
@@ -648,7 +543,7 @@ onUnmounted(() => {
                   :title="t('videoPreview')"
                   @click.stop="openVideoPreview(resource)"
                 >
-                  <ma-svg-icon name="solar:play-circle-bold" :size="38" />
+                  <ma-svg-icon name="ph:play-fill" :size="34" />
                 </button>
                 <div class="resource-item__selected">
                   <ma-svg-icon class="resource-item__selected-icon" name="gravity-ui:circle-check-fill" :size="18" />
@@ -719,26 +614,6 @@ onUnmounted(() => {
         playsinline
       />
     </el-dialog>
-
-    <div class="ma-resource-dock">
-      <template v-for="btn in resourceStore.getAllButton()">
-        <div class="res-app-container">
-          <div class="res-app">
-            <m-tooltip :text="getButtonLabel(btn)">
-              <input
-                type="file"
-                :name="btn.name"
-                class="hidden"
-                v-bind="btn?.uploadConfig ?? {}"
-                @change="handleFile($event, btn)"
-                @click.stop="() => {}"
-              >
-              <ma-svg-icon :name="btn.icon" class="res-app-icon" />
-            </m-tooltip>
-          </div>
-        </div>
-      </template>
-    </div>
   </div>
 </template>
 
@@ -757,62 +632,46 @@ onUnmounted(() => {
   --resource-item-size:120px;
 
   .ma-resource-dock {
-    @apply absolute bg-gray-2 dark-bg-dark-9
-    rounded-xl p-1 flex items-center justify-center gap-x-0.5
-    ;
-    height: 40px;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    bottom: 0;
+    @apply flex items-center gap-2;
+    flex-shrink: 0;
+  }
 
-    .res-app-container {
-      @apply relative h-40px flex items-center;
-    }
+  .res-app {
+    @apply inline-flex h-32px cursor-pointer items-center gap-1.5 rounded-md border border-solid px-3 text-13px font-500 transition-colors duration-200;
+  }
 
-    // 白色圆点
-    .activate::after {
-      content: "";
-      @apply block b-2 b-solid b-white rounded-full w-0 h-0 absolute bottom-2px left-50%;
-    }
+  .res-app--image {
+    border-color: var(--el-color-primary-light-5);
+    color: var(--el-color-primary);
+    background: var(--el-color-primary-light-9);
+  }
 
-    .res-app {
-      @apply w-40px h-40px shadow-inset shadow-md rounded-10px transition-all duration-300 flex items-center justify-center
-      bg-gray-3 dark-bg-dark-4
-        dark-shadow-dark-9
-      ;
-    }
+  .res-app--file {
+    border-color: var(--el-color-success-light-5);
+    color: var(--el-color-success);
+    background: var(--el-color-success-light-9);
+  }
 
-    .res-app-icon {
-      @apply w-55px h-55px !text-2xl text-dark-1 dark-text-gray-2 cursor-pointer
-      ;
-      transition: transform .28s ease;
-      will-change: transform;
-    }
+  .res-app--image:hover {
+    border-color: var(--el-color-primary);
+    color: var(--el-color-white);
+    background: var(--el-color-primary);
+  }
 
-    // 悬停效果：只做「轻微缩放 + 上移」，不改容器宽高（改宽高会挤压相邻按钮、整排跳动）
-    .main-effect {
-      transform: translateY(-10px);
-    }
+  .res-app--file:hover {
+    border-color: var(--el-color-success);
+    color: var(--el-color-white);
+    background: var(--el-color-success);
+  }
 
-    .main-effect .res-app-icon {
-      transform: scale(1.08);
-    }
+  .res-app-icon {
+    @apply flex items-center justify-center;
+    width: 17px;
+    height: 17px;
+  }
 
-    .second-effect {
-      transform: translateY(-6px);
-    }
-
-    .second-effect .res-app-icon {
-      transform: scale(1.04);
-    }
-
-    .third-effect {
-      transform: translateY(-3px);
-    }
-
-    .third-effect .res-app-icon {
-      transform: scale(1.02);
-    }
+  .res-app-label {
+    @apply whitespace-nowrap;
   }
 }
 .resource-item{
@@ -833,11 +692,20 @@ onUnmounted(() => {
   background-image: linear-gradient(to top right, transparent 50%, rgb(var(--ui-primary)) 50%);
 }
 .resource-item__play{
-  @apply absolute inset-0 flex items-center justify-center border-0 bg-black/25 text-white opacity-80 transition-opacity duration-200;
+  /* 常显的播放标记：一眼区分视频/图片。
+     不要圆底——黑半透明圆压在封面图上显得脏、也挡内容；改成纯白三角 + 投影，最经典也最干净。
+     只占居中 40×40，卡片其它区域仍留给「选中」（inset:0 铺满会把单击全吃掉） */
+  @apply absolute left-50% top-50% flex h-40px w-40px items-center justify-center border-0 bg-transparent text-white transition-transform duration-200;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  /* 双层投影：浅色封面（白底图）上白三角也要立得住 */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .95)) drop-shadow(0 0 8px rgba(0, 0, 0, .5));
 }
-.resource-item__play:hover{
-  @apply opacity-100;
+
+.resource-item:hover .resource-item__play{
+  transform: translate(-50%, -50%) scale(1.12);
 }
+
 .resource-item__selected-icon{
   @apply absolute top-0 right-0 p-2px c-white;
 }

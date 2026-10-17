@@ -9,6 +9,9 @@ import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
+import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import TabFooterForm from './form.vue'
 import BindCategory from './components/BindCategory.vue'
@@ -98,15 +101,34 @@ function openAdd(): void {
   maDialog.open({ formType: 'add' })
 }
 
+/** 批量操作菜单：权限不满足的项由组件内部过滤 */
+const batchActions: BatchAction[] = [
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, auth: 'tabFooter:delete' },
+]
+
+/** 批量操作入口：当前各页只有删除，后续新增批量项在这里分发即可 */
+function handleBatchCommand(command: string): void {
+  if (command === 'delete') {
+    handleDelete()
+  }
+}
+
+/**
+ * 批量删除所选数据.
+ *
+ * 确认框写明「N 条 + 不可恢复」，比通用的「是否删除所选中数据」更能避免误删；
+ * 成功后清空勾选，避免删完还勾着导致下一次误操作。
+ */
 function handleDelete(): void {
-  const ids = selections.value.map(item => item.id)
+  const ids = selections.value.map((item: any) => item.id)
   if (ids.length === 0) {
     return
   }
-  msg.confirm(t('crud.delMessage')).then(async () => {
+  msg.confirm(t('crud.batchDeleteConfirm', { count: ids.length })).then(async () => {
     const response = await deleteByIds(ids)
     if (response.code === ResultCode.SUCCESS) {
       msg.success(t('crud.delSuccess'))
+      clearTableSelection(proTableRef, selections)
       proTableRef.value.refresh()
     }
     else {
@@ -126,15 +148,7 @@ function handleDelete(): void {
       </template>
 
       <template #toolbarLeft>
-        <el-button
-          v-auth="['tabFooter:delete']"
-          type="danger"
-          plain
-          :disabled="selections.length < 1"
-          @click="handleDelete"
-        >
-          {{ t('crud.delete') }}
-        </el-button>
+        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
       </template>
     </MaProTable>
 

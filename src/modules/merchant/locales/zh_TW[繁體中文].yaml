@@ -12,6 +12,103 @@ merchantMenu:
   tabFooterIndex: 底部Tab列表
   tabFooterSave: 底部Tab儲存
   tabFooterDelete: 底部Tab刪除
+  merchantInfo: 商戶信息
+  merchantIndex: 商戶信息列表
+  merchantSave: 商戶信息儲存
+  merchantDelete: 商戶信息刪除
+
+merchantInfo:
+  mainTitle: 商戶信息
+  subTitle: 維護商戶基本信息、展示信息與彈窗信息；切換商戶類型會動態調整區域與欄位，統計欄位暫為佔位
+  id: ID
+  name: 商戶名稱
+  namePlaceholder: 請輸入商戶名稱
+  categoryType: 商戶類目
+  showType: 商戶類型
+  categoryArea: 商戶區域
+  jumpUrl: 跳轉連結
+  jumpLink: 跳轉連結
+  jumpUrlPlaceholder: 請輸入落地頁或跳轉地址
+  weight: 排序值
+  weightTip: 數值越小越靠前
+  weightSaved: 排序值已更新
+  batchOperation: 批次操作
+  batchEnable: 啟用
+  batchDisable: 停用
+  batchEnableAction: 啟用
+  batchDisableAction: 停用
+  batchStatusConfirm: 將{action}所選的 {count} 個商戶，是否繼續？
+  batchStatusDone: 已{action} {count} 個商戶
+  batchModifyName: 修改名稱
+  batchModifyJumpUrl: 修改跳轉連結
+  batchHint: 所選的 {count} 個商戶都會改成下面這個值，請確認後再提交
+  batchNamePlaceholder: 請輸入新的商戶名稱
+  batchJumpUrlPlaceholder: 請輸入新的跳轉連結
+  batchValueTooLong: 最多 {max} 個字元
+  batchUpdateDone: 已更新 {count} 個商戶
+  batchDeleteConfirm: 確定要刪除所選的 {count} 個商戶嗎？刪除後不可復原。
+  updatedBy: 更新人
+  showName: 展示名稱
+  merchantPv: 商戶PV
+  merchantUv: 商戶UV
+  statsPlaceholder: 統計功能將在數據中心統一接入
+  basicInfo: 基本信息
+  showInfoTitle: 展示信息
+  popupInfoTitle: 彈窗信息
+  layerType: 彈窗類型
+  selectPlaceholder: 請選擇
+  selectArea: 請選擇區域
+  selectShowTypeFirst: 請先選擇商戶類型
+  remarkPlaceholder: 備註該商戶的用途
+  copySuccess: 連結已複製
+  copyFail: 複製失敗，請手動複製
+  areaType: 展示類型
+  internalName: 內部名稱
+  explicitName: 顯式名稱
+  areaAdd: 新增區域
+  areaEdit: 編輯區域
+  areaMerchantTitle: 區域商戶【{name}】
+  merchantCount: 商戶數量
+  config: 配置
+  dragSort: 拖拽排序
+  backList: 返回列表
+  saveSort: 儲存排序
+  sortTip: 按住卡片任意位置拖拽調整順序，儲存後生效
+  noMerchant: 暫無商戶
+  showInfo:
+    carouselImage: 輪播圖
+    btnText: 按鈕文案
+    productImage: 商品圖片
+    productName: 商品名稱
+    productLabel: 商品標籤
+    productPrice: 商品售價
+    sellNumber: 已售數量
+    liveImage: 直播圖片
+    onlineNumber: 在線觀眾
+    anchorAge: 主播年齡
+    appIcon: 應用圖標
+    appName: 應用名稱
+    appLabel: 應用標籤
+    appIntro: 應用簡介
+    graphicImage: 圖文詳情圖片
+    graphicImageList: 圖文詳情圖片列表
+    personName: 人物名稱
+    personAge: 人物年齡
+    personLabel: 人物標籤
+    personIntro: 人物簡介
+    serviceIntro: 服務介紹
+    serviceFeedback: 服務反饋
+    videoImageList: 視頻圖片列表
+    videoUrl: 視頻連結地址
+    personCode: 人物編號
+    adImage: 廣告圖片
+  popup:
+    downIcon: 下載圖標
+    detailImage: 詳情圖片
+    btnText: 按鈕文案
+    layerRemark: 彈窗簡介
+    appIcon: 應用圖標
+    layerTitle: 彈窗標題
 
 category:
   mainTitle: 頂部Tab
@@ -22,6 +119,12 @@ category:
   weightTip: 數值越小越靠前
   weightSaved: 排序值已更新
   updatedBy: 更新人
+  area: 區域配置
+  config: 配置
+  daily: 日統計
+  areaTitle: 區域配置【{name}】
+  dailyPlaceholderTitle: 日統計【{name}】
+  dailyPlaceholderDesc: 日統計將在數據中心統一接入，本次僅保留入口佔位。
   remarkPlaceholder: 備註該頂部Tab的用途
 
 categoryType:

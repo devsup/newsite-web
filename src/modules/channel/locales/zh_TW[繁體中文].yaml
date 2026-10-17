@@ -8,7 +8,7 @@ channel:
   name: 通路名稱
   namePlaceholder: 如 A7返回量-steve
   code: 通路編碼
-  codePlaceholder: 編碼會拼進落地頁 / 導航頁 / 自動跳轉連結，建立後不可修改
+  codePlaceholder: 僅允許字母數字，建立後不可修改
   codeInvalid: 僅允許字母、數字
   codeLocked: 通路編碼建立後不可修改
   loginName: 登入帳號

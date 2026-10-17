@@ -15,18 +15,35 @@ import { useMessage } from '@/hooks/useMessage.ts'
  * 统一的资源上传处理：无论成功还是失败都给用户一个提示。
  * 之前成功只刷新列表、失败直接抛错，界面上毫无反馈，用户会误以为「不能上传」。
  */
-function handleResourceUpload(files: FileList, args: Resources.Args) {
+async function handleResourceUpload(files: FileList, args: Resources.Args) {
   const msg = useMessage()
-  const options = { file: files[0] }
+  const list = Array.from(files ?? [])
+  if (list.length === 0) {
+    return
+  }
 
-  uploadLocal(options)
-    .then(() => {
-      msg.success('上传成功')
-      args?.getResourceList?.()
-    })
-    .catch((e: any) => {
-      msg.error(e?.message || '上传失败，请重试')
-    })
+  let uploaded = 0
+  const errors: string[] = []
+
+  // 串行上传：后端调试环境只有 1 个 HTTP worker，并发会排队到超时；同时单个失败不影响后面的文件
+  for (const file of list) {
+    try {
+      await uploadLocal({ file })
+      ++uploaded
+    }
+    catch (e: any) {
+      errors.push(`${file.name}：${e?.message || '上传失败'}`)
+    }
+  }
+
+  if (uploaded > 0) {
+    msg.success(list.length > 1 ? `成功上传 ${uploaded} 个文件` : '上传成功')
+    args?.getResourceList?.()
+  }
+
+  if (errors.length > 0) {
+    msg.error(errors.length === 1 ? errors[0] : `${errors.length} 个文件上传失败，如「${errors[0]}」`)
+  }
 }
 
 const resourceDefaultButtons: Resources.Button[] = [
@@ -36,8 +53,9 @@ const resourceDefaultButtons: Resources.Button[] = [
     icon: 'solar:upload-square-broken',
     upload: handleResourceUpload,
     uploadConfig: {
+      // accept 只是选择器的过滤条件；multiple 让用户一次能选多张（原来 limit: 1 只能选一个）
       accept: 'image/*',
-      limit: 1,
+      multiple: true,
     },
     order: 0,
   },
@@ -49,7 +67,7 @@ const resourceDefaultButtons: Resources.Button[] = [
     uploadConfig: {
       // 文档 + 压缩包 + 视频 + 音频（后端不限类型，只是选择器按这里过滤，别漏了视频）
       accept: '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.pdf,.zip,.rar,.7z,.mp4,.mov,.avi,.mkv,.webm,.flv,.m4v,.mp3,.wav,.aac,.flac,.m4a',
-      limit: 1,
+      multiple: true,
     },
     order: 1,
   },

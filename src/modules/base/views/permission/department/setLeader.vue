@@ -20,6 +20,9 @@ import type { TransType } from '@/hooks/auto-imports/useTrans.ts'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
+import { clearTableSelection } from '@/utils/table.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
@@ -190,16 +193,39 @@ const schema = ref<MaProTableSchema>({
 })
 
 // 批量删除
-function handleDelete() {
+/**
+ * 批量移除负责人.
+ *
+ * 这个列表是「部门 + 用户」双主键，所以删除走 deleteByDoubleKey（部门取第一行的 dept_id）。
+ */
+function handleDelete(): void {
+  if (selections.value.length === 0) {
+    return
+  }
   const deptId = selections.value[0].dept_id
   const userIds = selections.value.map((item: any) => item.user_id)
-  msg.confirm(t('crud.delMessage')).then(async () => {
+  msg.confirm(t('crud.batchDeleteConfirm', { count: userIds.length })).then(async () => {
     const response = await deleteByDoubleKey(deptId, userIds)
     if (response.code === ResultCode.SUCCESS) {
       msg.success(t('crud.delSuccess'))
+      clearTableSelection(proTableRef, selections)
       await proTableRef?.value?.refresh?.()
     }
+    else {
+      msg.error(response.message)
+    }
   })
+}
+
+/** 批量操作菜单 */
+const batchActions: BatchAction[] = [
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, auth: 'permission:leader:delete' },
+]
+
+function handleBatchCommand(command: string): void {
+  if (command === 'delete') {
+    handleDelete()
+  }
 }
 </script>
 
@@ -227,15 +253,7 @@ function handleDelete() {
         >
           {{ t('crud.add') }}
         </el-button>
-        <el-button
-          v-auth="['permission:leader:delete']"
-          type="danger"
-          plain
-          :disabled="selections.length < 1"
-          @click="handleDelete"
-        >
-          {{ t('crud.delete') }}
-        </el-button>
+        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
       </div>
     </template>
   </ma-pro-table>

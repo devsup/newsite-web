@@ -18,6 +18,9 @@ import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
+import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
 import RoleForm from './form.vue'
@@ -125,15 +128,34 @@ const schema = ref<MaProTableSchema>({
 })
 
 // 批量删除
-function handleDelete() {
+/** 批量删除所选角色：确认框写明条数，成功后清空勾选 */
+function handleDelete(): void {
   const ids = selections.value.map((item: any) => item.id)
-  msg.confirm(t('crud.delMessage')).then(async () => {
+  if (ids.length === 0) {
+    return
+  }
+  msg.confirm(t('crud.batchDeleteConfirm', { count: ids.length })).then(async () => {
     const response = await deleteByIds(ids)
     if (response.code === ResultCode.SUCCESS) {
       msg.success(t('crud.delSuccess'))
+      clearTableSelection(proTableRef, selections)
       proTableRef.value.refresh()
     }
+    else {
+      msg.error(response.message)
+    }
   })
+}
+
+/** 批量操作菜单 */
+const batchActions: BatchAction[] = [
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, auth: 'permission:role:delete' },
+]
+
+function handleBatchCommand(command: string): void {
+  if (command === 'delete') {
+    handleDelete()
+  }
 }
 </script>
 
@@ -154,15 +176,7 @@ function handleDelete() {
       </template>
 
       <template #toolbarLeft>
-        <el-button
-          v-auth="['permission:role:delete']"
-          type="danger"
-          plain
-          :disabled="selections.length < 1"
-          @click="handleDelete"
-        >
-          {{ t('crud.delete') }}
-        </el-button>
+        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
       </template>
       <!-- 数据为空时 -->
       <template #empty>

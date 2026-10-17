@@ -364,12 +364,15 @@ onMounted(refreshAll)
 
     <!--
       证书操作：按用途分成三行，左侧「图标 + 分组名」定宽、右侧控件，行间细线分隔。
-      按钮按业务语义配色：申请部署=主色实心（主操作）、开启强制HTTPS=蓝色描边（启用）、
+      按钮按业务语义配色并配同语义图标：申请部署=主色实心（主操作）、开启强制HTTPS=蓝色描边（启用）、
       关闭强制HTTPS=橙色描边（可逆的停用）、续签=绿色描边（续期）、关闭SSL=红色描边（销毁性操作）。
     -->
     <el-card class="mb-3" shadow="never">
       <template #header>
-        <span class="font-medium">{{ t('baota.sslActions') }}</span>
+        <span class="flex items-center gap-1 font-medium">
+          <ma-svg-icon name="material-symbols:verified-user-outline" :size="16" />
+          {{ t('baota.sslActions') }}
+        </span>
       </template>
 
       <div class="ssl-action">
@@ -379,9 +382,11 @@ onMounted(refreshAll)
         </span>
         <div class="ssl-action__body">
           <el-button v-auth="['baota:sslSave']" type="success" plain @click="doRenew">
+            <ma-svg-icon name="material-symbols:autorenew" :size="16" class="mr-1" />
             {{ t('baota.renewSsl') }}
           </el-button>
           <el-button v-auth="['baota:sslSave']" type="danger" plain @click="doCloseSsl">
+            <ma-svg-icon name="material-symbols:lock-open-outline" :size="16" class="mr-1" />
             {{ t('baota.closeSsl') }}
           </el-button>
         </div>
@@ -393,9 +398,11 @@ onMounted(refreshAll)
         </span>
         <div class="ssl-action__body">
           <el-button v-auth="['baota:sslSave']" type="primary" plain @click="doForceHttps(true)">
+            <ma-svg-icon name="material-symbols:lock-outline" :size="16" class="mr-1" />
             {{ t('baota.forceHttpsOn') }}
           </el-button>
           <el-button v-auth="['baota:sslSave']" type="warning" plain @click="doForceHttps(false)">
+            <ma-svg-icon name="material-symbols:lock-open-outline" :size="16" class="mr-1" />
             {{ t('baota.forceHttpsOff') }}
           </el-button>
         </div>
@@ -426,6 +433,7 @@ onMounted(refreshAll)
             :disabled="!selectedDomain"
             @click="doApplyAndDeploy"
           >
+            <ma-svg-icon name="material-symbols:verified-user-outline" :size="16" class="mr-1" />
             {{ t('baota.applyAndDeploy') }}
           </el-button>
           <span class="ssl-action__hint">
@@ -439,14 +447,17 @@ onMounted(refreshAll)
     <el-card shadow="never">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="font-medium">{{ t('baota.setSsl') }}</span>
+          <span class="flex items-center gap-1 font-medium">
+            <ma-svg-icon name="material-symbols:upload-rounded" :size="16" />
+            {{ t('baota.setSsl') }}
+          </span>
           <span v-if="certKey && certPem" class="text-xs text-[var(--el-text-color-secondary)]">
             {{ t('baota.sslLoadedTip') }}
           </span>
         </div>
       </template>
 
-      <el-form label-width="100px">
+      <el-form label-position="top">
         <el-form-item :label="t('baota.sslKey')">
           <el-input
             v-model="certKey"
@@ -472,6 +483,7 @@ onMounted(refreshAll)
         <!-- 提交按钮靠右，与「添加域名」卡片保持一致 -->
         <div class="flex justify-end">
           <el-button v-auth="['baota:sslSave']" type="primary" @click="doSetSsl">
+            <ma-svg-icon name="material-symbols:upload-rounded" :size="16" class="mr-1" />
             {{ t('baota.setSslSubmit') }}
           </el-button>
         </div>

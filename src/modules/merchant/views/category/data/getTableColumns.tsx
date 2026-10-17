@@ -13,7 +13,9 @@ import hasAuth from '@/utils/permission/hasAuth.ts'
 export default function getTableColumns(
   dialog: UseDialogExpose,
   t: any,
-  proTableRef?: Ref<MaProTableExpose>,
+  proTableRef: Ref<MaProTableExpose>,
+  openArea: (row: CategoryVo) => void,
+  openDaily: (row: CategoryVo) => void,
 ): MaProTableColumns[] {
   const msg = useMessage()
   const statusLoading = ref<number>()
@@ -94,6 +96,18 @@ export default function getTableColumns(
         </div>
       ),
     },
+    {
+      label: () => t('category.area'),
+      prop: 'area_count',
+      width: '140px',
+      cellRender: ({ row }) => (
+        <div class="flex-center">
+          <el-button size="small" type="primary" onClick={() => openArea(row as CategoryVo)}>
+            {`${(row as CategoryVo).area_count || 0} ${t('category.config')}`}
+          </el-button>
+        </div>
+      ),
+    },
     { label: () => t('crud.remark'), prop: 'remark', minWidth: '160px', showOverflowTooltip: true },
     { label: () => t('crud.createTime'), prop: 'created_at', width: '170px' },
     { label: () => t('category.updatedBy'), prop: 'updated_by_name', width: '110px' },
@@ -101,10 +115,16 @@ export default function getTableColumns(
       type: 'operation',
       label: () => t('crud.operation'),
       fixed: 'right',
-      width: '180px',
+      width: '260px',
       operationConfigure: {
         type: 'tile',
         actions: [
+          {
+            name: 'daily',
+            icon: 'ant-design:bar-chart-outlined',
+            text: () => t('category.daily'),
+            onClick: ({ row }) => openDaily(row as CategoryVo),
+          },
           {
             name: 'edit',
             icon: 'material-symbols:person-edit',

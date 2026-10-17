@@ -74,6 +74,14 @@ const provider: ProviderService.Provider = {
         icon: markRaw(MaSvgIcon),
         contextMenu: ContextMenu.showContextMenu,
       },
+      // 全局默认每页条数：pro-table 内置默认是 10，这里统一改成 30，
+      // 页面自己的 options.requestOptions.requestPage.size 仍然优先（浅合并时整体覆盖）
+      // 注：类型上 requestOptions.api 是必填，但此处只放默认分页，api 由各页面提供，故断言
+      options: {
+        requestOptions: {
+          requestPage: { size: 30 },
+        },
+      } as any,
     })
     app.config.globalProperties.$mineCore = commonConfig()
   },

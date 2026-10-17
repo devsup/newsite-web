@@ -251,21 +251,39 @@ defineExpose({
 </template>
 
 <style scoped lang="scss">
+/* 弹窗内表单居中，两侧留白约 24px（与商户信息表单一致）：原来 1000px 时留白 59px 偏大 */
+.channel-form {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
 .channel-form__group-title {
-  margin: 4px 0 14px;
-  padding-left: 8px;
+  // 分组标题做成「小标题 + 下划线」：分割线在标题下方（不是上方），段落之间靠 margin-top 拉开
+  margin: 0 0 14px;
+  padding: 0 0 8px 8px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
   border-left: 3px solid var(--el-color-primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
+}
+
+.channel-form__group-title:not(:first-child) {
+  margin-top: 20px;
 }
 
 .channel-form__grid {
   display: grid;
   // 两列铺满卡片（不用 el-row 的 gutter——它是负 margin 实现的，会把内容顶出弹窗）
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 72px;
+  column-gap: 48px;
   row-gap: 4px;
+
+  // 同一行里「输入框 + 下方提示文字」和「高控件」高度不一致时，默认垂直居中会让标签错位；
+  // 统一顶部对齐（与商户信息表单一致）
+  :deep(.el-form-item) {
+    align-items: flex-start;
+  }
 }
 
 .channel-form__radios {

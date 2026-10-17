@@ -12,6 +12,103 @@ merchantMenu:
   tabFooterIndex: Bottom tab list
   tabFooterSave: Bottom tab save
   tabFooterDelete: Bottom tab delete
+  merchantInfo: Merchant Info
+  merchantIndex: Merchant list
+  merchantSave: Merchant save
+  merchantDelete: Merchant delete
+
+merchantInfo:
+  mainTitle: Merchants
+  subTitle: Maintain merchant basic, display and popup information. Changing the display type updates areas and fields dynamically; statistics are placeholders for now.
+  id: ID
+  name: Merchant Name
+  namePlaceholder: Please enter the merchant name
+  categoryType: Category
+  showType: Display Type
+  categoryArea: Area
+  jumpUrl: Jump URL
+  jumpLink: Jump URL
+  jumpUrlPlaceholder: Please enter the landing or jump URL
+  weight: Sort
+  weightTip: Smaller values come first
+  weightSaved: Sort value updated
+  batchOperation: Batch Actions
+  batchEnable: Enable
+  batchDisable: Disable
+  batchEnableAction: enabled
+  batchDisableAction: disabled
+  batchStatusConfirm: '{action} the {count} selected merchant(s)?'
+  batchStatusDone: '{action} {count} merchant(s)'
+  batchModifyName: Change Name
+  batchModifyJumpUrl: Change Jump URL
+  batchHint: 'The {count} selected merchant(s) will all be set to the value below'
+  batchNamePlaceholder: Enter the new merchant name
+  batchJumpUrlPlaceholder: Enter the new jump URL
+  batchValueTooLong: At most {max} characters
+  batchUpdateDone: '{count} merchant(s) updated'
+  batchDeleteConfirm: 'Delete the {count} selected merchant(s)? This cannot be undone.'
+  updatedBy: Updated By
+  showName: Display Name
+  merchantPv: Merchant PV
+  merchantUv: Merchant UV
+  statsPlaceholder: Statistics will be provided by the Data Center later
+  basicInfo: Basic Information
+  showInfoTitle: Display Information
+  popupInfoTitle: Popup Information
+  layerType: Popup Type
+  selectPlaceholder: Please select
+  selectArea: Please select an area
+  selectShowTypeFirst: Select the display type first
+  remarkPlaceholder: Note the purpose of this merchant
+  copySuccess: Link copied
+  copyFail: Copy failed, please copy manually
+  areaType: Display Type
+  internalName: Internal Name
+  explicitName: Explicit Name
+  areaAdd: Add Area
+  areaEdit: Edit Area
+  areaMerchantTitle: Area Merchants [{name}]
+  merchantCount: Merchant Count
+  config: Configure
+  dragSort: Drag to Sort
+  backList: Back to List
+  saveSort: Save Sort
+  sortTip: Drag anywhere on a card to reorder; changes take effect after saving
+  noMerchant: No merchants
+  showInfo:
+    carouselImage: Carousel
+    btnText: Button Text
+    productImage: Product Image
+    productName: Product Name
+    productLabel: Product Label
+    productPrice: Product Price
+    sellNumber: Sold Count
+    liveImage: Live Image
+    onlineNumber: Online Viewers
+    anchorAge: Anchor Age
+    appIcon: App Icon
+    appName: App Name
+    appLabel: App Label
+    appIntro: App Intro
+    graphicImage: Detail Image
+    graphicImageList: Detail Image List
+    personName: Person Name
+    personAge: Person Age
+    personLabel: Person Label
+    personIntro: Person Intro
+    serviceIntro: Service Intro
+    serviceFeedback: Service Feedback
+    videoImageList: Video Image List
+    videoUrl: Video URL
+    personCode: Person Code
+    adImage: Ad Image
+  popup:
+    downIcon: Download Icon
+    detailImage: Detail Image
+    btnText: Button Text
+    layerRemark: Popup Intro
+    appIcon: App Icon
+    layerTitle: Popup Title
 
 category:
   mainTitle: Top Tabs
@@ -22,6 +119,12 @@ category:
   weightTip: Smaller values come first
   weightSaved: Sort value updated
   updatedBy: Updated By
+  area: Area Configuration
+  config: Configure
+  daily: Daily Statistics
+  areaTitle: Area Configuration [{name}]
+  dailyPlaceholderTitle: Daily Statistics [{name}]
+  dailyPlaceholderDesc: Daily statistics will be provided by the Data Center later. This entry is a placeholder for now.
   remarkPlaceholder: Note the purpose of this top tab
 
 categoryType:

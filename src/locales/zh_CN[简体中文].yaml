@@ -167,6 +167,8 @@ crud:
   delDataMessage: 是否删除数据？
   delNoData: 至少要选择一行数据
   delSuccess: 删除成功
+  batchActions: 批量操作
+  batchDeleteConfirm: 确定要删除选中的 {count} 条数据吗？删除后不可恢复。
   status: 状态
   remark: 备注
   sort: 排序

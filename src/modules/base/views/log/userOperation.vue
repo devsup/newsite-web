@@ -16,6 +16,9 @@ import type { RequestLogInfoVo } from '~/base/api/log.ts'
 import { UserOperatorLog } from '~/base/api/log.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
+import { clearTableSelection } from '@/utils/table.ts'
 
 defineOptions({ name: 'log:userOperation' })
 
@@ -24,14 +27,34 @@ const proTableRef = ref<MaProTableExpose>() as Ref<MaProTableExpose>
 const selections: Ref<RequestLogInfoVo[]> = ref([])
 const msg = useMessage()
 
-async function clickDelete() {
+/** 批量删除所选操作日志：确认框写明条数，成功后清空勾选 */
+function handleDelete(): void {
   const ids = selections.value.map((value: RequestLogInfoVo) => value.id)
-  msg.confirm(t('crud.delMessage')).then(async () => {
+  if (ids.length === 0) {
+    return
+  }
+  msg.confirm(t('crud.batchDeleteConfirm', { count: ids.length })).then(async () => {
     const res = await UserOperatorLog.delete(ids)
     if (res.code === ResultCode.SUCCESS) {
+      msg.success(t('crud.delSuccess'))
+      clearTableSelection(proTableRef, selections)
       proTableRef.value.refresh()
     }
+    else {
+      msg.error(res.message)
+    }
   })
+}
+
+/** 批量操作菜单 */
+const batchActions: BatchAction[] = [
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true },
+]
+
+function handleBatchCommand(command: string): void {
+  if (command === 'delete') {
+    handleDelete()
+  }
 }
 
 const options = ref<MaProTableOptions>({
@@ -77,9 +100,7 @@ const schema = ref<MaProTableSchema>({
   <div class="mine-layout pt-3">
     <MaProTable ref="proTableRef" :options="options" :schema="schema">
       <template #toolbarLeft>
-        <el-button type="danger" plain :disabled="selections.length < 1" @click="clickDelete">
-          {{ t('crud.delete') }}
-        </el-button>
+        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
       </template>
     </MaProTable>
   </div>

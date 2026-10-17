@@ -18,6 +18,9 @@ import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
+import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
 import ChannelForm from './form.vue'
@@ -185,15 +188,44 @@ function handleRebuildSelected(): void {
 }
 
 // 批量删除
+/** 批量删除渠道：确认框写明条数，删除会一并删掉对应的落地页文件，成功后清空勾选 */
 function handleDelete(): void {
   const ids = selections.value.map((item: any) => item.id)
-  msg.confirm(t('crud.delMessage')).then(async () => {
+  if (ids.length === 0) {
+    return
+  }
+  msg.confirm(t('crud.batchDeleteConfirm', { count: ids.length })).then(async () => {
     const response = await deleteByIds(ids)
     if (response.code === ResultCode.SUCCESS) {
       msg.success(t('crud.delSuccess'))
+      clearTableSelection(proTableRef, selections)
       proTableRef.value.refresh()
     }
+    else {
+      msg.error(response.message)
+    }
   })
+}
+
+/**
+ * 批量操作菜单.
+ *
+ * 重建过程中把「重建」项禁用，避免重复触发既耗磁盘又要排队；
+ * 删除单独加分隔线并用危险色，和重建区分开。
+ */
+const batchActions = computed<BatchAction[]>(() => [
+  { command: 'rebuild', label: () => t('channel.rebuildLanding'), icon: 'material-symbols:refresh', auth: 'channel:save', disabled: rebuilding.value },
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, divided: true, auth: 'channel:delete' },
+])
+
+function handleBatchCommand(command: string): void {
+  if (command === 'rebuild') {
+    handleRebuildSelected()
+    return
+  }
+  if (command === 'delete') {
+    handleDelete()
+  }
 }
 </script>
 
@@ -247,26 +279,7 @@ function handleDelete(): void {
       </template>
 
       <template #toolbarLeft>
-        <el-button
-          v-auth="['channel:delete']"
-          type="danger"
-          plain
-          :disabled="selections.length < 1"
-          @click="handleDelete"
-        >
-          {{ t('crud.delete') }}
-        </el-button>
-        <!-- 与「删除」并排：列表有多选，勾几条就只重建这几条 -->
-        <el-button
-          v-auth="['channel:save']"
-          type="warning"
-          plain
-          :loading="rebuilding"
-          :disabled="rebuilding || selections.length < 1"
-          @click="handleRebuildSelected"
-        >
-          {{ t('channel.rebuildLandingSelected') }}
-        </el-button>
+        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
       </template>
       <!-- 数据为空时 -->
       <template #empty>

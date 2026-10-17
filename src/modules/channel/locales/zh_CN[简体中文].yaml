@@ -8,7 +8,7 @@ channel:
   name: 渠道名称
   namePlaceholder: 如 A7返回量-steve
   code: 渠道编码
-  codePlaceholder: 编码会拼进落地页 / 导航页 / 自动跳转链接，创建后不可修改
+  codePlaceholder: 只允许字母数字，创建后不可修改
   codeInvalid: 只允许字母、数字
   codeLocked: 渠道编码创建后不可修改
   loginName: 登陆账户

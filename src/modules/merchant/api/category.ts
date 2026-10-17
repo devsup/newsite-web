@@ -9,6 +9,8 @@ export interface CategoryVo {
   /** 状态：1 启用 / 2 禁用 */
   status?: number
   remark?: string
+  /** 区域数量（列表接口补充） */
+  area_count?: number
   /** 最后更新人用户名（列表接口补充） */
   updated_by_name?: string
   created_at?: string
