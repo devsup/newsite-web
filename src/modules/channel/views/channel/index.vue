@@ -12,6 +12,7 @@ import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@min
 import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
+import { useDebounceFn } from '@vueuse/core'
 import { deleteByIds, page, rebuildLanding } from '~/channel/api/channel'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
@@ -114,23 +115,61 @@ function openAdd(): void {
   maDialog.open({ formType: 'add' })
 }
 
+/** 重建请求的全局 loading：请求期间两个按钮都禁用，避免重复触发 */
+const rebuilding = ref(false)
+
+/**
+ * 重建落地页（全量/批量共用）。
+ *
+ * 防抖 500ms：连续点击只执行一次；确认框弹出前就锁住 rebuilding，取消后释放。
+ * 后端另有 Redis 锁，多标签页/直接调接口也会被串行化。
+ */
+const runRebuildLanding = useDebounceFn(async (ids?: number[]) => {
+  if (rebuilding.value) {
+    return
+  }
+  rebuilding.value = true
+
+  try {
+    try {
+      await msg.confirm(ids
+        ? t('channel.rebuildLandingSelectedConfirm', { count: ids.length })
+        : t('channel.rebuildLandingConfirm'))
+    }
+    catch {
+      // 用户取消确认框
+      return
+    }
+
+    const response = await rebuildLanding(ids)
+    if (response.code !== ResultCode.SUCCESS) {
+      msg.error(response.message)
+      return
+    }
+    if (response.data?.busy) {
+      msg.warning(t('channel.rebuildLandingBusy'))
+      return
+    }
+
+    msg.success(t('channel.rebuildLandingSuccess', {
+      generated: response.data?.generated ?? 0,
+      total: response.data?.total ?? 0,
+    }))
+    if (ids) {
+      proTableRef.value.refresh()
+    }
+  }
+  finally {
+    rebuilding.value = false
+  }
+}, 500)
+
 /**
  * 重建全部落地页：落地页内容是从系统设置「烘焙」进静态文件的
  *（背景图 / 安装包地址 / 自动下载开关），所以改完系统设置点一次即可全量刷新。
  */
 function handleRebuildLanding(): void {
-  msg.confirm(t('channel.rebuildLandingConfirm')).then(async () => {
-    const response = await rebuildLanding()
-    if (response.code === ResultCode.SUCCESS) {
-      msg.success(t('channel.rebuildLandingSuccess', {
-        generated: response.data?.generated ?? 0,
-        total: response.data?.total ?? 0,
-      }))
-    }
-    else {
-      msg.error(response.message)
-    }
-  })
+  runRebuildLanding()
 }
 
 /**
@@ -139,19 +178,10 @@ function handleRebuildLanding(): void {
  */
 function handleRebuildSelected(): void {
   const ids = selections.value.map((item: any) => item.id)
-  msg.confirm(t('channel.rebuildLandingSelectedConfirm', { count: ids.length })).then(async () => {
-    const response = await rebuildLanding(ids)
-    if (response.code === ResultCode.SUCCESS) {
-      msg.success(t('channel.rebuildLandingSuccess', {
-        generated: response.data?.generated ?? 0,
-        total: response.data?.total ?? 0,
-      }))
-      proTableRef.value.refresh()
-    }
-    else {
-      msg.error(response.message)
-    }
-  })
+  if (ids.length === 0) {
+    return
+  }
+  runRebuildLanding(ids)
 }
 
 // 批量删除
@@ -199,6 +229,8 @@ function handleDelete(): void {
           <el-button
             v-auth="['channel:save']"
             type="warning"
+            :loading="rebuilding"
+            :disabled="rebuilding"
             @click="handleRebuildLanding"
           >
             <ma-svg-icon name="material-symbols:sync-rounded" :size="16" class="mr-1" />
@@ -229,7 +261,8 @@ function handleDelete(): void {
           v-auth="['channel:save']"
           type="warning"
           plain
-          :disabled="selections.length < 1"
+          :loading="rebuilding"
+          :disabled="rebuilding || selections.length < 1"
           @click="handleRebuildSelected"
         >
           {{ t('channel.rebuildLandingSelected') }}

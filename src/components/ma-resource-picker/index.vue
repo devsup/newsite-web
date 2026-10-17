@@ -7,6 +7,15 @@
  - @Author X.Mo<root@imoi.cn>
  - @Link   https://github.com/mineadmin
 -->
+<i18n lang="yaml">
+en:
+  title: Resource Picker
+zh_CN:
+  title: 资源选择器
+zh_TW:
+  title: 資源選擇器
+</i18n>
+
 <script setup lang="ts">
 import { omit } from 'lodash-es'
 import MaResourcePanel from './panel.vue'
@@ -18,6 +27,9 @@ const emit = defineEmits<{
   cancel: []
   confirm: [selected: Resource[]]
 }>()
+
+const { localTrans: t } = useTrans()
+
 const dialogVisible = defineModel<boolean>('visible', { default: false })
 function onCancel() {
   dialogVisible.value = false
@@ -36,7 +48,7 @@ const attrs = omit(useAttrs(), ['onConfirm', 'onCancel'])
 <template>
   <MaDialog
     v-model="dialogVisible"
-    title="资源选择器"
+    :title="t('title')"
     append-to-body
     destroy-on-close
     align-center

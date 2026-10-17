@@ -21,6 +21,12 @@ export interface AttachmentVo {
   size_byte?: number
   size_info?: string
   url?: string
+  /** 对象存储桶名（OBS 等云存储有值） */
+  bucket_name?: string
+  /** 桶内对象键，如 2026-10-17/uuid.png */
+  storage_key?: string
+  /** 桶内绝对路径，如 obs://file-8750/2026-10-17/uuid.png */
+  storage_uri?: string
   remark?: string
 }
 

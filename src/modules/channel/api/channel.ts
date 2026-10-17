@@ -85,8 +85,16 @@ export function save(id: number, data: ChannelVo): Promise<ResponseStruct<{ land
  *
  * 不传 `ids` 重建全部；传 `ids` 只重建这些渠道（列表顶部「批量重建」）。
  */
-export function rebuildLanding(ids?: number[]): Promise<ResponseStruct<{ total: number, generated: number }>> {
-  return useHttp().post('/admin/channel/rebuild-landing', ids ? { ids } : {})
+/**
+ * POST /admin/channel/rebuild-landing - 重建全部/选中渠道的落地页
+ *
+ * 全量重建 1000 个渠道可能持续几分钟，必须覆盖全局默认 5s 超时，
+ * 否则前端会在后端还没生成完时提前释放按钮锁。
+ */
+export function rebuildLanding(ids?: number[]): Promise<ResponseStruct<{ total: number, generated: number, busy?: boolean }>> {
+  return useHttp().post('/admin/channel/rebuild-landing', ids ? { ids } : {}, {
+    timeout: 10 * 60 * 1000,
+  })
 }
 
 /**

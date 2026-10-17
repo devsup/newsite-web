@@ -3,7 +3,7 @@ import type { MTabsOptionItems } from '$/mine-admin/basic-ui/components/tab/type
 
 export interface Resource {
   id?: number
-  storage_mode?: number
+  storage_mode?: string
   origin_name?: string
   object_name?: string
   hash?: string
@@ -13,6 +13,12 @@ export interface Resource {
   size_byte?: number
   size_info?: string
   url?: string
+  /** 对象存储桶名 */
+  bucket_name?: string
+  /** 桶内对象键 */
+  storage_key?: string
+  /** 桶内绝对路径 obs://bucket/key */
+  storage_uri?: string
 }
 
 export interface FileType extends MTabsOptionItems<string> {

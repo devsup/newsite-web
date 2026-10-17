@@ -9,7 +9,7 @@
 -->
 <i18n lang="yaml">
 en:
-  searchPlaceholder: Search for icons under this category
+  searchPlaceholder: Search resources in this category
   tips: Are you sure you want to delete this data?
   cancelMessage: Deletion operation has been canceled
   errorMessage: An error occurred during the deletion process
@@ -26,6 +26,8 @@ en:
   delete: Delete
   cancel: Cancel
   confirm: Confirm
+  imageUpload: Upload image
+  fileUpload: Upload file
 zh_CN:
   searchPlaceholder: 搜索此分类下的资源
   tips: 你确定要删除这条数据吗？
@@ -44,6 +46,8 @@ zh_CN:
   delete: 删除
   cancel: 取消
   confirm: 确认
+  imageUpload: 上传图片
+  fileUpload: 上传文件
 
 zh_TW:
   searchPlaceholder: 搜索此分類下的資源
@@ -63,6 +67,8 @@ zh_TW:
   delete: 刪除
   cancel: 取消
   confirm: 確認
+  imageUpload: 上載圖片
+  fileUpload: 上載文件
 </i18n>
 
 <script setup lang="ts">
@@ -74,7 +80,6 @@ import { ResultCode } from '@/utils/ResultCode.ts'
 
 import { useImageViewer } from '@/hooks/useImageViewer.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
-import type { TransType } from '@/hooks/auto-imports/useTrans.ts'
 import type { Resources } from '#/global'
 import useParentNode from '@/hooks/useParentNode.ts'
 
@@ -91,8 +96,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
   (e: 'confirm', value: any[]): void
 }>()
-const i18n = useTrans() as TransType
-const t = i18n.globalTrans
+const { localTrans: t } = useTrans()
 
 const msg = useMessage()
 const resourceStore = useResourceStore()
@@ -195,6 +199,23 @@ function getFileTypeLabel(item: unknown): string {
     return typeof label === 'function' ? label() : String(label ?? '')
   }
   return ''
+}
+
+/**
+ * 资源库上传按钮的文案映射。
+ *
+ * store 里的按钮 label 是中文兜底（插件/外部也可能读取），面板展示时按 name 走本文件的多语言，
+ * 否则附件管理页底部上传按钮的 tooltip 始终是中文。
+ */
+const buttonI18nKeys: Record<string, string> = {
+  'local-image-upload': 'imageUpload',
+  'local-file-upload': 'fileUpload',
+}
+
+function getButtonLabel(btn: Resources.Button): string {
+  const key = buttonI18nKeys[btn.name]
+
+  return key ? t(key) : btn.label
 }
 
 /**
@@ -593,7 +614,7 @@ onUnmounted(() => {
       <template v-for="btn in resourceStore.getAllButton()">
         <div class="res-app-container">
           <div class="res-app">
-            <m-tooltip :text="btn.label">
+            <m-tooltip :text="getButtonLabel(btn)">
               <input
                 type="file"
                 :name="btn.name"

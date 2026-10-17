@@ -51,6 +51,7 @@ channel:
   rebuildLandingNotice: Channel landing pages are static files — after changing the landing background, package URLs or download switches in Settings, click Rebuild Landings at the top right to regenerate them
   rebuildLanding: Rebuild Landings
   rebuildLandingSuccess: Rebuilt {generated}/{total} landing pages
+  rebuildLandingBusy: Landing pages are being rebuilt, please try again shortly
   landingFailed: Channel saved, but the landing page file failed to generate. Check the landing directory permission and click "Rebuild Landings"
   rebuildLandingTipTitle: 'Rebuild is needed after changing:'
   rebuildLandingTip1: · landing background / app icon / landing name in Settings

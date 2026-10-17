@@ -25,6 +25,8 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
   const statusLoading = ref<number>()
   // 正在保存排序值的行 id，用于数字输入框的 loading 态
   const weightLoading = ref<number>()
+  // 行内「重建」防重复：同一行请求未返回前再次点击直接忽略
+  const rebuildingIds = new Set<number>()
 
   /** 打开方式 1 自适应（跟随系统运行模式）/ 2 落地页 / 3 导航页 → 展示文案与标签色 */
   const openModeMap: Record<number, { label: string, type: 'primary' | 'success' | 'info' }> = {
@@ -269,15 +271,24 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
                 return
               }
               // 单个重建是幂等操作、无副作用，不做二次确认；失败时把原因提示出来
-              rebuildLanding([row.id as number]).then((response) => {
+              const id = row.id as number
+              if (rebuildingIds.has(id)) {
+                return
+              }
+              rebuildingIds.add(id)
+              rebuildLanding([id]).then((response) => {
                 if (response.code !== ResultCode.SUCCESS) {
                   msg.error(response.message)
+                  return
+                }
+                if (response.data?.busy) {
+                  msg.warning(t('channel.rebuildLandingBusy'))
                   return
                 }
                 response.data?.generated
                   ? msg.success(t('channel.rebuildLandingOneSuccess'))
                   : msg.error(t('channel.rebuildLandingOneFailed'))
-              })
+              }).finally(() => rebuildingIds.delete(id))
             },
           },
           {

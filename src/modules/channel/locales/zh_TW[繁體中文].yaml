@@ -51,6 +51,7 @@ channel:
   rebuildLandingNotice: 通路落地頁是靜態檔案：改動系統設定裡的落地頁背景圖 / 安裝包位址 / 下載開關後，需點右上「重建落地頁」重新生成才會生效
   rebuildLanding: 重建落地頁
   rebuildLandingSuccess: 已重建 {generated}/{total} 個落地頁
+  rebuildLandingBusy: 正在重建落地頁，請稍候再試
   landingFailed: 通路已保存，但落地頁檔案生成失敗，請檢查落地頁目錄權限後點「重建落地頁」
   rebuildLandingTipTitle: 以下改動需要重建落地頁：
   rebuildLandingTip1: · 系統設定裡的落地頁背景圖 / APP 預設圖示 / 落地頁名稱

@@ -51,6 +51,7 @@ channel:
   rebuildLandingNotice: 渠道落地页是静态文件：改动系统设置里的落地页背景图 / 安装包地址 / 下载开关后，需点右上「重建落地页」重新生成才会生效
   rebuildLanding: 重建落地页
   rebuildLandingSuccess: 已重建 {generated}/{total} 个落地页
+  rebuildLandingBusy: 正在重建落地页，请稍候再试
   landingFailed: 渠道已保存，但落地页文件生成失败，请检查落地页目录权限后点「重建落地页」
   rebuildLandingTipTitle: 以下改动需要重建落地页：
   rebuildLandingTip1: · 系统设置里的落地页背景图 / APP 默认图标 / 落地页名称
