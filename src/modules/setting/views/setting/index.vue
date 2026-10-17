@@ -101,6 +101,7 @@ zh_TW:
 </i18n>
 
 <script setup lang="ts">
+import { useSiteStore } from '@/store/modules/useSiteStore.ts'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import type { SettingItemVo, SettingOption } from '~/setting/api/setting.ts'
 import { useEventListener } from '@vueuse/core'
@@ -262,6 +263,8 @@ async function handleSave(): Promise<void> {
     if (response.code === ResultCode.SUCCESS) {
       msg.success(globalTrans('crud.updateSuccess'))
       await loadSettings()
+      // 站点名称 / 图标可能刚被改过：强制刷新一次，左上角 logo 立即生效（不用刷新页面）
+      useSiteStore().load(true)
     }
     else {
       msg.error(response.message)

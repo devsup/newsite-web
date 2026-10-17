@@ -48,13 +48,6 @@ const defaultGlobalConfigSettings: RecursiveRequired<SystemSettings.all> = {
     mode: 'rectangle',
   },
   toolBars: [],
-  copyright: {
-    enable: true,
-    dates: useDayjs().format('YYYY'),
-    company: 'MineAdmin Team',
-    website: 'https://www.mineadmin.com',
-    putOnRecord: '豫ICP备00000000号-1',
-  },
 }
 
 const systemSetting = defaultsDeep(globalConfigSettings, defaultGlobalConfigSettings) as RecursiveRequired<SystemSettings.all>

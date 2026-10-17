@@ -21,12 +21,6 @@ loginForm:
 mineAdmin:
   goHome: 回到首頁
   settings:
-    copyRights:
-      date: 時間
-      website: 網址
-      enable: 啟用版權
-      putOnRecord: 備案號
-      company: 公司
     primaryColorSetting: 主顏色設置
     toolBarSettings: 工具列設置
     tabBarSettings: 標籤列設置
@@ -49,7 +43,6 @@ mineAdmin:
     mainAsides:
       autoToFirstMenu: 自動進入第一個功能表
       mainMenuTitle: 主功能表標題
-    copyRightSettings: 版權設置
     enableBreadcrumb: 啟用麵包屑
     asideDark: 側邊欄黑暗模式
     tabbars:

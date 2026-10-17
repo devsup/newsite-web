@@ -3,7 +3,8 @@
 }
 
 .mine-logo-img {
-  @apply h-[35px] w-[35px];
+  /* 35px 的小图标配 8px 圆角（约 1/4 边长），观感圆润又不至于变成圆形 */
+  @apply h-[35px] w-[35px] rounded-lg object-cover;
 }
 
 .mine-logo-title {

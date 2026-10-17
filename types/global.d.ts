@@ -125,7 +125,7 @@ declare namespace Plugin {
 }
 
 declare namespace SystemSettings {
-  type settingType = 'app' | 'welcomePage' | 'mainAside' | 'subAside' | 'tabbar' | 'toolBars' | 'copyright'
+  type settingType = 'app' | 'welcomePage' | 'mainAside' | 'subAside' | 'tabbar' | 'toolBars'
   // 应用属性
   interface app {
     /**
@@ -269,34 +269,6 @@ declare namespace SystemSettings {
      */
     show?: boolean
   }
-  // 版权信息属性
-  interface copyright {
-    /**
-     * 是否开启底部版权，同时在路由 meta 对象里可以单独设置某个路由是否显示底部版权信息
-     * @默认值 `true`
-     */
-    enable?: boolean
-    /**
-     * 网站运行日期
-     * @默认值 `''`
-     */
-    dates?: string
-    /**
-     * 公司名称
-     * @默认值 `''`
-     */
-    company?: string
-    /**
-     * 网站地址
-     * @默认值 `''`
-     */
-    website?: string
-    /**
-     * 网站备案号
-     * @默认值 `''`
-     */
-    putOnRecord?: string
-  }
 
   interface all {
     /** 应用设置 */
@@ -311,8 +283,6 @@ declare namespace SystemSettings {
     tabbar: tabbar
     /** 工具栏设置 */
     toolBars: toolBars[]
-    /** 底部版权设置 */
-    copyright: copyright
   }
 }
 
@@ -378,7 +348,6 @@ declare namespace MineRoute {
     affix?: boolean
     hidden?: boolean
     subForceShow?: boolean
-    copyright?: boolean
     link?: string
     breadcrumb?: routeRecord[]
     breadcrumbEnable?: boolean

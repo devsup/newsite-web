@@ -55,7 +55,6 @@ baseMenuManage:
   isEnabled: 是否啟用
   isHidden: 是否隱藏
   isCache: 是否緩存
-  isCopyright: 版權顯示
   isBreadcrumb: 麵包屑顯示
   isAffix: Tab是否固定
   remark: 備註

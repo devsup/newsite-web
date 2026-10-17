@@ -261,11 +261,6 @@ const formItems = ref<MaFormItem[]>([
     cols: { lg: 8, md: 8, sm: 8, xs: 12 },
   },
   {
-    label: () => t('baseMenuManage.isCopyright'), prop: 'meta.copyright', render: 'switch',
-    show: (_, model) => model.meta.type === 'M',
-    cols: { lg: 8, md: 8, sm: 8, xs: 12 },
-  },
-  {
     label: () => t('baseMenuManage.isBreadcrumb'), prop: 'meta.breadcrumbEnable', render: 'switch',
     show: (_, model) => model.meta.type === 'M',
     cols: { lg: 8, md: 8, sm: 8, xs: 12 },

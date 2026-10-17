@@ -14,7 +14,6 @@ import MineSearchPanel from './components/search-panel'
 import MineMainAside from './components/main-aside'
 import MineSubAside from './components/sub-aside'
 import MineBars from './components/bars'
-import MineFooter from './components/footer'
 import MineBackTop from './components/back-top'
 import MineIframe from './components/iframe'
 import '@/layouts/style/index.scss'
@@ -95,7 +94,6 @@ export default defineComponent({
                 <div class="mine-iframe-area" v-show={route.meta?.type === 'I'}>
                   <MineIframe />
                 </div>
-                <MineFooter />
                 <MineBackTop />
               </div>
 

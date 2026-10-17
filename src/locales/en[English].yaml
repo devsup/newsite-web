@@ -21,12 +21,6 @@ loginForm:
 mineAdmin:
   goHome: Back to Home
   settings:
-    copyRights:
-      date: Date
-      website: URL
-      enable: Enable copyright
-      putOnRecord: Put on record
-      company: Corporation
     primaryColorSetting: Primary color settings
     toolBarSettings: Toolbar settings
     tabBarSettings: Tab bar settings
@@ -49,7 +43,6 @@ mineAdmin:
     mainAsides:
       autoToFirstMenu: Auto to first menu
       mainMenuTitle: Main menu title
-    copyRightSettings: Copyright settings
     enableBreadcrumb: Enable breadcrumbs
     asideDark: Side bar dark mode
     tabbars:

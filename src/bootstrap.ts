@@ -18,7 +18,6 @@ import toolbars from '@/utils/toolbars.ts'
 import ElementPlus from 'element-plus'
 import router from './router'
 import pinia from './store'
-import './utils/copyright.ts'
 import iconCollections from '@/iconify/index.json'
 import { downloadAndInstall } from '@/iconify/index.ts'
 

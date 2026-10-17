@@ -21,12 +21,6 @@ loginForm:
 mineAdmin:
   goHome: 回到首页
   settings:
-    copyRights:
-      date: 时间
-      website: 网址
-      enable: 启用版权
-      putOnRecord: 备案号
-      company: 公司
     primaryColorSetting: 主颜色设置
     toolBarSettings: 工具栏设置
     tabBarSettings: 标签栏设置
@@ -49,7 +43,6 @@ mineAdmin:
     mainAsides:
       autoToFirstMenu: 自动进入第一个菜单
       mainMenuTitle: 主菜单标题
-    copyRightSettings: 版权设置
     enableBreadcrumb: 启用面包屑
     asideDark: 侧边栏黑暗模式
     tabbars:

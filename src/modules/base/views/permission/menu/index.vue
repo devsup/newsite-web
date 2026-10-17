@@ -37,7 +37,6 @@ const newMenu = ref<MenuVo>({
     componentSuffix: '.vue',
     componentPath: 'modules/',
     breadcrumbEnable: true,
-    copyright: true,
     useDefaultLayout: true,
     hidden: false,
     affix: false,

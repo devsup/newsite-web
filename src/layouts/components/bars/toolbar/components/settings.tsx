@@ -216,39 +216,6 @@ export default defineComponent({
       )
     }
 
-    const copyrightRender = () => {
-      const setting = settingStore.getSettings('copyright')
-      const options = [
-        { label: useTrans('mineAdmin.settings.copyRights.date') as string, value: 'dates' },
-        { label: useTrans('mineAdmin.settings.copyRights.company') as string, value: 'company' },
-        { label: useTrans('mineAdmin.settings.copyRights.website') as string, value: 'website' },
-        { label: useTrans('mineAdmin.settings.copyRights.putOnRecord') as string, value: 'putOnRecord' },
-      ]
-      return (
-        <>
-          {
-            settingsRender('copyright', [
-              { label: useTrans('mineAdmin.settings.copyRights.enable') as string, value: 'enable' },
-            ])
-          }
-          { options.map((item: any) => (
-            <div class="mine-setting-description">
-              <div class="desc-label !w-6/12">{item.label}</div>
-              <div class="desc-value !w-6/12">
-                <m-input
-                  class="mb-1 !h-6 !py-1"
-                  v-model={setting[item.value]}
-                  onInput={(v: InputEvent) => {
-                    setting[item.value] = (v.target as HTMLInputElement).value
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </>
-      )
-    }
-
     return () => (
       <div class="flex items-center">
         <m-drawer
@@ -302,9 +269,6 @@ export default defineComponent({
 
                 {divider(useTrans('mineAdmin.settings.toolBarSettings') as string)}
                 {toolbarHook.state && toolbarRender()}
-
-                {divider(useTrans('mineAdmin.settings.copyRightSettings') as string)}
-                {copyrightRender()}
 
                 {divider(useTrans('mineAdmin.settings.otherSettings') as string)}
                 {

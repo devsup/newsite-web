@@ -55,7 +55,6 @@ baseMenuManage:
   isEnabled: Enabled
   isHidden: Hidden
   isCache: Cached
-  isCopyright: Copyright
   isBreadcrumb: Breadcrumb
   isAffix: Tab Is Fixed
   remark: Remarks
