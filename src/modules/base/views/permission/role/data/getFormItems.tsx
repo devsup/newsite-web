@@ -10,6 +10,7 @@
 import type { MaFormItem } from '@mineadmin/form'
 import type { RoleVo } from '~/base/api/role.ts'
 import MaDictRadio from '@/components/ma-dict-picker/ma-dict-radio.vue'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 export default function getFormItems(formType: 'add' | 'edit' = 'add', t: any, model: RoleVo): MaFormItem[] {
   if (formType === 'add') {
@@ -57,7 +58,7 @@ export default function getFormItems(formType: 'add' | 'edit' = 'add', t: any, m
       cols: { md: 12, xs: 24 },
       renderProps: {
         placeholder: t('form.pleaseInput', { msg: t('crud.status') }),
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
     {

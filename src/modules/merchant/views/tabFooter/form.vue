@@ -33,7 +33,7 @@ function initModel(): void {
       icon: data.icon ?? '',
       icon_on: data.icon_on ?? '',
       weight: Number(data.weight ?? 0),
-      status: Number(data.status ?? 1),
+      status: Number(data.status ?? Status.ENABLED),
       remark: data.remark ?? '',
     }
     return

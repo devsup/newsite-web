@@ -19,6 +19,7 @@ import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { Status } from '@/constants/status.ts'
+import { OPEN_MODE, PUSH_TYPE } from '~/channel/constants.ts'
 
 export default function getTableColumns(dialog: UseDialogExpose, t: any, proTableRef?: Ref<MaProTableExpose>): MaProTableColumns[] {
   const msg = useMessage()
@@ -31,9 +32,9 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
 
   /** 打开方式 1 自适应（跟随系统运行模式）/ 2 落地页 / 3 导航页 → 展示文案与标签色 */
   const openModeMap: Record<number, { label: string, type: 'primary' | 'success' | 'info' }> = {
-    1: { label: t('channel.modeAuto'), type: 'info' },
-    2: { label: t('channel.modeLand'), type: 'primary' },
-    3: { label: t('channel.modeNavi'), type: 'success' },
+    [OPEN_MODE.AUTO]: { label: t('channel.modeAuto'), type: 'info' },
+    [OPEN_MODE.LAND]: { label: t('channel.modeLand'), type: 'primary' },
+    [OPEN_MODE.NAVI]: { label: t('channel.modeNavi'), type: 'success' },
   }
 
   /**
@@ -44,8 +45,8 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
     updateStatus(row.id as number, status).then((response) => {
       if (response.code === ResultCode.SUCCESS) {
         // 状态与落地页同步：禁用会把文件删掉（推广链接随即 404），提示里说清楚
-        msg.success(status === 2 ? t('channel.statusDisabledTip') : t('crud.updateSuccess'))
-        if (status === 1 && response.data?.landing === false) {
+        msg.success(status === Status.DISABLED ? t('channel.statusDisabledTip') : t('crud.updateSuccess'))
+        if (status === Status.ENABLED && response.data?.landing === false) {
           msg.error(t('channel.landingFailed'))
         }
       }
@@ -214,7 +215,7 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
       cellRender: ({ row }) => {
         const value = Number((row as ChannelVo).bot_link_type)
         // 0 是「禁用」（只有推送类型才有），1~3 与「打开方式」共用同一套文案与颜色
-        const item = value === 0
+        const item = value === PUSH_TYPE.DISABLED
           ? { label: t('channel.pushDisabled'), type: 'info' as const }
           : (openModeMap[value] ?? { label: '—', type: 'info' as const })
         return <div class="flex-center"><ElTag type={item.type} size="small">{item.label}</ElTag></div>

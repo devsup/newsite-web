@@ -1,5 +1,6 @@
 import type { MaSearchItem } from '@mineadmin/search'
 import MaDictSelect from '@/components/ma-dict-picker/ma-dict-select.vue'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 /** 底部Tab搜索：ID 精确、名称模糊、状态字典 */
 export default function getSearchItems(t: any): MaSearchItem[] {
@@ -13,7 +14,7 @@ export default function getSearchItems(t: any): MaSearchItem[] {
       renderProps: {
         clearable: true,
         placeholder: '',
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
   ]

@@ -12,6 +12,7 @@ import type { UserVo } from '~/base/api/user.ts'
 import MaUploadImage from '@/components/ma-upload-image/index.vue'
 import MaDictRadio from '@/components/ma-dict-picker/ma-dict-radio.vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 export default function getFormItems(
   formType: 'add' | 'edit' = 'add',
@@ -260,7 +261,7 @@ export default function getFormItems(
       render: () => MaDictRadio,
       renderProps: {
         placeholder: t('form.pleaseInput', { msg: t('crud.status') }),
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
   ]

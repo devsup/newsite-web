@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { MaTableExpose } from '@mineadmin/table'
 import type { CategoryAreaVo } from '~/merchant/api/categoryArea'
 import type { MerchantVo } from '~/merchant/api/merchant'
@@ -212,8 +213,8 @@ useTable('tableRef').then((table: MaTableExpose) => {
       width: '90px',
       cellRender: ({ row }): any => (
         <div class="flex-center">
-          <ElTag type={Number(row.status) === 1 ? 'success' : 'info'} size="small">
-            {Number(row.status) === 1
+          <ElTag type={Number(row.status) === Status.ENABLED ? 'success' : 'info'} size="small">
+            {Number(row.status) === Status.ENABLED
               ? t('dictionary.system.statusEnabled')
               : t('dictionary.system.statusDisabled')}
           </ElTag>

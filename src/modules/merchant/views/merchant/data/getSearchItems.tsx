@@ -2,6 +2,7 @@ import type { MaSearchItem } from '@mineadmin/search'
 import type { MerchantOptions } from '~/merchant/api/merchant'
 
 import MaDictSelect from '@/components/ma-dict-picker/ma-dict-select.vue'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 /** 商户搜索：ID / 名称 / 展示类型 / 区域 / 类目 / 状态 / 跳转链接 / 创建时间 */
 export default function getSearchItems(t: any, options: MerchantOptions): MaSearchItem[] {
@@ -45,7 +46,7 @@ export default function getSearchItems(t: any, options: MerchantOptions): MaSear
       renderProps: {
         clearable: true,
         placeholder: '',
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
     { label: () => t('merchantInfo.jumpUrl'), prop: 'jump_url', render: 'input' },

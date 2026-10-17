@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@mineadmin/pro-table'
 import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
@@ -193,7 +194,7 @@ function handleBatchCommand(command: string): void {
  * 后端调试环境只有 1 个 worker，前端循环调单个接口会排队到超时。
  */
 function handleBatchStatus(ids: number[], status: number): void {
-  const action = status === 1 ? t('merchantInfo.batchEnableAction') : t('merchantInfo.batchDisableAction')
+  const action = status === Status.ENABLED ? t('merchantInfo.batchEnableAction') : t('merchantInfo.batchDisableAction')
   msg.confirm(t('merchantInfo.batchStatusConfirm', { action, count: ids.length })).then(async () => {
     const response = await batchUpdate(ids, 'status', status)
     if (response.code === ResultCode.SUCCESS) {

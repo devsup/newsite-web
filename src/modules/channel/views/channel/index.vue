@@ -272,7 +272,7 @@ function handleBatchCommand(command: string): void {
       <template #actions>
         <!-- 落地页是「烘焙」出来的静态文件，系统设置改了不会自动生效，所以这个按钮用醒目的 warning 色，
              并用悬浮说明列清楚「哪些改动需要重建」——否则很容易改了背景图/安装包却忘了点 -->
-        <el-tooltip placement="bottom" :show-after="120">
+        <el-tooltip placement="left" :show-after="120">
           <template #content>
             <div style="line-height: 1.7;">
               <div style="font-weight: 600;">

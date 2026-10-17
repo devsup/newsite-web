@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LAYER_TYPE } from '~/merchant/constants.ts'
 import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MerchantOptions, MerchantVo } from '~/merchant/api/merchant'
@@ -106,9 +107,9 @@ function initModel(): void {
       category_area: Number(data.category_area ?? 0),
       category_type: Number(data.category_type ?? 0),
       show_type: Number(data.show_type ?? 0),
-      layer_type: Number(data.layer_type ?? 1),
+      layer_type: Number(data.layer_type ?? LAYER_TYPE.DIRECT_JUMP),
       weight: Number(data.weight ?? 0),
-      status: Number(data.status ?? 1),
+      status: Number(data.status ?? Status.ENABLED),
       show_info: { ...(data.show_info ?? {}) },
       layer_info: { ...(data.layer_info ?? {}) },
     }
@@ -122,7 +123,7 @@ function initModel(): void {
     show_type: undefined,
     jump_url: '',
     show_info: {},
-    layer_type: 1,
+    layer_type: LAYER_TYPE.DIRECT_JUMP,
     layer_info: {},
     weight: 0,
     status: Status.ENABLED,

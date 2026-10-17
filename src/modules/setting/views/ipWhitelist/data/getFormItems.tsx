@@ -11,6 +11,8 @@ import type { MaFormItem } from '@mineadmin/form'
 import type { IpWhitelistVo } from '~/setting/api/ipWhitelist.ts'
 import MaDictRadio from '@/components/ma-dict-picker/ma-dict-radio.vue'
 import { isValidIpOrCidr, splitIps } from '@/utils/ip.ts'
+import { Status } from '@/constants/status.ts'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 /** 表单配置：新增用多行文本批量录入 IP / 网段，编辑只改单条；备注必填，状态走 system-status 字典 */
 export default function getFormItems(formType: 'add' | 'edit' = 'add', t: any, model: IpWhitelistVo): MaFormItem[] {
@@ -20,7 +22,7 @@ export default function getFormItems(formType: 'add' | 'edit' = 'add', t: any, m
   if (isBatch) {
     model.ip = model.ip ?? ''
     model.remark = model.remark ?? ''
-    model.status = model.status ?? 1
+    model.status = model.status ?? Status.ENABLED
   }
 
   return [
@@ -80,7 +82,7 @@ export default function getFormItems(formType: 'add' | 'edit' = 'add', t: any, m
       prop: 'status',
       render: () => MaDictRadio,
       renderProps: {
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
   ]

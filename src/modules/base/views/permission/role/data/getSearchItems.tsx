@@ -10,6 +10,7 @@
 
 import type { MaSearchItem } from '@mineadmin/search'
 import MaDictSelect from '@/components/ma-dict-picker/ma-dict-select.vue'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 export default function getSearchItems(t: any): MaSearchItem[] {
   return [
@@ -30,7 +31,7 @@ export default function getSearchItems(t: any): MaSearchItem[] {
       renderProps: {
         clearable: true,
         placeholder: '',
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
   ]

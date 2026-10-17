@@ -16,6 +16,7 @@ import { useMessage } from '@/hooks/useMessage.ts'
 import { deleteByIds } from '~/base/api/role.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t: any): MaProTableColumns[] {
   const dictStore = useDictStore()
@@ -38,8 +39,8 @@ export default function getTableColumns(dialog: UseDialogExpose, formRef: any, t
     { label: () => t('baseRoleManage.code'), prop: 'code' },
     { label: () => t('crud.status'), prop: 'status',
       cellRender: ({ row }) => (
-        <ElTag type={dictStore.t('system-status', row.status, 'color')}>
-          {t(dictStore.t('system-status', row.status, 'i18n'))}
+        <ElTag type={dictStore.t(DICT_SYSTEM_STATUS, row.status, 'color')}>
+          {t(dictStore.t(DICT_SYSTEM_STATUS, row.status, 'i18n'))}
         </ElTag>
       ),
     },

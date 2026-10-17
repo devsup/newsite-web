@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="ts">
+import { OPEN_MODE, PUSH_TYPE } from '~/channel/constants.ts'
 import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ChannelVo } from '~/channel/api/channel'
@@ -67,9 +68,9 @@ function initModel(): void {
       kl_start: Number(data.kl_start ?? 0),
       kl_ratio: Number(data.kl_ratio ?? 0),
       weight: Number(data.weight ?? 0),
-      status: Number(data.status ?? 1),
-      bot_link_type: Number(data.bot_link_type ?? 0),
-      open_mode: Number(data.open_mode ?? 1),
+      status: Number(data.status ?? Status.ENABLED),
+      bot_link_type: Number(data.bot_link_type ?? PUSH_TYPE.DISABLED),
+      open_mode: Number(data.open_mode ?? OPEN_MODE.AUTO),
     }
     return
   }
@@ -83,8 +84,8 @@ function initModel(): void {
     kl_ratio: 0,
     status: Status.ENABLED,
     weight: 0,
-    bot_link_type: 0,
-    open_mode: 1,
+    bot_link_type: PUSH_TYPE.DISABLED,
+    open_mode: OPEN_MODE.AUTO,
     js_code: '',
     remark: '',
   }
@@ -171,10 +172,10 @@ defineExpose({
         </el-form-item>
         <el-form-item :label="t('crud.status')" prop="status">
           <el-radio-group v-model="model.status">
-            <el-radio :value="1">
+            <el-radio :value="OPEN_MODE.AUTO">
               {{ t('dictionary.system.statusEnabled') }}
             </el-radio>
-            <el-radio :value="2">
+            <el-radio :value="OPEN_MODE.LAND">
               {{ t('dictionary.system.statusDisabled') }}
             </el-radio>
           </el-radio-group>
@@ -194,16 +195,16 @@ defineExpose({
         <el-form-item :label="t('channel.botLinkType')" prop="bot_link_type">
           <!-- 取值与「打开方式」同构：0 禁用 / 1 自适应 / 2 落地页 / 3 导航页（推送的「自动跳转」就是自适应），所以共用同一套文案 -->
           <el-radio-group v-model="model.bot_link_type" class="channel-form__radios">
-            <el-radio :value="0">
+            <el-radio :value="PUSH_TYPE.DISABLED">
               {{ t('channel.pushDisabled') }}
             </el-radio>
-            <el-radio :value="1">
+            <el-radio :value="OPEN_MODE.AUTO">
               {{ t('channel.modeAuto') }}
             </el-radio>
-            <el-radio :value="2">
+            <el-radio :value="OPEN_MODE.LAND">
               {{ t('channel.modeLand') }}
             </el-radio>
-            <el-radio :value="3">
+            <el-radio :value="OPEN_MODE.NAVI">
               {{ t('channel.modeNavi') }}
             </el-radio>
           </el-radio-group>
@@ -214,13 +215,13 @@ defineExpose({
         <el-form-item :label="t('channel.openMode')" prop="open_mode">
           <!-- 自适应放在第一位：取值与系统设置的「运行模式」同构（1 自适应 / 2 落地页 / 3 导航页），渠道上的设置优先 -->
           <el-radio-group v-model="model.open_mode" class="channel-form__radios">
-            <el-radio :value="1">
+            <el-radio :value="OPEN_MODE.AUTO">
               {{ t('channel.modeAuto') }}
             </el-radio>
-            <el-radio :value="2">
+            <el-radio :value="OPEN_MODE.LAND">
               {{ t('channel.modeLand') }}
             </el-radio>
-            <el-radio :value="3">
+            <el-radio :value="OPEN_MODE.NAVI">
               {{ t('channel.modeNavi') }}
             </el-radio>
           </el-radio-group>

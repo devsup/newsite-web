@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { IpBlacklistVo } from '~/setting/api/ipBlacklist'
 import type { MaFormExpose } from '@mineadmin/form'
 import { createBatch, save } from '~/setting/api/ipBlacklist'
@@ -49,7 +50,7 @@ function add(): Promise<any> {
     ips: splitIps(model.value.ip ?? ''),
     ban_reason: model.value.ban_reason ?? '',
     remark: model.value.remark ?? '',
-    status: model.value.status ?? 1,
+    status: model.value.status ?? Status.ENABLED,
   }
 
   return new Promise((resolve, reject) => {

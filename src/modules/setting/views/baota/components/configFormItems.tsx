@@ -11,6 +11,8 @@ import type { MaFormItem } from '@mineadmin/form'
 import type { BaoTaConfigVo } from '~/setting/api/baota.ts'
 
 import MaDictRadio from '@/components/ma-dict-picker/ma-dict-radio.vue'
+import { Status } from '@/constants/status.ts'
+import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 
 /**
  * API 配置表单字段。
@@ -21,7 +23,7 @@ import MaDictRadio from '@/components/ma-dict-picker/ma-dict-radio.vue'
  */
 export default function getConfigFormItems(formType: 'add' | 'edit', t: any, model: BaoTaConfigVo): MaFormItem[] {
   if (formType === 'add') {
-    model.status = model.status ?? 1
+    model.status = model.status ?? Status.ENABLED
     model.weight = model.weight ?? 0
   }
 
@@ -94,7 +96,7 @@ export default function getConfigFormItems(formType: 'add' | 'edit', t: any, mod
       prop: 'status',
       render: () => MaDictRadio,
       renderProps: {
-        dictName: 'system-status',
+        dictName: DICT_SYSTEM_STATUS,
       },
     },
     {

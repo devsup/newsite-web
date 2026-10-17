@@ -9,6 +9,7 @@
  */
 import type { MaProTableColumns } from '@mineadmin/pro-table'
 import { ElTag } from 'element-plus'
+import { DICT_SYSTEM_STATE } from '@/constants/dict.ts'
 
 /**
  * 登录日志列表列.
@@ -28,8 +29,8 @@ export default function getColumns(t: any): MaProTableColumns[] {
     { label: () => t('baseLoginLog.browser'), prop: 'browser' },
     { label: () => t('baseLoginLog.status'), prop: 'status',
       cellRender: ({ row }) => (
-        <ElTag type={dictStore.t('system-state', row.status, 'color')}>
-          {t(dictStore.t('system-state', row.status, 'i18n'))}
+        <ElTag type={dictStore.t(DICT_SYSTEM_STATE, row.status, 'color')}>
+          {t(dictStore.t(DICT_SYSTEM_STATE, row.status, 'i18n'))}
         </ElTag>
       ),
     },

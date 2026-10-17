@@ -11,6 +11,7 @@ import type { MaProTableColumns } from '@mineadmin/pro-table'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
 import { ElTag } from 'element-plus'
+import { Status } from '@/constants/status.ts'
 
 /**
  * 渲染 SSL 摘要标签。
@@ -57,7 +58,7 @@ export default function getTableColumns(
       cellRender: ({ row }) => (
         <div class="flex-center">
           {
-            Number(row.status) === 1
+            Number(row.status) === Status.ENABLED
               ? <ElTag type="success">{t('baota.running')}</ElTag>
               : <ElTag type="info">{t('baota.stopped')}</ElTag>
           }

@@ -32,7 +32,7 @@ function initModel(): void {
     model.value = {
       ...data,
       weight: Number(data.weight ?? 0),
-      status: Number(data.status ?? 1),
+      status: Number(data.status ?? Status.ENABLED),
       remark: data.remark ?? '',
     }
     return

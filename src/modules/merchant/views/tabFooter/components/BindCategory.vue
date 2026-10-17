@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { MaTableExpose } from '@mineadmin/table'
 import type { TabFooterRelOptionVo, TabFooterRelVo } from '~/merchant/api/tabFooterRel'
 import type { TabFooterVo } from '~/merchant/api/tabFooter'
@@ -174,8 +175,8 @@ useTable('bindTable').then((table: MaTableExpose) => {
       width: '90px',
       cellRender: ({ row }): any => (
         <div class="flex-center">
-          <ElTag type={Number(row.category_status) === 1 ? 'success' : 'info'} size="small">
-            {Number(row.category_status) === 1
+          <ElTag type={Number(row.category_status) === Status.ENABLED ? 'success' : 'info'} size="small">
+            {Number(row.category_status) === Status.ENABLED
               ? t('dictionary.system.statusEnabled')
               : t('dictionary.system.statusDisabled')}
           </ElTag>

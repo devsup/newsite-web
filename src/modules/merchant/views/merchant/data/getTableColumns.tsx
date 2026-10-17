@@ -10,6 +10,7 @@ import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { Status } from '@/constants/status.ts'
+import { SHOW_TYPE_COLORS } from '~/merchant/constants'
 
 export default function getTableColumns(
   dialog: UseDialogExpose,
@@ -116,11 +117,24 @@ export default function getTableColumns(
       label: () => t('merchantInfo.showType'),
       prop: 'show_type',
       width: '130px',
-      cellRender: ({ row }) => (
-        <div class="flex-center">
-          <ElTag type="info" size="small">{showTypeNameMap[Number((row as MerchantVo).show_type)] ?? '--'}</ElTag>
-        </div>
-      ),
+      cellRender: ({ row }) => {
+        const type = Number((row as MerchantVo).show_type)
+        const color = SHOW_TYPE_COLORS[type] ?? '#909399'
+        return (
+          <div class="flex-center">
+            <ElTag
+              size="small"
+              style={{
+                backgroundColor: `${color}1a`,
+                borderColor: `${color}66`,
+                color,
+              }}
+            >
+              {showTypeNameMap[type] ?? '--'}
+            </ElTag>
+          </div>
+        )
+      },
     },
     { label: () => t('merchantInfo.categoryArea'), prop: 'category_area_name', minWidth: '170px', showOverflowTooltip: true },
     { label: () => t('merchantInfo.categoryType'), prop: 'category_type_name', width: '120px' },

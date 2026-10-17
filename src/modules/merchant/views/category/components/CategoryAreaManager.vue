@@ -127,7 +127,7 @@ function openEdit(row: CategoryAreaVo): void {
     category_id: category.id,
     type: Number(row.type ?? 1),
     weight: Number(row.weight ?? 0),
-    status: Number(row.status ?? 1),
+    status: Number(row.status ?? Status.ENABLED),
   }
   areaDialog.setTitle(t('merchantInfo.areaEdit'))
   areaDialog.open({})
