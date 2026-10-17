@@ -9,6 +9,7 @@ import { deleteByIds, updateStatus, updateWeight } from '~/merchant/api/category
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
+import { Status } from '@/constants/status.ts'
 
 /**
  * 统计列统一显示占位符：后端当前不返回统计值。
@@ -105,8 +106,8 @@ export default function getTableColumns(
         <div class="flex-center">
           <ElSwitch
             modelValue={Number(row.status)}
-            activeValue={1}
-            inactiveValue={2}
+            activeValue={Status.ENABLED}
+            inactiveValue={Status.DISABLED}
             loading={statusLoading.value === row.id}
             disabled={!hasAuth('categoryType:save')}
             onChange={(value: string | number | boolean) => handleStatusChange(row as CategoryTypeVo, Number(value))}
@@ -157,6 +158,7 @@ export default function getTableColumns(
           {
             name: 'delete',
             icon: 'mdi:delete',
+            linkProps: { type: 'danger' },
             text: () => t('crud.delete'),
             disabled: () => !hasAuth('categoryType:delete'),
             onClick: ({ row }, proxy: MaProTableExpose) => {

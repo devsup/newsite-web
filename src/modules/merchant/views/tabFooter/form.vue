@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { TabFooterVo } from '~/merchant/api/tabFooter'
 import { create, save } from '~/merchant/api/tabFooter'
@@ -43,7 +44,7 @@ function initModel(): void {
     icon: '',
     icon_on: '',
     weight: 0,
-    status: 1,
+    status: Status.ENABLED,
     remark: '',
   }
 }

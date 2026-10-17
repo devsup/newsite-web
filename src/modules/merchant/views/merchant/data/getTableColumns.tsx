@@ -9,6 +9,7 @@ import { deleteByIds, updateStatus, updateWeight } from '~/merchant/api/merchant
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
+import { Status } from '@/constants/status.ts'
 
 export default function getTableColumns(
   dialog: UseDialogExpose,
@@ -131,8 +132,8 @@ export default function getTableColumns(
         <div class="flex-center">
           <ElSwitch
             modelValue={Number(row.status)}
-            activeValue={1}
-            inactiveValue={2}
+            activeValue={Status.ENABLED}
+            inactiveValue={Status.DISABLED}
             loading={statusLoading.value === row.id}
             disabled={!hasAuth('merchant:save')}
             onChange={(value: string | number | boolean) => handleStatusChange(row as MerchantVo, Number(value))}
@@ -204,6 +205,7 @@ export default function getTableColumns(
           {
             name: 'delete',
             icon: 'mdi:delete',
+            linkProps: { type: 'danger' },
             text: () => t('crud.delete'),
             disabled: () => !hasAuth('merchant:delete'),
             onClick: ({ row }, proxy: MaProTableExpose) => {

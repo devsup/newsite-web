@@ -61,3 +61,14 @@
 .el-tag {
   border: none;
 }
+
+/* 危险操作（删除）统一跟着主题变量 --el-color-danger 走.
+   Element 默认把 hover 色换成 --el-color-danger-light-3（#f89898，偏粉），
+   鼠标一放上去就像换了个颜色；这里把 hover 也固定回主题危险色。 */
+.el-link.el-link--danger {
+  --el-link-hover-text-color: var(--el-color-danger);
+}
+
+.el-button.is-link.el-button--danger {
+  --el-button-hover-link-text-color: var(--el-color-danger);
+}

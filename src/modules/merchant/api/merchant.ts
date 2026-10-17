@@ -46,6 +46,8 @@ export interface MerchantSearchVo {
   category_type?: number
   status?: number
   jump_url?: string
+  /** 创建时间范围 ['开始', '结束']，后端按 created_at 做 between */
+  created_at?: string[]
   [key: string]: any
 }
 

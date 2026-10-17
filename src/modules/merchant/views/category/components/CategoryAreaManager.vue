@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MaTableExpose } from '@mineadmin/table'
 import type { CategoryAreaVo } from '~/merchant/api/categoryArea'
@@ -113,7 +114,7 @@ function openAdd(): void {
     internal_name: '',
     explicit_name: '',
     weight: 0,
-    status: 1,
+    status: Status.ENABLED,
   }
   areaDialog.setTitle(t('merchantInfo.areaAdd'))
   areaDialog.open({})
@@ -227,8 +228,8 @@ useTable('areaTable').then((table: MaTableExpose) => {
         <div class="flex-center">
           <ElSwitch
             modelValue={Number(row.status)}
-            activeValue={1}
-            inactiveValue={2}
+            activeValue={Status.ENABLED}
+            inactiveValue={Status.DISABLED}
             loading={statusLoading.value === row.id}
             disabled={!hasAuth('category:save')}
             onChange={(value: string | number | boolean) => handleStatusChange(row as CategoryAreaVo, Number(value))}

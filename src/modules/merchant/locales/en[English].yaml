@@ -47,6 +47,9 @@ merchantInfo:
   batchValueTooLong: At most {max} characters
   batchUpdateDone: '{count} merchant(s) updated'
   batchDeleteConfirm: 'Delete the {count} selected merchant(s)? This cannot be undone.'
+  createdAt: Created at
+  startTime: Start time
+  endTime: End time
   updatedBy: Updated By
   showName: Display Name
   merchantPv: Merchant PV

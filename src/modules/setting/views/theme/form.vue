@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance } from 'element-plus'
 import type { ThemeVo } from '~/setting/api/theme'
 import { create, save } from '~/setting/api/theme'
@@ -48,7 +49,7 @@ function initModel(): void {
     ...defaultThemeColors(),
     name: '',
     weight: 0,
-    status: 1,
+    status: Status.ENABLED,
     remark: '',
   } as ThemeVo
 }

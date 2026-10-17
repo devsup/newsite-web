@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { ElForm } from 'element-plus'
 import { useMessage } from '@/hooks/useMessage.ts'
 import getOnlyWorkAreaHeight from '@/utils/getOnlyWorkAreaHeight.ts'
@@ -48,7 +49,7 @@ const newMenu = ref<MenuVo>({
   },
   component: '',
   sort: 0,
-  status: 1,
+  status: Status.ENABLED,
   btnPermission: [],
 })
 

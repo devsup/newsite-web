@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="tsx">
+import { Status } from '@/constants/status.ts'
 import type { MaTableExpose } from '@mineadmin/table'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import type { BaoTaConfigVo } from '~/setting/api/baota.ts'
@@ -185,8 +186,8 @@ useTable('configTable').then((table: MaTableExpose) => {
       cellRender: ({ row }): any => (
         <ElSwitch
           modelValue={Number(row.status)}
-          activeValue={1}
-          inactiveValue={2}
+          activeValue={Status.ENABLED}
+          inactiveValue={Status.DISABLED}
           loading={statusLoading.value === row.id}
           disabled={!hasAuth('baota:save')}
           onChange={(value: string | number | boolean) => handleStatusChange(row, Number(value))}

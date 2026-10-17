@@ -17,6 +17,7 @@ import { deleteByIds, updateStatus } from '~/setting/api/ipWhitelist.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
+import { Status } from '@/constants/status.ts'
 
 export default function getTableColumns(dialog: UseDialogExpose, t: any, proTableRef?: Ref<MaProTableExpose>): MaProTableColumns[] {
   const msg = useMessage()
@@ -55,8 +56,8 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
       cellRender: ({ row }) => (
         <ElSwitch
           modelValue={Number(row.status)}
-          activeValue={1}
-          inactiveValue={2}
+          activeValue={Status.ENABLED}
+          inactiveValue={Status.DISABLED}
           loading={statusLoading.value === row.id}
           disabled={!hasAuth('ipWhitelist:save')}
           onChange={(value: string | number | boolean) => handleStatusChange(row, Number(value))}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { MerchantOptions, MerchantVo } from '~/merchant/api/merchant'
 import type { MerchantFieldConfig } from './data/fieldConfig'
@@ -124,7 +125,7 @@ function initModel(): void {
     layer_type: 1,
     layer_info: {},
     weight: 0,
-    status: 1,
+    status: Status.ENABLED,
     remark: '',
   }
 }

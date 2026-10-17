@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { CategoryVo } from '~/merchant/api/category'
 import { create, save } from '~/merchant/api/category'
@@ -40,7 +41,7 @@ function initModel(): void {
   model.value = {
     name: '',
     weight: 0,
-    status: 1,
+    status: Status.ENABLED,
     remark: '',
   }
 }

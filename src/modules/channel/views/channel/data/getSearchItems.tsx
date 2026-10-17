@@ -11,8 +11,14 @@
 import type { MaSearchItem } from '@mineadmin/search'
 import MaDictSelect from '@/components/ma-dict-picker/ma-dict-select.vue'
 
-/** 搜索项：ID 精确匹配、渠道名称与渠道编码模糊匹配，状态用 system-status 字典（1 启用 / 2 禁用） */
-export default function getSearchItems(t: any): MaSearchItem[] {
+/**
+ * 搜索项：ID 精确匹配、渠道名称用可搜索下拉（选项来自渠道列表）、渠道编码模糊匹配，
+ * 状态用 system-status 字典（1 启用 / 2 禁用）。
+ *
+ * 名称下拉的值是完整渠道名（后端按 name like 匹配），这样不用改搜索接口、
+ * 同名渠道也能一次筛出来。
+ */
+export default function getSearchItems(t: any, channels: Array<{ id: number, name: string }> = []): MaSearchItem[] {
   return [
     {
       label: () => t('ID'),
@@ -22,7 +28,13 @@ export default function getSearchItems(t: any): MaSearchItem[] {
     {
       label: () => t('channel.name'),
       prop: 'name',
-      render: 'input',
+      render: 'select',
+      renderProps: {
+        clearable: true,
+        filterable: true,
+        placeholder: t('form.pleaseSelect', { msg: t('channel.name') }),
+        options: channels.map(item => ({ label: item.name, value: item.name })),
+      },
     },
     {
       label: () => t('channel.code'),

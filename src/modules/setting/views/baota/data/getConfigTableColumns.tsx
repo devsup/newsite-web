@@ -17,6 +17,7 @@ import { configDelete, configUpdateStatus } from '~/setting/api/baota.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
+import { Status } from '@/constants/status.ts'
 
 /**
  * API 配置列表列。
@@ -61,8 +62,8 @@ export default function getConfigTableColumns(
       cellRender: ({ row }) => (
         <ElSwitch
           modelValue={Number(row.status)}
-          activeValue={1}
-          inactiveValue={2}
+          activeValue={Status.ENABLED}
+          inactiveValue={Status.DISABLED}
           loading={statusLoading.value === row.id}
           disabled={!hasAuth('baota:save')}
           onChange={(value: string | number | boolean) => handleStatusChange(row, Number(value))}

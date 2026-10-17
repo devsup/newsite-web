@@ -47,7 +47,6 @@ merchantInfo:
   batchValueTooLong: 最多 {max} 個字元
   batchUpdateDone: 已更新 {count} 個商戶
   batchDeleteConfirm: 確定要刪除所選的 {count} 個商戶嗎？刪除後不可復原。
-  channel: 所屬渠道
   createdAt: 建立時間
   startTime: 開始時間
   endTime: 結束時間

@@ -8,6 +8,7 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="ts">
+import { Status } from '@/constants/status.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ChannelVo } from '~/channel/api/channel'
 import { create, save } from '~/channel/api/channel'
@@ -80,7 +81,7 @@ function initModel(): void {
     password: '',
     kl_start: 0,
     kl_ratio: 0,
-    status: 1,
+    status: Status.ENABLED,
     weight: 0,
     bot_link_type: 0,
     open_mode: 1,

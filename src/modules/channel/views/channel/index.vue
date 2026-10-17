@@ -13,7 +13,7 @@ import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
 import { useDebounceFn } from '@vueuse/core'
-import { deleteByIds, page, rebuildLanding } from '~/channel/api/channel'
+import { deleteByIds, options as fetchChannelOptions, page, rebuildLanding } from '~/channel/api/channel'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
@@ -104,13 +104,41 @@ const options = ref<MaProTableOptions>({
     api: page,
   },
 })
-// 架构配置
+/**
+ * 搜索区「渠道名称」下拉的选项.
+ *
+ * 渠道名会被当作筛选值，所以取的是全量清单（1000+ 条）；下拉可输入过滤。
+ */
+const channelOptions = ref<Array<{ id: number, name: string }>>([])
+
+// 等渠道清单加载完再渲染表格：MaSearch 只在初始化时读一次 searchItems，
+// 之后改 schema.searchItems 不会生效（组件内部没有 watch），所以必须先拿到选项再建 schema
+const ready = ref(false)
+
 const schema = ref<MaProTableSchema>({
-  // 搜索项
-  searchItems: getSearchItems(t),
-  // 表格列
-  tableColumns: getTableColumns(maDialog, t, proTableRef),
+  searchItems: [],
+  tableColumns: [],
 })
+
+/**
+ * 加载渠道清单并构建列表配置.
+ *
+ * 失败不阻断列表（只是名称下拉为空），所以这里不弹错误提示，保留编码/状态等其它筛选。
+ */
+async function loadChannelOptions(): Promise<void> {
+  const response = await fetchChannelOptions()
+  if (response.code === ResultCode.SUCCESS) {
+    channelOptions.value = response.data ?? []
+  }
+
+  schema.value = {
+    searchItems: getSearchItems(t, channelOptions.value),
+    tableColumns: getTableColumns(maDialog, t, proTableRef),
+  }
+  ready.value = true
+}
+
+loadChannelOptions()
 
 /** 打开新增弹窗 */
 function openAdd(): void {
@@ -240,7 +268,7 @@ function handleBatchCommand(command: string): void {
       :title="t('channel.rebuildLandingNotice')"
     />
 
-    <MaProTable ref="proTableRef" :options="options" :schema="schema">
+    <MaProTable v-if="ready" ref="proTableRef" :options="options" :schema="schema">
       <template #actions>
         <!-- 落地页是「烘焙」出来的静态文件，系统设置改了不会自动生效，所以这个按钮用醒目的 warning 色，
              并用悬浮说明列清楚「哪些改动需要重建」——否则很容易改了背景图/安装包却忘了点 -->
