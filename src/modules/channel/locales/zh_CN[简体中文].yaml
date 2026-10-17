@@ -1,0 +1,50 @@
+channelMenu:
+  index: 渠道管理
+  save: 渠道保存
+  delete: 渠道删除
+channel:
+  mainTitle: 渠道管理
+  subTitle: 提供渠道添加、编辑、删除功能；渠道编码用于拼接落地页 / 导航页 / 自动跳转三条推广链接
+  name: 渠道名称
+  namePlaceholder: 如 A7返回量-steve
+  code: 渠道编码
+  codePlaceholder: 只允许字母、数字，创建后不可修改
+  codeLocked: 渠道编码创建后不可修改
+  loginName: 登陆账户
+  loginNamePlaceholder: 该渠道登录自有后台的账户
+  password: 登陆密码
+  passwordPlaceholder: 6~20 位
+  passwordEditPlaceholder: 留空表示不修改密码
+  klStart: 扣量基数
+  klRatio: 扣量系数
+  klInfo: 扣量信息
+  klStartTip: 有效点击超过扣量基数后才开始扣量
+  klRatioTip: 0~1，1 代表 100% 扣量
+  status: 状态
+  weight: 排序值
+  weightTip: 越大越靠前
+  jsCode: JS代码
+  jsCodePlaceholder: 投放到该渠道页面时附加执行的 JS 代码
+  botLinkType: 推送类型
+  botLinkTypeTip: 机器人给该渠道推送时使用哪种链接
+  openMode: 打开方式
+  openModeTip: 自适应 = 跟随「站点管理 → 系统设置 → 运行模式」，渠道设置优先
+  remark: 渠道备注
+  remarkPlaceholder: 备注该渠道的用途或对接人，便于日后识别
+  linkInfo: 链接信息
+  landUrl: 落地页
+  naviUrl: 导航页
+  autoUrl: 自动跳转
+  urlEmpty: 未配置域名
+  urlEmptyTip: 该链接缺少域名，请先到「站点管理 → 系统设置」配置落地 / 导航 / 自动识别页域名
+  copySuccess: 链接已复制
+  copyFail: 复制失败，请手动复制
+  updatedBy: 更新人
+  groupBasic: 基本信息
+  groupDeduct: 扣量与排序
+  groupExtend: 链接与扩展
+  pushDisabled: 禁用
+  modeLand: 落地页
+  modeNavi: 导航页
+  modeAuto: 自适应
+  weightSaved: 排序值已更新

@@ -1,0 +1,50 @@
+channelMenu:
+  index: 通路管理
+  save: 通路保存
+  delete: 通路刪除
+channel:
+  mainTitle: 通路管理
+  subTitle: 提供通路新增、編輯、刪除功能；通路編碼用於拼接落地頁 / 導航頁 / 自動跳轉三條推廣連結
+  name: 通路名稱
+  namePlaceholder: 如 A7返回量-steve
+  code: 通路編碼
+  codePlaceholder: 僅允許字母、數字，建立後不可修改
+  codeLocked: 通路編碼建立後不可修改
+  loginName: 登入帳號
+  loginNamePlaceholder: 該通路登入自有後台的帳號
+  password: 登入密碼
+  passwordPlaceholder: 6~20 位
+  passwordEditPlaceholder: 留空表示不修改密碼
+  klStart: 扣量基數
+  klRatio: 扣量係數
+  klInfo: 扣量資訊
+  klStartTip: 有效點擊超過扣量基數後才開始扣量
+  klRatioTip: 0~1，1 代表 100% 扣量
+  status: 狀態
+  weight: 排序值
+  weightTip: 越大越靠前
+  jsCode: JS代碼
+  jsCodePlaceholder: 投放到該通路頁面時附加執行的 JS 代碼
+  botLinkType: 推送類型
+  botLinkTypeTip: 機器人推送給該通路時使用哪種連結
+  openMode: 開啟方式
+  openModeTip: 自適應 = 跟隨「站點管理 → 系統設定 → 運行模式」，通路設定優先
+  remark: 通路備註
+  remarkPlaceholder: 備註該通路的用途或對接人，便於日後識別
+  linkInfo: 連結資訊
+  landUrl: 落地頁
+  naviUrl: 導航頁
+  autoUrl: 自動跳轉
+  urlEmpty: 未設定域名
+  urlEmptyTip: 該連結缺少域名，請先到「站點管理 → 系統設定」設定落地 / 導航 / 自動識別頁域名
+  copySuccess: 連結已複製
+  copyFail: 複製失敗，請手動複製
+  updatedBy: 更新人
+  groupBasic: 基本資訊
+  groupDeduct: 扣量與排序
+  groupExtend: 連結與擴展
+  pushDisabled: 停用
+  modeLand: 落地頁
+  modeNavi: 導航頁
+  modeAuto: 自適應
+  weightSaved: 排序值已更新

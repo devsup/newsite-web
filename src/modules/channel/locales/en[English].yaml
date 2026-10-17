@@ -1,0 +1,50 @@
+channelMenu:
+  index: Channel
+  save: Channel Save
+  delete: Channel Delete
+channel:
+  mainTitle: Channel
+  subTitle: Add, edit and delete channels; the channel code builds the landing / navigation / auto-redirect links
+  name: Channel Name
+  namePlaceholder: e.g. A7-steve
+  code: Channel Code
+  codePlaceholder: Letters and digits only, cannot be changed after creation
+  codeLocked: The channel code cannot be changed after creation
+  loginName: Login Account
+  loginNamePlaceholder: Account used to log in to the channel backend
+  password: Login Password
+  passwordPlaceholder: 6-20 characters
+  passwordEditPlaceholder: Leave empty to keep the current password
+  klStart: Deduct Base
+  klRatio: Deduct Ratio
+  klInfo: Deduct Info
+  klStartTip: Deduction starts after valid clicks exceed this value
+  klRatioTip: 0-1, 1 means 100% deduction
+  status: Status
+  weight: Sort
+  weightTip: The larger, the higher
+  jsCode: JS Code
+  jsCodePlaceholder: Extra JS executed on this channel's pages
+  botLinkType: Push Type
+  botLinkTypeTip: Which link the bot pushes for this channel
+  openMode: Open Mode
+  openModeTip: Adaptive follows "Site → System Settings → Run Mode"; the channel setting wins
+  remark: Remark
+  remarkPlaceholder: Note the purpose or owner of this channel for later reference
+  linkInfo: Links
+  landUrl: Landing
+  naviUrl: Navigation
+  autoUrl: Auto Redirect
+  urlEmpty: Domain not configured
+  urlEmptyTip: The domain is missing, configure the landing / navigation / auto-redirect domains in Settings first
+  copySuccess: Link copied
+  copyFail: Copy failed, please copy manually
+  updatedBy: Updated By
+  groupBasic: Basic
+  groupDeduct: Deduction & Sort
+  groupExtend: Links & Extras
+  pushDisabled: Disabled
+  modeLand: Landing
+  modeNavi: Navigation
+  modeAuto: Adaptive
+  weightSaved: Sort value updated
