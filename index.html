@@ -33,9 +33,6 @@
     .app-name__loader {
       line-height: 5em; font-weight: bold; color: #efefef; font-size: 20px;
     }
-    .app-name__loader::before {
-      content: 'MineAdmin';
-    }
     .app-animate__loader {
       color: #fff;
       width: 6px;
@@ -65,11 +62,24 @@
   <body>
     <div id="app">
       <div class="app-loading">
-        <div class="app-name__loader"></div>
+        <div id="app-loading-name" class="app-name__loader">%VITE_APP_TITLE%</div>
         <div class="app-animate__loader"></div>
         <div class="app-text__loader"></div>
       </div>
     </div>
+    <script>
+      /**
+       * 启动加载页在 Vue 挂载前就要显示，此时拿不到 /admin/passport/site-info，
+       * 只能读上一次成功加载时缓存到 localStorage 的站点名称（首次访问仍是默认品牌名）。
+       * 缓存由 src/store/modules/useSiteStore.ts 在拿到配置后写入。
+       */
+      try {
+        var cachedSiteName = localStorage.getItem('mine_site_name')
+        if (cachedSiteName) {
+          document.getElementById('app-loading-name').textContent = cachedSiteName
+        }
+      } catch (e) {}
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

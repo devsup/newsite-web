@@ -123,6 +123,13 @@ export const useSiteStore = defineStore('site', () => {
           // 浏览器标签页图标也跟站点图标走（清空后回到内置 /favicon.ico）；
           // 裁圆角是异步的，不阻塞 store 加载
           void applyFavicon(icon.value)
+          // 缓存站点名：index.html 的启动加载页在 Vue 挂载前就要显示它（那时调不了接口）
+          try {
+            localStorage.setItem('mine_site_name', name.value)
+          }
+          catch {
+            // 隐私模式下 localStorage 可能不可写，加载页退回默认品牌名即可
+          }
         }
       }
       catch {
