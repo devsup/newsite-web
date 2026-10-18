@@ -12,13 +12,9 @@ import axios from 'axios'
 import Message from 'vue-m-message'
 import { useDebounceFn } from '@vueuse/core'
 import { useNProgress } from '@vueuse/integrations/useNProgress'
-import useCache from '@/hooks/useCache.ts'
 import { ResultCode } from './ResultCode.ts'
 
 const { isLoading } = useNProgress()
-const cache = useCache()
-const requestList = ref<any[]>([])
-const isRefreshToken = ref<boolean>(false)
 
 function createHttp(baseUrl: string | null = null, config: AxiosRequestConfig = {}): AxiosInstance {
   const env = import.meta.env
@@ -57,9 +53,7 @@ let isLogout = false
 http.interceptors.response.use(
   async (response: AxiosResponse): Promise<any> => {
     isLoading.value = false
-    const userStore = useUserStore()
     await usePluginStore().callHooks('networkResponse', response)
-    const config = response.config
 
     if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
       // 处理 JSON 格式的错误响应
@@ -109,57 +103,11 @@ http.interceptors.response.use(
               await useUserStore().logout()
             }
           }
-          // 检查token是否需要刷新
-          if (userStore.isLogin && !isRefreshToken.value) {
-            isRefreshToken.value = true
-            if (!cache.get('refresh_token')) {
-              await logout()
-              break
-            }
-
-            try {
-              const refreshTokenResponse = await createHttp(null, {
-                headers: {
-                  Authorization: `Bearer ${cache.get('refresh_token')}`,
-                },
-              }).post('/admin/passport/refresh')
-
-              if (refreshTokenResponse.data.code !== 200) {
-                await logout()
-                break
-              }
-              else {
-                const { data } = refreshTokenResponse.data
-                userStore.token = data.access_token
-                cache.set('token', data.access_token)
-                cache.set('expire', useDayjs().unix() + data.expire_at, { exp: data.expire_at })
-                cache.set('refresh_token', data.refresh_token)
-
-                config.headers!.Authorization = `Bearer ${userStore.token}`
-                requestList.value.map((cb: any) => cb())
-                requestList.value = []
-                return http(config)
-              }
-            }
-            // eslint-disable-next-line unused-imports/no-unused-vars
-            catch (e: any) {
-              requestList.value.map((cb: any) => cb())
-              await logout()
-              break
-            }
-            finally {
-              requestList.value = []
-              isRefreshToken.value = false
-            }
-          }
-          else {
-            return new Promise((resolve) => {
-              requestList.value.push(() => {
-                config.headers!.Authorization = `Bearer ${cache.get('token')}`
-                resolve(http(config))
-              })
-            })
-          }
+          // 登录有效期固定（后端 JWT_TTL，默认 12 小时），这里**不做自动续期**：
+          // 一续期就会重新计时，用户只要一直在用就永远退不出去。
+          // 401 一律视为「登录已过期」，清掉本地登录态并跳登录页。
+          await logout()
+          break
         }
         case ResultCode.DISABLED: {
           Message.error(response?.data?.message ?? '账号已被禁用', { zIndex: 9999 })
