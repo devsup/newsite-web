@@ -162,10 +162,61 @@ const GROUP_DEFS: Array<{ title: string, types: string[] }> = [
   { title: 'groupTextarea', types: ['textarea'] },
   { title: 'groupSelect', types: ['select'] },
   { title: 'groupRadio', types: ['radio'] },
-  { title: 'groupCheckbox', types: ['checkbox'] },
+  // 「开关」紧跟「单选」：两者都很窄，排在同一行刚好互补（见 isWideGroup 的说明）
   { title: 'groupSwitch', types: ['switch'] },
+  { title: 'groupCheckbox', types: ['checkbox'] },
   { title: 'groupImage', types: ['imageUpload'] },
 ]
+
+/** 每组「最多」几列；实际项数不足时按实际数量平分（1 项占整行、2 项各一半…） */
+const MAX_COLUMNS: Record<string, number> = {
+  imageUpload: 5,
+  switch: 3,
+}
+const DEFAULT_MAX_COLUMNS = 3
+
+/**
+ * 每种控件一列的最小宽度（决定同一组里最多塞几列）.
+ *
+ * 单选/多选/多行文本的控件本身较宽（三个选项并排、文本域要有宽度），
+ * 挤成两三列会截断或换行，所以给更大的下限、通常只排一列。
+ */
+const MIN_COL_WIDTH: Record<string, number> = {
+  imageUpload: 260,
+  switch: 260,
+  select: 320,
+  textarea: 520,
+  radio: 560,
+  checkbox: 560,
+}
+const DEFAULT_MIN_COL_WIDTH = 420
+
+/** 分组容器的实际可用宽度：列数要跟着屏幕走，不能写死 */
+const sectionsRef = ref<HTMLElement>()
+const containerWidth = ref(0)
+
+onMounted(() => {
+  const el = sectionsRef.value
+  if (!el) {
+    return
+  }
+  const observer = new ResizeObserver((entries) => {
+    containerWidth.value = entries[0]?.contentRect.width ?? 0
+  })
+  observer.observe(el)
+  onBeforeUnmount(() => observer.disconnect())
+})
+
+/**
+ * 哪些分组跨整行：项数多的、图片（与模板里的 class 判断保持同一套逻辑）.
+ *
+ * 开关组不再跨整行——开关本身很窄，只有两三个，单独占一行会空掉一大片，
+ * 所以让它和相邻的小组（如「单选」）并排各占一半。
+ */
+function isWideGroup(group: { items: SettingItemVo[] }): boolean {
+  const type = group.items[0]?.input_type ?? 'input'
+  return group.items.length > 6 || type === 'imageUpload'
+}
 
 /** 按 GROUP_DEFS 的控件类型归组；后端以后新增的类型收进「其他配置」，空组不渲染 */
 const groupedItems = computed(() => {
@@ -184,6 +235,40 @@ const groupedItems = computed(() => {
 
   return groups
 })
+
+/**
+ * 半行组（不跨整行的组）数量为奇数时，把最后一个提成整行.
+ *
+ * 两个半行组并排刚好铺满一行，剩一个孤零零占左半、右侧空一大块；
+ * 让它跨整行后，组内列数也按整行重新算，视觉上才闭合。
+ */
+const lastOddHalfGroupTitle = computed(() => {
+  const half = groupedItems.value.filter(group => !isWideGroup(group))
+  return half.length % 2 === 1 ? (half[half.length - 1]?.title ?? null) : null
+})
+
+/**
+ * 给某个分组算 grid 列数.
+ *
+ * 取三者最小值：
+ * 1. 实际项数（项数不足时平分占位，1 项占整行、2 项各一半）
+ * 2. 该类型的上限（图片最多 5、开关最多 3、其它最多 3）
+ * 3. **这个组自己**的宽度放得下的列数——注意不是整个容器的宽度：
+ *    不跨行的组只占一半宽（如「多行文本」3 项），按容器宽度算会算出 3 列把文本域压成竖条。
+ */
+function groupColumns(group: { title: string, items: SettingItemVo[] }): number {
+  const type = group.items[0]?.input_type ?? 'input'
+  const max = MAX_COLUMNS[type] ?? DEFAULT_MAX_COLUMNS
+  const min = MIN_COL_WIDTH[type] ?? DEFAULT_MIN_COL_WIDTH
+  const gap = type === 'imageUpload' ? 20 : 40
+  const totalWidth = containerWidth.value || 1200
+  // 不跨行的组占「容器宽 - 24 列间距」的一半
+  const isFullRow = isWideGroup(group) || group.title === lastOddHalfGroupTitle.value
+  const width = isFullRow ? totalWidth : (totalWidth - 24) / 2
+  const fit = Math.max(1, Math.floor((width + gap) / (min + gap)))
+
+  return Math.max(1, Math.min(group.items.length, max, fit))
+}
 
 /** 新增 / 编辑配置项：居中弹窗（不是侧边抽屉） */
 const editingIndex = ref(-1)
@@ -414,20 +499,23 @@ useEventListener(window, 'resize', syncCardHeight)
       </div>
 
       <el-form class="site-setting__form" label-width="150px">
-        <div class="site-setting__sections">
+        <div ref="sectionsRef" class="site-setting__sections">
           <div
             v-for="group in groupedItems"
             :key="group.title"
             class="site-setting__section"
             :class="{
-              'site-setting__section--wide': group.items.length > 6 || group.items[0]?.input_type === 'imageUpload',
+              'site-setting__section--wide': isWideGroup(group) || group.title === lastOddHalfGroupTitle,
               'site-setting__section--images': group.items[0]?.input_type === 'imageUpload',
             }"
           >
             <div class="site-setting__section-title">
               {{ group.title }}
             </div>
-            <div class="site-setting__grid">
+            <div
+              class="site-setting__grid"
+              :style="{ gridTemplateColumns: `repeat(${groupColumns(group)}, minmax(0, 1fr))` }"
+            >
               <el-form-item v-for="item in group.items" :key="item.key">
                 <template #label>
                   <span>{{ item.name }}</span>
@@ -523,7 +611,7 @@ useEventListener(window, 'resize', syncCardHeight)
       </el-form>
 
       <!-- 配置项多时要滚到底部，这里再放一个保存，省得再滚回顶部；
-           上方加一条分隔线与表单隔开，按钮靠右（与右上角那组按钮的位置一致） -->
+           上方加一条分隔线与表单隔开，按钮居中 -->
       <div class="site-setting__footer">
         <el-button v-auth="['setting:save']" type="primary" :loading="saving" @click="handleSave">
           {{ t('save') }}
@@ -608,20 +696,24 @@ useEventListener(window, 'resize', syncCardHeight)
   color: var(--el-text-color-regular);
 }
 
-/* 分组标题：与渠道/商户表单一致——小标题 + 主色左边条 + 下划线 */
+/* 分组标题：主色小色块 + 文字，放在浅灰容器顶部 */
 .site-setting__section-title {
-  margin: 0 0 12px;
-  padding: 6px 0 6px 10px;
-  border-left: 3px solid var(--el-color-primary);
-  background: var(--el-fill-color-lighter);
-  border-radius: 0 4px 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.2;
+  color: var(--el-text-color-primary);
 }
 
-.site-setting__section-title:not(:first-child) {
-  margin-top: 20px;
+.site-setting__section-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--el-color-primary);
 }
 
 .site-setting__form {
@@ -634,20 +726,25 @@ useEventListener(window, 'resize', syncCardHeight)
   display: grid;
   // 组内单列：一行只放一个配置项（分组本身已经两列排布，再套两列就太挤）
   grid-template-columns: minmax(0, 1fr);
-  row-gap: 12px;
+  row-gap: 6px;
   align-items: start;
 }
 
-/* 分组两列排布：用 grid 而不是 column-count —— column-count 是按高度平衡的，
-   会出现「左列堆 5 个标题、右列只有 1 个」的观感失衡；grid 按顺序两两并排，更整齐 */
+/* 分组两列排布：每个分组是一块浅灰底的容器（不用再套一层卡片边框），
+   组内字段照常「label + 控件 + 图标」，视觉上分组清楚、也不会像纯标题那样零碎 */
 .site-setting__sections {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 56px;
-  row-gap: 26px;
-  // 同一行的两个分组各自按内容高度排，不互相拉伸
+  gap: 20px 24px;
   align-items: start;
-  max-width: 1380px;
+  // 铺满卡片内容区，不要再留左右边距
+  width: 100%;
+}
+
+.site-setting__section {
+  padding: 16px 20px 6px;
+  background: var(--el-fill-color-lighter);
+  border-radius: 8px;
 }
 
 /* 项数多的组（如「文本输入」15 项）跨整行、组内两列：
@@ -657,30 +754,34 @@ useEventListener(window, 'resize', syncCardHeight)
 }
 
 .site-setting__section--wide .site-setting__grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 56px;
+  column-gap: 40px;
 }
 
-/* 图片组：跨整行后横向铺开（260px 一列 ≈ label + 96px 缩略图 + 图标），
-   竖排 4 张会把整行高度顶到 600px，同排的其它分组下方就空一大片 */
+/* 图片组：跨整行后横向铺开 */
 .site-setting__section--images .site-setting__grid {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  column-gap: 32px;
-  // 图片行高（96px）远大于输入行，图标跟着顶部对齐会贴在图片上边缘，改成整行垂直居中
+  column-gap: 20px;
   align-items: center;
+}
 
-  // el-form-item 内部那层 flex 也要居中（模板里默认是 items-start，为了输入框与 label 齐顶）
-  :deep(.el-form-item__content > div) {
-    align-items: center;
-  }
+/* 图片行高（96px）远大于输入行，图标跟着顶部对齐会贴在图片上边缘 */
+.site-setting__section--images :deep(.el-form-item__content > div) {
+  align-items: center;
+}
+
+/* 图片组的 label 只有「站点图标」这类短名，用不上 150px；
+   收窄到 104px（「APP默认图标」刚好放得下）后一列 ≈ label + 96 缩略图 + 图标 */
+.site-setting__section--images :deep(.el-form-item__label) {
+  width: 104px !important;
+}
+
+/* 图片控件容器固定 120px：写 width:auto 时 flex 子项会塌缩、图片溢出把图标压到图片上 */
+.site-setting__section--images .site-setting__control {
+  width: 120px;
+  flex: none;
 }
 
 @media (max-width: 1200px) {
   .site-setting__sections {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .site-setting__section--wide .site-setting__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -733,7 +834,7 @@ useEventListener(window, 'resize', syncCardHeight)
 }
 .site-setting__footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--el-border-color-lighter);
