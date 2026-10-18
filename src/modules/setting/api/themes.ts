@@ -1,12 +1,12 @@
 import type { PageList, ResponseStruct } from '#/global'
 
-/** 主题记录（对应后端 App\Schema\ThemeSchema）：一条 = 一套配色方案 */
-export interface ThemeVo {
+/** 主题记录（对应后端 App\Schema\ThemesSchema）：一条 = 一套配色方案 */
+export interface ThemesVo {
   /** 主键 */
   id?: number
   /** 主题名称 */
   name?: string
-  /** 16 个颜色字段（键与后端 ThemeSaveRequest::COLOR_FIELDS 一致） */
+  /** 16 个颜色字段（键与后端 ThemesSaveRequest::COLOR_FIELDS 一致） */
   text_color?: string
   bg_color?: string
   header_bg_color?: string
@@ -43,7 +43,7 @@ export interface ThemeVo {
 }
 
 /** 列表查询条件 */
-export interface ThemeSearchVo {
+export interface ThemesSearchVo {
   /** 主键，精确匹配 */
   id?: number
   /** 主题名称，模糊匹配 */
@@ -53,27 +53,27 @@ export interface ThemeSearchVo {
   [key: string]: any
 }
 
-/** GET /admin/theme/list - 分页列表（按权重升序，数值越小越靠前） */
-export function page(data: ThemeSearchVo): Promise<ResponseStruct<PageList<ThemeVo>>> {
-  return useHttp().get('/admin/theme/list', { params: data })
+/** GET /admin/themes/list - 分页列表（按权重升序，数值越小越靠前） */
+export function page(data: ThemesSearchVo): Promise<ResponseStruct<PageList<ThemesVo>>> {
+  return useHttp().get('/admin/themes/list', { params: data })
 }
 
-/** POST /admin/theme - 新增 */
-export function create(data: ThemeVo): Promise<ResponseStruct<null>> {
-  return useHttp().post('/admin/theme', data)
+/** POST /admin/themes - 新增 */
+export function create(data: ThemesVo): Promise<ResponseStruct<null>> {
+  return useHttp().post('/admin/themes', data)
 }
 
-/** PUT /admin/theme/{id} - 更新 */
-export function save(id: number, data: ThemeVo): Promise<ResponseStruct<null>> {
-  return useHttp().put(`/admin/theme/${id}`, data)
+/** PUT /admin/themes/{id} - 更新 */
+export function save(id: number, data: ThemesVo): Promise<ResponseStruct<null>> {
+  return useHttp().put(`/admin/themes/${id}`, data)
 }
 
-/** PUT /admin/theme/{id}/status - 切换状态（列表开关，只改 status） */
+/** PUT /admin/themes/{id}/status - 切换状态（列表开关，只改 status） */
 export function updateStatus(id: number, status: number): Promise<ResponseStruct<null>> {
-  return useHttp().put(`/admin/theme/${id}/status`, { status })
+  return useHttp().put(`/admin/themes/${id}/status`, { status })
 }
 
-/** DELETE /admin/theme - 按 id 批量删除 */
+/** DELETE /admin/themes - 按 id 批量删除 */
 export function deleteByIds(ids: number[]): Promise<ResponseStruct<{ deleted: number }>> {
-  return useHttp().delete('/admin/theme', { data: { ids } })
+  return useHttp().delete('/admin/themes', { data: { ids } })
 }

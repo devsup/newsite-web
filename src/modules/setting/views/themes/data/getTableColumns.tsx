@@ -9,11 +9,11 @@
  */
 import type { MaProTableColumns, MaProTableExpose } from '@mineadmin/pro-table'
 import type { Ref } from 'vue'
-import type { ThemeVo } from '~/setting/api/theme.ts'
+import type { ThemesVo } from '~/setting/api/themes.ts'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
 import { ElSwitch, ElTooltip } from 'element-plus'
-import { deleteByIds, updateStatus } from '~/setting/api/theme.ts'
+import { deleteByIds, updateStatus } from '~/setting/api/themes.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
@@ -28,7 +28,7 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
   /**
    * 列表开关切换状态：成功后刷新列表（开关显示由数据驱动），失败给提示并同样刷新以回滚显示.
    */
-  function handleStatusChange(row: ThemeVo, status: number): void {
+  function handleStatusChange(row: ThemesVo, status: number): void {
     statusLoading.value = row.id
     updateStatus(row.id as number, status).then((response) => {
       if (response.code === ResultCode.SUCCESS) {
@@ -49,7 +49,7 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
    * 参考站点把 16 个颜色平铺成 16 列裸 hex，横向拉得极长且看不出效果；
    * 这里收成一列色板，既能看到配色关系，也不用横向滚很久。
    */
-  function renderPalette(row: ThemeVo) {
+  function renderPalette(row: ThemesVo) {
     return (
       <div class="flex flex-wrap items-center" style={{ gap: '4px', maxWidth: '280px' }}>
         {THEME_COLOR_FIELDS.map(field => (
@@ -81,7 +81,7 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
     // 普通列：ID / 名称 / 配色预览 / 启用 / 权重 / 备注 / 创建时间 / 更新人
     { label: () => t('ID'), prop: 'id', width: '80px' },
     { label: () => t('theme.name'), prop: 'name', minWidth: '140px' },
-    { label: () => t('theme.palette'), prop: 'name', width: '300px', cellRender: ({ row }) => renderPalette(row as ThemeVo) },
+    { label: () => t('theme.palette'), prop: 'name', width: '300px', cellRender: ({ row }) => renderPalette(row as ThemesVo) },
     {
       label: () => t('crud.status'),
       prop: 'status',
@@ -92,8 +92,8 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
           activeValue={Status.ENABLED}
           inactiveValue={Status.DISABLED}
           loading={statusLoading.value === row.id}
-          disabled={!hasAuth('theme:save')}
-          onChange={(value: string | number | boolean) => handleStatusChange(row as ThemeVo, Number(value))}
+          disabled={!hasAuth('themes:save')}
+          onChange={(value: string | number | boolean) => handleStatusChange(row as ThemesVo, Number(value))}
         />
       ),
     },

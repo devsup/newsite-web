@@ -12,7 +12,7 @@ import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@min
 import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
-import { deleteByIds, page } from '~/setting/api/theme'
+import { deleteByIds, page } from '~/setting/api/themes'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
@@ -22,9 +22,9 @@ import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
 import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
-import ThemeForm from './form.vue'
+import ThemesForm from './form.vue'
 
-defineOptions({ name: 'setting:theme' })
+defineOptions({ name: 'setting:themes' })
 
 const proTableRef = ref<MaProTableExpose>() as Ref<MaProTableExpose>
 const formRef = ref()
@@ -110,7 +110,7 @@ function openAdd(): void {
 
 /** 批量操作菜单：权限不满足的项由组件内部过滤 */
 const batchActions: BatchAction[] = [
-  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, auth: 'theme:delete' },
+  { command: 'delete', label: () => t('crud.delete'), icon: 'material-symbols:delete-outline', danger: true, auth: 'themes:delete' },
 ]
 
 /** 批量操作入口：当前各页只有删除，后续新增批量项在这里分发即可 */
@@ -150,7 +150,7 @@ function handleDelete(): void {
     <MaProTable ref="proTableRef" :options="options" :schema="schema">
       <template #actions>
         <el-button
-          v-auth="['theme:save']"
+          v-auth="['themes:save']"
           type="primary"
           @click="openAdd()"
         >
@@ -165,7 +165,7 @@ function handleDelete(): void {
       <template #empty>
         <el-empty>
           <el-button
-            v-auth="['theme:save']"
+            v-auth="['themes:save']"
             type="primary"
             @click="openAdd()"
           >
@@ -177,7 +177,7 @@ function handleDelete(): void {
 
     <component :is="maDialog.Dialog">
       <template #default="{ formType, data }">
-        <ThemeForm ref="formRef" :form-type="formType" :data="data" />
+        <ThemesForm ref="formRef" :form-type="formType" :data="data" />
       </template>
     </component>
   </div>

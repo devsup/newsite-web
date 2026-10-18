@@ -10,27 +10,27 @@
 <script setup lang="ts">
 import { Status } from '@/constants/status.ts'
 import type { FormInstance } from 'element-plus'
-import type { ThemeVo } from '~/setting/api/theme'
-import { create, save } from '~/setting/api/theme'
+import type { ThemesVo } from '~/setting/api/themes'
+import { create, save } from '~/setting/api/themes'
 import { defaultThemeColors, THEME_COLOR_FIELDS, THEME_GROUPS } from './data/colorFields.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
-import ThemePreview from './components/ThemePreview.vue'
+import ThemesPreview from './components/ThemesPreview.vue'
 import GradientColorPicker from './components/GradientColorPicker.vue'
 
-defineOptions({ name: 'setting:theme:form' })
+defineOptions({ name: 'setting:themes:form' })
 
 const { formType = 'add', data = null } = defineProps<{
   formType: 'add' | 'edit'
-  data?: ThemeVo | null
+  data?: ThemesVo | null
 }>()
 
 const t = useTrans().globalTrans
 const msg = useMessage()
 const formRef = ref<FormInstance>()
-const model = ref<ThemeVo>({})
+const model = ref<ThemesVo>({})
 
-/** 与后端 ThemeSaveRequest 保持一致的颜色格式校验（可为空，支持纯色与渐变） */
+/** 与后端 ThemesSaveRequest 保持一致的颜色格式校验（可为空，支持纯色与渐变） */
 const COLOR_PATTERN = /^(?:#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\)|(?:linear|radial)-gradient\(.+\))$/
 
 const rules = {
@@ -51,7 +51,7 @@ function initModel(): void {
     weight: 0,
     status: Status.ENABLED,
     remark: '',
-  } as ThemeVo
+  } as ThemesVo
 }
 
 initModel()
@@ -164,7 +164,7 @@ defineExpose({
     <!-- 右：实时预览（只有样式样张，不再带标题与提示文案） -->
     <div class="theme-form__preview">
       <div class="theme-form__preview-body">
-        <ThemePreview :colors="model" />
+        <ThemesPreview :colors="model" />
       </div>
     </div>
   </div>
