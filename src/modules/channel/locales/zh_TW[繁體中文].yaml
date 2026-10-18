@@ -48,7 +48,6 @@ channel:
   modeLand: 落地頁
   modeNavi: 導航頁
   modeAuto: 自適應
-  rebuildLandingNotice: 通路落地頁是靜態檔案：改動系統設定裡的落地頁背景圖 / 安裝包位址 / 下載開關後，需點右上「重建落地頁」重新生成才會生效
   rebuildLanding: 重建落地頁
   rebuildLandingSuccess: 已重建 {generated}/{total} 個落地頁
   rebuildLandingBusy: 正在重建落地頁，請稍候再試
@@ -57,6 +56,7 @@ channel:
   rebuildLandingTip1: · 系統設定裡的落地頁背景圖 / APP 預設圖示 / 落地頁名稱
   rebuildLandingTip2: · 系統設定裡的蘋果包 / 安卓包下載位址
   rebuildLandingTip3: · 系統設定裡的「落地頁App自動下載」「下載彈窗」開關
+  rebuildLandingTipCdn: 重建完成後，還需到 CDN 平台刷新落地頁網域的快取，否則訪客仍會拿到舊頁面
   rebuildLandingTipFooter: 通路自身的改動（如 JS代碼）儲存時會自動重新生成，無需手動重建
   rebuildLandingConfirm: 將按目前系統設定重新生成所有通路的落地頁（改過背景圖 / 安裝包位址 / 下載開關後才需要執行），是否繼續？
   rebuildLandingSelected: 批次重建

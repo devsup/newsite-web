@@ -48,7 +48,6 @@ channel:
   modeLand: Landing
   modeNavi: Navigation
   modeAuto: Adaptive
-  rebuildLandingNotice: Channel landing pages are static files — after changing the landing background, package URLs or download switches in Settings, click Rebuild Landings at the top right to regenerate them
   rebuildLanding: Rebuild Landings
   rebuildLandingSuccess: Rebuilt {generated}/{total} landing pages
   rebuildLandingBusy: Landing pages are being rebuilt, please try again shortly
@@ -57,6 +56,7 @@ channel:
   rebuildLandingTip1: · landing background / app icon / landing name in Settings
   rebuildLandingTip2: · iOS or Android package download URL in Settings
   rebuildLandingTip3: · "auto download" or "download dialog" switch in Settings
+  rebuildLandingTipCdn: After rebuilding, purge the cache for the landing domain on your CDN, otherwise visitors keep getting the old page
   rebuildLandingTipFooter: Changes on the channel itself (e.g. JS code) regenerate the page automatically on save
   rebuildLandingConfirm: Regenerate every channel landing page from the current settings? (Only needed after changing the background, package URLs or download switches.)
   rebuildLandingSelected: Rebuild Selected

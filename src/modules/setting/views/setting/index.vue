@@ -12,7 +12,7 @@ en:
   title: System Settings
   subtitle: Edit values in the form directly; add or modify a setting with the buttons above
   goChannel: Go to Channel →
-  landingRebuildTip: Changing the landing background, package URLs or download switches does not refresh the generated landing pages — go to Channel and click Rebuild Landings
+  landingRebuildTip: Changing the landing background, package URLs or download switches does not refresh the generated landing pages — go to Channel, click Rebuild Landings, then purge the landing domain cache on your CDN
   save: Save
   create: Add setting
   edit: Edit
@@ -42,7 +42,7 @@ zh_CN:
   title: 系统设置
   subtitle: 直接在表单里修改配置值，新增或修改配置项请用上方按钮
   goChannel: 去渠道管理 →
-  landingRebuildTip: 改动「落地页背景图 / 苹果包 / 安卓包 / 下载开关」后，已生成的渠道落地页不会自动更新，需到「渠道管理」点「重建落地页」重新生成
+  landingRebuildTip: 改动「落地页背景图 / 苹果包 / 安卓包 / 下载开关」后，已生成的渠道落地页不会自动更新：需到「渠道管理」点「重建落地页」，再到 CDN 平台刷新落地页域名的缓存
   save: 保存
   create: 新增配置项
   edit: 编辑
@@ -72,7 +72,7 @@ zh_TW:
   title: 系統設置
   subtitle: 直接在表單裡修改配置值，新增或修改配置項請用上方按鈕
   goChannel: 去通路管理 →
-  landingRebuildTip: 改動「落地頁背景圖 / 蘋果包 / 安卓包 / 下載開關」後，已生成的通路落地頁不會自動更新，需到「通路管理」點「重建落地頁」重新生成
+  landingRebuildTip: 改動「落地頁背景圖 / 蘋果包 / 安卓包 / 下載開關」後，已生成的通路落地頁不會自動更新：需到「通路管理」點「重建落地頁」，再到 CDN 平台刷新落地頁網域的快取
   save: 保存
   create: 新增配置項
   edit: 編輯
@@ -324,16 +324,17 @@ useEventListener(window, 'resize', syncCardHeight)
   <div ref="pageRef" class="mine-layout pt-3">
     <el-card v-loading="loading" class="site-setting__card" shadow="never">
       <template #header>
+        <!-- 与 MaProTable 的表头保持一致：主标题 16px、副标题 14px 且同一行，右侧放操作按钮 -->
         <div class="flex items-center justify-between">
-          <div>
-            <div class="text-base font-medium">
+          <div class="min-w-0 flex items-center gap-x-4">
+            <span class="shrink-0 text-[16px]">
               {{ t('title') }}
-            </div>
-            <div class="mt-1 text-xs text-[var(--el-text-color-secondary)]">
+            </span>
+            <span class="min-w-0 truncate text-[14px] text-[var(--el-text-color-regular)]">
               {{ t('subtitle') }}
-            </div>
+            </span>
           </div>
-          <div class="flex items-center gap-x-2">
+          <div class="flex shrink-0 items-center gap-x-2">
             <el-button v-auth="['setting:save']" @click="openCreate">
               {{ t('create') }}
             </el-button>
@@ -440,7 +441,9 @@ useEventListener(window, 'resize', syncCardHeight)
         </div>
       </el-form>
 
-      <div class="mt-4 text-center">
+      <!-- 配置项多时要滚到底部，这里再放一个保存，省得再滚回顶部；
+           上方加一条分隔线与表单隔开，按钮靠右（与右上角那组按钮的位置一致） -->
+      <div class="site-setting__footer">
         <el-button v-auth="['setting:save']" type="primary" :loading="saving" @click="handleSave">
           {{ t('save') }}
         </el-button>
@@ -563,5 +566,12 @@ useEventListener(window, 'resize', syncCardHeight)
   &__action {
     flex: none;
   }
+}
+.site-setting__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 </style>

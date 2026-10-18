@@ -48,7 +48,6 @@ channel:
   modeLand: 落地页
   modeNavi: 导航页
   modeAuto: 自适应
-  rebuildLandingNotice: 渠道落地页是静态文件：改动系统设置里的落地页背景图 / 安装包地址 / 下载开关后，需点右上「重建落地页」重新生成才会生效
   rebuildLanding: 重建落地页
   rebuildLandingSuccess: 已重建 {generated}/{total} 个落地页
   rebuildLandingBusy: 正在重建落地页，请稍候再试
@@ -57,6 +56,7 @@ channel:
   rebuildLandingTip1: · 系统设置里的落地页背景图 / APP 默认图标 / 落地页名称
   rebuildLandingTip2: · 系统设置里的苹果包 / 安卓包下载地址
   rebuildLandingTip3: · 系统设置里的「落地页App自动下载」「下载弹窗」开关
+  rebuildLandingTipCdn: 重建完成后，还需到 CDN 平台刷新落地页域名的缓存，否则访客仍会拿到旧页面
   rebuildLandingTipFooter: 渠道自身的改动（如 JS代码）保存时会自动重新生成，无需手动重建
   rebuildLandingConfirm: 将按当前系统设置重新生成所有渠道的落地页（改过背景图 / 安装包地址 / 下载开关后才需要执行），是否继续？
   rebuildLandingSelected: 批量重建

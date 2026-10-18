@@ -259,15 +259,6 @@ function handleBatchCommand(command: string): void {
 
 <template>
   <div class="mine-layout pt-3">
-    <!-- 落地页是静态文件：改完系统设置不会自动生效，这条提示常驻显示（副标题放不下这么长的说明） -->
-    <el-alert
-      class="mb-3"
-      type="warning"
-      :closable="false"
-      show-icon
-      :title="t('channel.rebuildLandingNotice')"
-    />
-
     <MaProTable v-if="ready" ref="proTableRef" :options="options" :schema="schema">
       <template #actions>
         <!-- 落地页是「烘焙」出来的静态文件，系统设置改了不会自动生效，所以这个按钮用醒目的 warning 色，
@@ -281,6 +272,9 @@ function handleBatchCommand(command: string): void {
               <div>{{ t('channel.rebuildLandingTip1') }}</div>
               <div>{{ t('channel.rebuildLandingTip2') }}</div>
               <div>{{ t('channel.rebuildLandingTip3') }}</div>
+              <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,.35);">
+                {{ t('channel.rebuildLandingTipCdn') }}
+              </div>
               <div style="margin-top: 4px; font-size: 12px; opacity: .85;">
                 {{ t('channel.rebuildLandingTipFooter') }}
               </div>
