@@ -10,6 +10,14 @@
 <i18n lang="yaml">
 en:
   title: System Settings
+  groupInput: Text Input
+  groupTextarea: Multi-line Text
+  groupSelect: Select
+  groupRadio: Radio
+  groupCheckbox: Checkbox
+  groupSwitch: Switch
+  groupImage: Image Upload
+  groupOther: Other Settings
   subtitle: Edit values in the form directly; add or modify a setting with the buttons above
   goChannel: Go to Channel →
   landingRebuildTip: Changing the landing background, package URLs or download switches does not refresh the generated landing pages — go to Channel, click Rebuild Landings, then purge the landing domain cache on your CDN
@@ -40,6 +48,14 @@ en:
     imageUpload: Image
 zh_CN:
   title: 系统设置
+  groupInput: 文本输入
+  groupTextarea: 多行文本
+  groupSelect: 下拉选择
+  groupRadio: 单选
+  groupCheckbox: 多选
+  groupSwitch: 开关
+  groupImage: 图片上传
+  groupOther: 其他配置
   subtitle: 直接在表单里修改配置值，新增或修改配置项请用上方按钮
   goChannel: 去渠道管理 →
   landingRebuildTip: 改动「落地页背景图 / 苹果包 / 安卓包 / 下载开关」后，已生成的渠道落地页不会自动更新：需到「渠道管理」点「重建落地页」，再到 CDN 平台刷新落地页域名的缓存
@@ -70,6 +86,14 @@ zh_CN:
     imageUpload: 图片
 zh_TW:
   title: 系統設置
+  groupInput: 文字輸入
+  groupTextarea: 多行文字
+  groupSelect: 下拉選擇
+  groupRadio: 單選
+  groupCheckbox: 多選
+  groupSwitch: 開關
+  groupImage: 圖片上傳
+  groupOther: 其他設定
   subtitle: 直接在表單裡修改配置值，新增或修改配置項請用上方按鈕
   goChannel: 去通路管理 →
   landingRebuildTip: 改動「落地頁背景圖 / 蘋果包 / 安卓包 / 下載開關」後，已生成的通路落地頁不會自動更新：需到「通路管理」點「重建落地頁」，再到 CDN 平台刷新落地頁網域的快取
@@ -125,6 +149,41 @@ const { globalTrans, localTrans: t } = useTrans()
 const loading = ref(false)
 const saving = ref(false)
 const items = ref<SettingItemVo[]>([])
+
+/**
+ * 配置项分组：**按控件类型**归组.
+ *
+ * 同一个网格里混排会很难看——输入框 32px、图片 120px、开关 24px、单选 32px，高度全不一样，
+ * 行高被图片撑起来后其它控件都悬在中间。按控件类型分组后，每组内控件高度一致、排布整齐。
+ * 组标题样式与渠道/商户表单的分组一致（主色左边条 + 下划线）。
+ */
+const GROUP_DEFS: Array<{ title: string, types: string[] }> = [
+  { title: 'groupInput', types: ['input', ''] },
+  { title: 'groupTextarea', types: ['textarea'] },
+  { title: 'groupSelect', types: ['select'] },
+  { title: 'groupRadio', types: ['radio'] },
+  { title: 'groupCheckbox', types: ['checkbox'] },
+  { title: 'groupSwitch', types: ['switch'] },
+  { title: 'groupImage', types: ['imageUpload'] },
+]
+
+/** 按 GROUP_DEFS 的控件类型归组；后端以后新增的类型收进「其他配置」，空组不渲染 */
+const groupedItems = computed(() => {
+  const groups = GROUP_DEFS
+    .map(def => ({
+      title: t(def.title),
+      items: items.value.filter(item => def.types.includes(item.input_type ?? '')),
+    }))
+    .filter(group => group.items.length > 0)
+
+  const known = new Set(GROUP_DEFS.flatMap(def => def.types))
+  const others = items.value.filter(item => !known.has(item.input_type ?? ''))
+  if (others.length > 0) {
+    groups.push({ title: t('groupOther'), items: others })
+  }
+
+  return groups
+})
 
 /** 新增 / 编辑配置项：居中弹窗（不是侧边抽屉） */
 const editingIndex = ref(-1)
@@ -355,89 +414,111 @@ useEventListener(window, 'resize', syncCardHeight)
       </div>
 
       <el-form class="site-setting__form" label-width="150px">
-        <div class="site-setting__grid">
-          <el-form-item v-for="(item, index) in items" :key="item.key || index">
-            <template #label>
-              <span>{{ item.name }}</span>
-            </template>
-
-            <div class="w-full flex items-center gap-x-4">
-              <div class="min-w-0 flex-1">
-                <el-input
-                  v-if="item.input_type === 'input'"
-                  v-model="item.value"
-                  clearable
-                  :placeholder="t('inputPlaceholder', { name: item.name })"
-                />
-
-                <el-input
-                  v-else-if="item.input_type === 'textarea'"
-                  v-model="item.value"
-                  type="textarea"
-                  :rows="3"
-                  :placeholder="t('inputPlaceholder', { name: item.name })"
-                />
-
-                <el-select
-                  v-else-if="item.input_type === 'select'"
-                  v-model="item.value"
-                  clearable
-                  :placeholder="t('selectPlaceholder', { name: item.name })"
-                >
-                  <el-option v-for="opt in optionsOf(item)" :key="opt.value" :label="opt.label" :value="opt.value" />
-                </el-select>
-
-                <el-radio-group v-else-if="item.input_type === 'radio'" v-model="item.value">
-                  <el-radio v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
-                    {{ opt.label }}
-                  </el-radio>
-                </el-radio-group>
-
-                <el-checkbox-group v-else-if="item.input_type === 'checkbox'" v-model="item.value">
-                  <el-checkbox v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
-                    {{ opt.label }}
-                  </el-checkbox>
-                </el-checkbox-group>
-
-                <el-switch
-                  v-else-if="item.input_type === 'switch'"
-                  v-model="item.value"
-                  :active-value="optionsOf(item)[0]?.value ?? '1'"
-                  :inactive-value="optionsOf(item)[1]?.value ?? '0'"
-                />
-
-                <!-- 图片：走资源库选择 / 上传，不允许手填地址 -->
-                <ma-upload-image
-                  v-else-if="item.input_type === 'imageUpload'"
-                  v-model="item.value"
-                  :size="120"
-                />
-
-                <el-input v-else v-model="item.value" clearable />
-              </div>
-
-              <div class="site-setting__actions flex shrink-0 items-center">
-                <el-button
-                  v-auth="['setting:save']"
-                  link
-                  type="primary"
-                  :title="t('edit')"
-                  @click="openEdit(item, index)"
-                >
-                  <ma-svg-icon name="material-symbols:edit-outline-rounded" :size="18" />
-                </el-button>
-                <el-button
-                  v-auth="['setting:delete']"
-                  link
-                  type="danger"
-                  :title="t('remove')"
-                  @click="removeItem(item, index)"
-                >
-                  <ma-svg-icon name="material-symbols:delete-outline-rounded" :size="18" />
-                </el-button>
-              </div>
+        <div class="site-setting__sections">
+          <div
+            v-for="group in groupedItems"
+            :key="group.title"
+            class="site-setting__section"
+            :class="{
+              'site-setting__section--wide': group.items.length > 6 || group.items[0]?.input_type === 'imageUpload',
+              'site-setting__section--images': group.items[0]?.input_type === 'imageUpload',
+            }"
+          >
+            <div class="site-setting__section-title">
+              {{ group.title }}
             </div>
-          </el-form-item>
+            <div class="site-setting__grid">
+              <el-form-item v-for="item in group.items" :key="item.key">
+                <template #label>
+                  <span>{{ item.name }}</span>
+                </template>
+
+                <!-- 图片、开关、单选/多选这类控件尺寸固定，容器不用占满 420px，否则图标会离控件很远 -->
+                <div class="w-full flex items-start gap-x-2">
+                  <div
+                    class="site-setting__control min-w-0"
+                    :class="{
+                      'site-setting__control--auto': ['switch', 'radio', 'checkbox'].includes(item.input_type ?? ''),
+                      'site-setting__control--image': item.input_type === 'imageUpload',
+                    }"
+                  >
+                    <el-input
+                      v-if="item.input_type === 'input'"
+                      v-model="item.value"
+                      clearable
+                      :placeholder="t('inputPlaceholder', { name: item.name })"
+                    />
+
+                    <el-input
+                      v-else-if="item.input_type === 'textarea'"
+                      v-model="item.value"
+                      type="textarea"
+                      :rows="3"
+                      :placeholder="t('inputPlaceholder', { name: item.name })"
+                    />
+
+                    <el-select
+                      v-else-if="item.input_type === 'select'"
+                      v-model="item.value"
+                      clearable
+                      :placeholder="t('selectPlaceholder', { name: item.name })"
+                    >
+                      <el-option v-for="opt in optionsOf(item)" :key="opt.value" :label="opt.label" :value="opt.value" />
+                    </el-select>
+
+                    <el-radio-group v-else-if="item.input_type === 'radio'" v-model="item.value">
+                      <el-radio v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
+                        {{ opt.label }}
+                      </el-radio>
+                    </el-radio-group>
+
+                    <el-checkbox-group v-else-if="item.input_type === 'checkbox'" v-model="item.value">
+                      <el-checkbox v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
+                        {{ opt.label }}
+                      </el-checkbox>
+                    </el-checkbox-group>
+
+                    <el-switch
+                      v-else-if="item.input_type === 'switch'"
+                      v-model="item.value"
+                      :active-value="optionsOf(item)[0]?.value ?? '1'"
+                      :inactive-value="optionsOf(item)[1]?.value ?? '0'"
+                    />
+
+                    <!-- 图片：走资源库选择 / 上传，不允许手填地址 -->
+                    <ma-upload-image
+                      v-else-if="item.input_type === 'imageUpload'"
+                      v-model="item.value"
+                      :size="96"
+                    />
+
+                    <el-input v-else v-model="item.value" clearable />
+                  </div>
+
+                  <div class="site-setting__actions flex shrink-0 items-center" style="min-height: 32px;">
+                    <el-button
+                      v-auth="['setting:save']"
+                      link
+                      type="primary"
+                      :title="t('edit')"
+                      @click="openEdit(item, items.indexOf(item))"
+                    >
+                      <ma-svg-icon name="material-symbols:edit-outline-rounded" :size="18" />
+                    </el-button>
+                    <el-button
+                      v-auth="['setting:delete']"
+                      link
+                      type="danger"
+                      :title="t('remove')"
+                      @click="removeItem(item, items.indexOf(item))"
+                    >
+                      <ma-svg-icon name="material-symbols:delete-outline-rounded" :size="18" />
+                    </el-button>
+                  </div>
+                </div>
+              </el-form-item>
+            </div>
+          </div>
         </div>
       </el-form>
 
@@ -503,6 +584,46 @@ useEventListener(window, 'resize', syncCardHeight)
 }
 
 // 表单铺满卡片宽度，不做居中约束（居中会让两列挤在中间、两侧空一大片）
+/* 控件固定宽度：输入框被 flex-1 拉满时，右侧的编辑/删除图标会被顶到列尾、离字段很远；
+   固定 420px 后图标紧跟在控件后面，图片类字段也不会拖出一条长空白 */
+.site-setting__control {
+  width: 420px;
+  max-width: 100%;
+}
+
+/* 开关 / 单选 / 多选这类控件本身很窄，容器占 420px 会把图标顶得很远 */
+.site-setting__control--auto {
+  width: auto;
+}
+
+/* 图片字段：固定 120px（缩略图 96 + 内边距）。不能写 `width: auto`——flex 子项会塌缩到最小宽度，
+   图片会溢出容器、把右侧的编辑/删除图标压到图片上 */
+.site-setting__control--image {
+  width: 120px;
+  flex: none;
+}
+
+/* label 用常规文字色（默认是主文字色，长配置名看起来偏重） */
+.site-setting__form :deep(.el-form-item__label) {
+  color: var(--el-text-color-regular);
+}
+
+/* 分组标题：与渠道/商户表单一致——小标题 + 主色左边条 + 下划线 */
+.site-setting__section-title {
+  margin: 0 0 12px;
+  padding: 6px 0 6px 10px;
+  border-left: 3px solid var(--el-color-primary);
+  background: var(--el-fill-color-lighter);
+  border-radius: 0 4px 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.site-setting__section-title:not(:first-child) {
+  margin-top: 20px;
+}
+
 .site-setting__form {
   max-width: none;
 }
@@ -511,13 +632,56 @@ useEventListener(window, 'resize', syncCardHeight)
 // 用 grid 而不是 el-row/el-col + gutter——gutter 走负 margin，gutter 一大就会把内容顶出卡片、出现横向滚动。
 .site-setting__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 96px;
+  // 组内单列：一行只放一个配置项（分组本身已经两列排布，再套两列就太挤）
+  grid-template-columns: minmax(0, 1fr);
   row-gap: 12px;
+  align-items: start;
+}
 
-  @media (max-width: 1200px) {
+/* 分组两列排布：用 grid 而不是 column-count —— column-count 是按高度平衡的，
+   会出现「左列堆 5 个标题、右列只有 1 个」的观感失衡；grid 按顺序两两并排，更整齐 */
+.site-setting__sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 56px;
+  row-gap: 26px;
+  // 同一行的两个分组各自按内容高度排，不互相拉伸
+  align-items: start;
+  max-width: 1380px;
+}
+
+/* 项数多的组（如「文本输入」15 项）跨整行、组内两列：
+   否则它单独占一列会拉到一整屏高，另一列只剩几个小组、下面空一大片 */
+.site-setting__section--wide {
+  grid-column: 1 / -1;
+}
+
+.site-setting__section--wide .site-setting__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 56px;
+}
+
+/* 图片组：跨整行后横向铺开（260px 一列 ≈ label + 96px 缩略图 + 图标），
+   竖排 4 张会把整行高度顶到 600px，同排的其它分组下方就空一大片 */
+.site-setting__section--images .site-setting__grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  column-gap: 32px;
+  // 图片行高（96px）远大于输入行，图标跟着顶部对齐会贴在图片上边缘，改成整行垂直居中
+  align-items: center;
+
+  // el-form-item 内部那层 flex 也要居中（模板里默认是 items-start，为了输入框与 label 齐顶）
+  :deep(.el-form-item__content > div) {
+    align-items: center;
+  }
+}
+
+@media (max-width: 1200px) {
+  .site-setting__sections {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 12px;
+  }
+
+  .site-setting__section--wide .site-setting__grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
