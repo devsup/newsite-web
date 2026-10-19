@@ -9,6 +9,10 @@
  */
 import App from './App.vue'
 import MineBootstrap from './bootstrap'
+import { registerObsImageWorker } from './utils/obsImageWorker'
+
+// OBS 图片是密文，先注册解密 Worker，再挂载页面（Worker 没配好时会自动跳过）
+registerObsImageWorker()
 
 const app = createApp(App)
 

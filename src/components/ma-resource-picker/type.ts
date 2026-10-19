@@ -13,6 +13,8 @@ export interface Resource {
   size_byte?: number
   size_info?: string
   url?: string
+  /** 库里保存的原始地址（相对路径，未拼域名；历史外链则是完整地址） */
+  relative_url?: string
   /** 对象存储桶名 */
   bucket_name?: string
   /** 桶内对象键 */

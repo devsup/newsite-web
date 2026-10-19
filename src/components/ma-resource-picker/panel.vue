@@ -23,6 +23,10 @@ en:
   deselect: Deselect
   singleSelect: Select only this item
   view: View
+  copyAbsolutePath: Copy absolute path
+  copyRelativePath: Copy relative path
+  copySuccess: Path copied
+  copyFail: Copy failed, please copy manually
   delete: Delete
   cancel: Cancel
   confirm: Confirm
@@ -44,6 +48,10 @@ zh_CN:
   deselect: 取消选中
   singleSelect: 独选此项
   view: 查看
+  copyAbsolutePath: 复制绝对路径
+  copyRelativePath: 复制相对路径
+  copySuccess: 路径已复制
+  copyFail: 复制失败，请手动复制
   delete: 删除
   cancel: 取消
   confirm: 确认
@@ -66,6 +74,10 @@ zh_TW:
   deselect: 取消選中
   singleSelect: 獨選此項
   view: 查看
+  copyAbsolutePath: 複製絕對路徑
+  copyRelativePath: 複製相對路徑
+  copySuccess: 路徑已複製
+  copyFail: 複製失敗，請手動複製
   delete: 刪除
   cancel: 取消
   confirm: 確認
@@ -127,6 +139,14 @@ const loading = ref(false)
 const resources = ref<Resource[]>([])
 
 /**
+ * 图片域名（系统设置「图片域名」）.
+ *
+ * 附件列表接口一并返回，右键「复制绝对路径」用它拼相对地址；
+ * 不额外请求设置接口，避免没有 `setting:index` 权限的账号拿不到域名。
+ */
+const imageDomain = ref('')
+
+/**
  * 资源总数
  */
 const total = ref<number>(0)
@@ -168,6 +188,8 @@ async function getResourceList(params: Resource = {}) {
   )
   total.value = data.total
   resources.value = data.list
+  // 图片域名随列表一起下发，用于「复制绝对路径」拼完整地址
+  imageDomain.value = String(data.image_domain ?? '')
   loading.value = false
 }
 
@@ -363,6 +385,97 @@ async function onDel(id: number): Promise<void> {
 }
 
 /**
+ * 取资源在桶里的相对路径（OBS / CDN 地址 = 图片域名 + 该路径）.
+ *
+ * 优先用 `storage_key`（上传时记录的桶内完整对象键，如 `2026-10-18/uuid.gif`）：
+ * 只有它才是 OBS / CDN 上真实存在的路径，`url` 是后端解密接口地址（`/attachment/uuid`），
+ * 不能拿去拼图片域名。历史本地存储的附件没有 `storage_key`，退回解析 `url`。
+ */
+function getRelativePath(resource: Resource): string {
+  const key = String(resource?.storage_key ?? '').replace(/^\/+/, '')
+  if (key) {
+    return `/${key}`
+  }
+
+  const url = resource?.url
+  if (!url) {
+    return ''
+  }
+
+  try {
+    const parsed = new URL(url, window.location.origin)
+
+    return `${parsed.pathname}${parsed.search}`
+  }
+  catch {
+    // 不是合法 URL（例如库里的脏数据）时退回原值，至少让用户能复制到东西
+    return url
+  }
+}
+
+/**
+ * 组装绝对路径：后台配置的「图片域名」+ 桶内相对路径.
+ *
+ * 图片域名取自系统设置（`image_domain`），既可以是 OBS 桶地址，也可以是套在前面的 CDN 域名，
+ * 换域名只改配置、不用动代码。以下情况退回后端返回的 `url`，避免拼出无效地址：
+ * - 没有 `storage_key`（历史本地存储等非 OBS 附件）；
+ * - 图片域名没配；
+ * - 库里的地址本身已经是外链 / data URI（历史数据）。
+ */
+function getAbsolutePath(resource: Resource): string {
+  const relative = getRelativePath(resource)
+  const domain = imageDomain.value.replace(/\/+$/, '')
+
+  if (resource?.storage_key && domain) {
+    return `${domain}/${relative.replace(/^\/+/, '')}`
+  }
+
+  return resource?.url || relative
+}
+
+/**
+ * 复制文本到剪贴板.
+ *
+ * 优先 Clipboard API（HTTPS / localhost 可用），失败或不可用时退化到临时 textarea + execCommand；
+ * 内网 http 地址属于非安全上下文，`navigator.clipboard` 直接不可用，必须有兜底。
+ * 与渠道 / 商户列表里的复制逻辑保持一致。
+ */
+function copyText(text: string): void {
+  if (!text) {
+    msg.error(t('copyFail'))
+
+    return
+  }
+
+  const done = (ok: boolean): void => {
+    ok ? msg.success(t('copySuccess')) : msg.error(t('copyFail'))
+  }
+
+  const fallback = (): boolean => {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(textarea)
+
+    return ok
+  }
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => done(true))
+      .catch(() => done(fallback()))
+
+    return
+  }
+
+  done(fallback())
+}
+
+/**
  * 右键菜单
  */
 function executeContextmenu(e: MouseEvent, resource: Resource) {
@@ -408,9 +521,27 @@ function executeContextmenu(e: MouseEvent, resource: Resource) {
           useImageViewer([resource?.url ?? ''])
         },
       },
+      // 复制路径：绝对路径 = 后台配置的「图片域名」+ 桶内对象键；相对路径 = 桶内对象键
+      {
+        label: t('copyAbsolutePath'),
+        icon: 'i-ri:file-copy-line',
+        // `divided: 'up'` 才是「在该项上方画分隔线」；`true` 是 `'down'`，会把两条复制操作拆开
+        divided: 'up',
+        onClick: () => {
+          copyText(getAbsolutePath(resource))
+        },
+      },
+      {
+        label: t('copyRelativePath'),
+        icon: 'i-ri:link',
+        onClick: () => {
+          copyText(getRelativePath(resource))
+        },
+      },
       {
         label: t('delete'),
         icon: 'i-material-symbols:delete-outline',
+        divided: 'up',
         onClick: () => {
           if (resource?.id !== undefined) {
             onDel(resource.id)
