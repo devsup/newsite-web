@@ -151,7 +151,7 @@ const saving = ref(false)
 const items = ref<SettingItemVo[]>([])
 
 /**
- * 配置项分组：**按控件类型**归组.
+ * 配置项分组：按控件类型归组.
  *
  * 同一个网格里混排会很难看——输入框 32px、图片 120px、开关 24px、单选 32px，高度全不一样，
  * 行高被图片撑起来后其它控件都悬在中间。按控件类型分组后，每组内控件高度一致、排布整齐。
@@ -253,7 +253,7 @@ const lastOddHalfGroupTitle = computed(() => {
  * 取三者最小值：
  * 1. 实际项数（项数不足时平分占位，1 项占整行、2 项各一半）
  * 2. 该类型的上限（图片最多 5、开关最多 3、其它最多 3）
- * 3. **这个组自己**的宽度放得下的列数——注意不是整个容器的宽度：
+ * 3. 这个组自己的宽度放得下的列数——注意不是整个容器的宽度：
  *    不跨行的组只占一半宽（如「多行文本」3 项），按容器宽度算会算出 3 列把文本域压成竖条。
  */
 function groupColumns(group: { title: string, items: SettingItemVo[] }): number {
@@ -423,7 +423,7 @@ async function handleSave(): Promise<void> {
 const pageRef = ref<HTMLElement>()
 
 /**
- * 把卡片高度锁进 `.mine-main` 的可视区域：
+ * 把卡片高度锁进 .mine-main 的可视区域：
  * 用实测的「页面根顶部偏移 + 下方其它占位」计算，避免整页 / 内容区跟着滚。
  */
 function syncCardHeight(): void {
@@ -436,7 +436,7 @@ function syncCardHeight(): void {
   const mainRect = main.getBoundingClientRect()
   const rootTop = root.getBoundingClientRect().top - mainRect.top + main.scrollTop
 
-  // `.mine-main` 里排在页面之后的兄弟节点（如底部占位）也要扣掉
+  // .mine-main 里排在页面之后的兄弟节点（如底部占位）也要扣掉
   let bottomExtras = 0
   let passedRoot = false
   for (const child of Array.from(main.children)) {
@@ -684,7 +684,7 @@ useEventListener(window, 'resize', syncCardHeight)
   width: auto;
 }
 
-/* 图片字段：固定 120px（缩略图 96 + 内边距）。不能写 `width: auto`——flex 子项会塌缩到最小宽度，
+/* 图片字段：固定 120px（缩略图 96 + 内边距）。不能写 width: auto——flex 子项会塌缩到最小宽度，
    图片会溢出容器、把右侧的编辑/删除图标压到图片上 */
 .site-setting__control--image {
   width: 120px;

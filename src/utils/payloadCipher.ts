@@ -1,34 +1,34 @@
 /**
  * 通用载荷加解密（AES-256-GCM，浏览器侧）.
  *
- * 与后端 `App\Library\Crypto\PayloadCipher` 一一对应，格式完全一致：
+ * 与后端 App\Library\Crypto\PayloadCipher 一一对应，格式完全一致：
  *
- * ```
+ * 
  * 密文 = base64( MAGIC + iv(12) + tag(16) + ciphertext )
- * ```
+ * 
  *
- * - `MAGIC` 默认 `PAY1`（配置项 `PAYLOAD_CIPHER_MAGIC` / `VITE_PAYLOAD_CIPHER_MAGIC`），
+ * MAGIC 默认 PAY1（配置项 PAYLOAD_CIPHER_MAGIC / VITE_PAYLOAD_CIPHER_MAGIC），
  *   用来区分「密文」和「普通字符串」，改版本号前后端必须一起改；
- * - `iv` 每次随机生成，同样的明文每次得到不同密文；
- * - GCM 认证标签由 WebCrypto 自动附带在密文尾部，这里按后端约定拆出来重新拼进格式里；
- * - **内容改一个字节就解不开**（能防篡改），但**不防重放**；要防重放得在业务层带
+ * iv 每次随机生成，同样的明文每次得到不同密文；
+ * GCM 认证标签由 WebCrypto 自动附带在密文尾部，这里按后端约定拆出来重新拼进格式里；
+ * 内容改一个字节就解不开（能防篡改），但不防重放；要防重放得在业务层带
  *   时间戳 / nonce。
  *
  * 与具体业务无关：接口请求响应、分享链接参数、本地缓存里需要加密的内容都能用。
- * 接口相关的封装（开关、请求发送、错误处理）在 `apiCrypto.ts`。
+ * 接口相关的封装（开关、请求发送、错误处理）在 apiCrypto.ts。
  *
  * 安全边界：密钥最终会随前端产物分发，能被逆向拿到，这套机制是「提高抓包 / 爬虫门槛」，
  * 不是密码学意义上的保密。真正的敏感数据不要交给浏览器保存。
  */
 
-/** 默认魔术字节，与后端 `crypto.payload.magic` 一致 */
+/** 默认魔术字节，与后端 crypto.payload.magic 一致 */
 const DEFAULT_MAGIC = 'PAY1'
 
 /** 加解密可选参数：不传就用构建期变量里的密钥与魔术字节 */
 export interface PayloadCipherOptions {
-  /** base64 编码的 32 字节密钥，默认 `VITE_PAYLOAD_CIPHER_KEY` */
+  /** base64 编码的 32 字节密钥，默认 VITE_PAYLOAD_CIPHER_KEY */
   keyBase64?: string
-  /** 密文头部标识，默认 `VITE_PAYLOAD_CIPHER_MAGIC`（`PAY1`） */
+  /** 密文头部标识，默认 VITE_PAYLOAD_CIPHER_MAGIC（PAY1） */
   magic?: string
 }
 
@@ -41,8 +41,8 @@ const TAG_LENGTH = 16
 /**
  * base64 转字节数组.
  *
- * 显式用 `new ArrayBuffer` 建底层缓冲，返回类型才是 `Uint8Array<ArrayBuffer>`
- * （WebCrypto 的 BufferSource 不接受 `Uint8Array<ArrayBufferLike>`）。
+ * 显式用 new ArrayBuffer 建底层缓冲，返回类型才是 Uint8Array<ArrayBuffer>
+ * （WebCrypto 的 BufferSource 不接受 Uint8Array<ArrayBufferLike>）。
  */
 function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
   const binary = atob(base64)

@@ -51,8 +51,8 @@ const selectedDomain = ref('')
 /**
  * 是否为 IP 地址。
  *
- * 面板允许为 IP 申请证书，只是签发的是**自签名证书**（非 Let's Encrypt、有效期通常只有几天）。
- * 这里只用于在界面上如实提示，**不做任何拦截**——申请目标由使用者决定。
+ * 面板允许为 IP 申请证书，只是签发的是自签名证书（非 Let's Encrypt、有效期通常只有几天）。
+ * 这里只用于在界面上如实提示，不做任何拦截——申请目标由使用者决定。
  */
 function isIpAddress(value: string): boolean {
   if (!value) {

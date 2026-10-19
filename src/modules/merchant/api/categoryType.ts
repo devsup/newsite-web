@@ -3,7 +3,7 @@ import type { PageList, ResponseStruct } from '#/global'
 /**
  * 商户类目（对应后端 App\Schema\CategoryTypeSchema）。
  *
- * 统计字段当前没有后端来源，列表统一显示 `--`；
+ * 统计字段当前没有后端来源，列表统一显示 --；
  * 后续数据中心接入后再补 merchant_number / merchant_pv / merchant_uv / click_rate 等字段.
  */
 export interface CategoryTypeVo {

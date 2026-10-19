@@ -5,8 +5,8 @@
  * 必须由 Service Worker 拦截 <img> 请求、解密后再交给浏览器渲染（详见 public/sw-obs-image.js）。
  *
  * 配置来自构建环境变量：
- * - `VITE_OBS_CONTENT_KEY`：与后端 `OBS_CONTENT_KEY` 一致的 base64 密钥（放 `.env.*.local`）；
- * - `VITE_OBS_IMAGE_ORIGINS`：允许解密的图片来源，逗号分隔（OBS 地址或 CDN 域名）；
+ * VITE_OBS_CONTENT_KEY：与后端 OBS_CONTENT_KEY 一致的 base64 密钥（放 .env.*.local）；
+ * VITE_OBS_IMAGE_ORIGINS：允许解密的图片来源，逗号分隔（OBS 地址或 CDN 域名）；
  * 两者缺一就不注册，避免把非加密来源的图片也接管。
  */
 const SW_URL = '/sw-obs-image.js'

@@ -1,7 +1,7 @@
 /**
- * 商户「弹窗类型」取值（与后端 `App\Model\Enums\Merchant\LayerType` 一致）.
+ * 商户「弹窗类型」取值（与后端 App\Model\Enums\Merchant\LayerType 一致）.
  *
- * 展示类型（show_type 1~11）的字段定义在 `views/merchant/data/fieldConfig.ts`，
+ * 展示类型（show_type 1~11）的字段定义在 views/merchant/data/fieldConfig.ts，
  * 那里按类型分组维护，不需要再单独抽常量。
  */
 export const LAYER_TYPE = {

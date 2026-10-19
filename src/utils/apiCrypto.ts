@@ -1,29 +1,29 @@
 /**
- * 对外接口（`/api/**`）的请求封装：双向加解密 + 信封解包.
+ * 对外接口（/api/**）的请求封装：双向加解密 + 信封解包.
  *
- * 加解密能力来自通用层 `payloadCipher.ts`（与后端 `App\Library\Crypto\PayloadCipher` 对应），
+ * 加解密能力来自通用层 payloadCipher.ts（与后端 App\Library\Crypto\PayloadCipher 对应），
  * 本文件只处理「接口」相关的部分：开关、参数打包、请求发送、响应解包、错误提示。
  *
- * 后端 `ApiEncryptMiddleware` 在 `API_ENCRYPT_ENABLED=true` 时：
+ * 后端 ApiEncryptMiddleware 在 API_ENCRYPT_ENABLED=true 时：
  *
- * - **请求**：参数加密后放 `payload`（GET 走查询串 `?payload=<base64>`，POST 走 body
- *   `{"payload":"<base64>"}`），后端解密成真实参数再交给控制器；`channel_code` 会被转成
- *   `Channel-Code` 请求头。
- * - **响应**：`data` 直接换成密文字符串（不加 `encrypted` 之类标识）：
- *   `{ "code": 200, "message": "成功", "data": "QVBJRTF..." }`
+ * 请求：参数加密后放 payload（GET 走查询串 ?payload=<base64>，POST 走 body
+ *   {"payload":"<base64>"}），后端解密成真实参数再交给控制器；channel_code 会被转成
+ *   Channel-Code 请求头。
+ * 响应：data 直接换成密文字符串（不加 encrypted 之类标识）：
+ *   { "code": 200, "message": "成功", "data": "QVBJRTF..." }
  *
- * 判断「要不要解密」靠两点：`typeof data === 'string'`（接口约定 `data` 只可能是数组或对象）
- * 且密文魔术字节匹配（`looksEncrypted`）。
+ * 判断「要不要解密」靠两点：typeof data === 'string'（接口约定 data 只可能是数组或对象）
+ * 且密文魔术字节匹配（looksEncrypted）。
  *
  * 用法：
- * ```ts
+ * ts
  * const categories = await requestApi<TopFooterCategory[]>('/api/v1/top-footer/list', {
  *   channelCode: route.query.code as string,
  * })
- * ```
+ * 
  *
- * 开关是**按模块**的（模块 = 后端 `app/Http` 下的目录）：`VITE_CRYPT_ENABLED_API` /
- * `VITE_CRYPT_ENABLED_ADMIN`，与后端 `CRYPT_ENABLED_<MODULE>` 一一对应，两边一起开或一起关。
+ * 开关是按模块的（模块 = 后端 app/Http 下的目录）：VITE_CRYPT_ENABLED_API /
+ * VITE_CRYPT_ENABLED_ADMIN，与后端 CRYPT_ENABLED_<MODULE> 一一对应，两边一起开或一起关。
  * 模块开关关掉时接口是纯明文，用浏览器 / curl 直接看。
  */
 
@@ -50,17 +50,17 @@ export interface ApiRequestOptions {
   query?: Record<string, unknown>
   /** 请求体（POST） */
   body?: Record<string, unknown>
-  /** 渠道编码：加密时并入 payload 的 `channel_code`，明文时放 `Channel-Code` 头 */
+  /** 渠道编码：加密时并入 payload 的 channel_code，明文时放 Channel-Code 头 */
   channelCode?: string
   /**
-   * 用哪把密钥：对应后端 `crypto.rules` 里该路径规则的 `key`，
-   * 也是密钥池 `crypto.keys` 的名称（前端读 `VITE_PAYLOAD_CIPHER_KEY_<NAME>`）。
-   * 默认 `api`（与后端 `/api/*` 规则一致）。模块要用独立密钥时两边都改。
+   * 用哪把密钥：对应后端 crypto.rules 里该路径规则的 key，
+   * 也是密钥池 crypto.keys 的名称（前端读 VITE_PAYLOAD_CIPHER_KEY_<NAME>）。
+   * 默认 api（与后端 /api/* 规则一致）。模块要用独立密钥时两边都改。
    */
   cryptoKey?: string
   /**
-   * 是否加解密：不传则跟随该模块的开关（`VITE_CRYPT_ENABLED_<cryptoKey>`）。
-   * 传 `false` 表示这个请求按明文收发，对应后端规则里的 `enabled: false`
+   * 是否加解密：不传则跟随该模块的开关（VITE_CRYPT_ENABLED_<cryptoKey>）。
+   * 传 false 表示这个请求按明文收发，对应后端规则里的 enabled: false
    * （两边要一致，否则一端加密一端不加密会解不开）。
    */
   encrypt?: boolean
@@ -69,10 +69,10 @@ export interface ApiRequestOptions {
 }
 
 /**
- * 密钥池名称 => 构建期变量：default -> `VITE_PAYLOAD_CIPHER_KEY`，
- * channel -> `VITE_PAYLOAD_CIPHER_KEY_CHANNEL`。
+ * 密钥池名称 => 构建期变量：default -> VITE_PAYLOAD_CIPHER_KEY，
+ * channel -> VITE_PAYLOAD_CIPHER_KEY_CHANNEL。
  *
- * 具名密钥没配就直接抛错，**不静默回退到主密钥**：
+ * 具名密钥没配就直接抛错，不静默回退到主密钥：
  * 回退的后果是「前端以为用 channel 密钥、后端按 channel 密钥解」，一旦后端真的切了规则，
  * 这里就会变成一个极难定位的解密失败。
  */
@@ -93,12 +93,12 @@ function resolveKeyByCryptoKey(cryptoKey: string): string | undefined {
 /**
  * 某个模块是否开启加解密.
  *
- * 「模块」= 后端 `app/Http` 下的一个目录（`Admin` / `Api` / ...），与后端
- * `CRYPT_ENABLED_<MODULE>` 一一对应：`api`（默认开）、`admin`（默认关）。
+ * 「模块」= 后端 app/Http 下的一个目录（Admin / Api / ...），与后端
+ * CRYPT_ENABLED_<MODULE> 一一对应：api（默认开）、admin（默认关）。
  * 业务内的细分（landing / channel）不单独设开关，属于 api 模块。
  *
- * 变量没配时按「开启」处理（与后端 `env(..., true)` 的默认值保持一致），
- * 显式写 `false` 才会关闭——这样新增模块忘了配也不会悄悄变成明文。
+ * 变量没配时按「开启」处理（与后端 env(..., true) 的默认值保持一致），
+ * 显式写 false 才会关闭——这样新增模块忘了配也不会悄悄变成明文。
  */
 export function isCryptEnabled(cryptoKey: string): boolean {
   const envName = `VITE_CRYPT_ENABLED_${cryptoKey.toUpperCase()}`
@@ -110,15 +110,15 @@ export function isCryptEnabled(cryptoKey: string): boolean {
 /**
  * 请求对外接口：请求加密（开关打开时）+ 响应自动解密.
  *
- * - 开关打开：参数合并成 `{...query, ...body, channel_code}` 加密后发送
- * - 开关关闭：GET 用查询串、POST 用 JSON body，渠道编码并入 `channel_code` 参数
+ * 开关打开：参数合并成 {...query, ...body, channel_code} 加密后发送
+ * 开关关闭：GET 用查询串、POST 用 JSON body，渠道编码并入 channel_code 参数
  *   （不自定义请求头：自定义头会触发 CORS 预检，浏览器默认不放行）
- * - 模块独立密钥：传 `cryptoKey: 'channel'` → 读 `VITE_PAYLOAD_CIPHER_KEY_CHANNEL`
- * - 单个请求免加密：传 `encrypt: false`（与后端规则的 `enabled: false` 对应）
- * - 响应 `data` 是密文时自动解密
- * - `code !== 200` 抛错（错误信息用后端 `message`，页面可直接提示）
+ * 模块独立密钥：传 cryptoKey: 'channel' → 读 VITE_PAYLOAD_CIPHER_KEY_CHANNEL
+ * 单个请求免加密：传 encrypt: false（与后端规则的 enabled: false 对应）
+ * 响应 data 是密文时自动解密
+ * code !== 200 抛错（错误信息用后端 message，页面可直接提示）
  *
- * @param url 接口地址（如 `/api/v1/web/config`，相对地址会自动接 API baseURL）
+ * @param url 接口地址（如 /api/v1/web/config，相对地址会自动接 API baseURL）
  * @param options 方法 / 参数 / 渠道编码 / 额外请求头
  */
 export async function requestApi<T = unknown>(
@@ -153,7 +153,7 @@ export async function requestApi<T = unknown>(
     }
   }
   else {
-    // 明文模式把渠道编码放查询串，而不是 `Channel-Code` 自定义头：
+    // 明文模式把渠道编码放查询串，而不是 Channel-Code 自定义头：
     // 自定义头会触发 CORS 预检，而浏览器默认不放行未声明的头（后端 CorsMiddleware 的头列表里没有它）
     const search = new URLSearchParams()
     const plainQuery: Record<string, unknown> = { ...query }

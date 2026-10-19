@@ -70,7 +70,7 @@ export function options(): Promise<ResponseStruct<Array<{ id: number, name: stri
   return useHttp().get('/admin/channel/options')
 }
 
-/** POST /admin/channel - 新增（返回 `landing` = 落地页静态文件是否生成成功） */
+/** POST /admin/channel - 新增（返回 landing = 落地页静态文件是否生成成功） */
 export function create(data: ChannelVo): Promise<ResponseStruct<{ landing: boolean }>> {
   return useHttp().post('/admin/channel', data)
 }

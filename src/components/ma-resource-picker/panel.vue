@@ -142,7 +142,7 @@ const resources = ref<Resource[]>([])
  * 图片域名（系统设置「图片域名」）.
  *
  * 附件列表接口一并返回，右键「复制绝对路径」用它拼相对地址；
- * 不额外请求设置接口，避免没有 `setting:index` 权限的账号拿不到域名。
+ * 不额外请求设置接口，避免没有 setting:index 权限的账号拿不到域名。
  */
 const imageDomain = ref('')
 
@@ -387,9 +387,9 @@ async function onDel(id: number): Promise<void> {
 /**
  * 取资源在桶里的相对路径（OBS / CDN 地址 = 图片域名 + 该路径）.
  *
- * 优先用 `storage_key`（上传时记录的桶内完整对象键，如 `2026-10-18/uuid.gif`）：
- * 只有它才是 OBS / CDN 上真实存在的路径，`url` 是后端解密接口地址（`/attachment/uuid`），
- * 不能拿去拼图片域名。历史本地存储的附件没有 `storage_key`，退回解析 `url`。
+ * 优先用 storage_key（上传时记录的桶内完整对象键，如 2026-10-18/uuid.gif）：
+ * 只有它才是 OBS / CDN 上真实存在的路径，url 是后端解密接口地址（/attachment/uuid），
+ * 不能拿去拼图片域名。历史本地存储的附件没有 storage_key，退回解析 url。
  */
 function getRelativePath(resource: Resource): string {
   const key = String(resource?.storage_key ?? '').replace(/^\/+/, '')
@@ -416,11 +416,11 @@ function getRelativePath(resource: Resource): string {
 /**
  * 组装绝对路径：后台配置的「图片域名」+ 桶内相对路径.
  *
- * 图片域名取自系统设置（`image_domain`），既可以是 OBS 桶地址，也可以是套在前面的 CDN 域名，
- * 换域名只改配置、不用动代码。以下情况退回后端返回的 `url`，避免拼出无效地址：
- * - 没有 `storage_key`（历史本地存储等非 OBS 附件）；
- * - 图片域名没配；
- * - 库里的地址本身已经是外链 / data URI（历史数据）。
+ * 图片域名取自系统设置（image_domain），既可以是 OBS 桶地址，也可以是套在前面的 CDN 域名，
+ * 换域名只改配置、不用动代码。以下情况退回后端返回的 url，避免拼出无效地址：
+ * 没有 storage_key（历史本地存储等非 OBS 附件）；
+ * 图片域名没配；
+ * 库里的地址本身已经是外链 / data URI（历史数据）。
  */
 function getAbsolutePath(resource: Resource): string {
   const relative = getRelativePath(resource)
@@ -437,7 +437,7 @@ function getAbsolutePath(resource: Resource): string {
  * 复制文本到剪贴板.
  *
  * 优先 Clipboard API（HTTPS / localhost 可用），失败或不可用时退化到临时 textarea + execCommand；
- * 内网 http 地址属于非安全上下文，`navigator.clipboard` 直接不可用，必须有兜底。
+ * 内网 http 地址属于非安全上下文，navigator.clipboard 直接不可用，必须有兜底。
  * 与渠道 / 商户列表里的复制逻辑保持一致。
  */
 function copyText(text: string): void {
@@ -525,7 +525,7 @@ function executeContextmenu(e: MouseEvent, resource: Resource) {
       {
         label: t('copyAbsolutePath'),
         icon: 'i-ri:file-copy-line',
-        // `divided: 'up'` 才是「在该项上方画分隔线」；`true` 是 `'down'`，会把两条复制操作拆开
+        // divided: 'up' 才是「在该项上方画分隔线」；true 是 'down'，会把两条复制操作拆开
         divided: 'up',
         onClick: () => {
           copyText(getAbsolutePath(resource))

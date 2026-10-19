@@ -15,15 +15,15 @@ import 'vue3-colorpicker/style.css'
  * 支持「纯色 + 渐变」的颜色选择器.
  *
  * 为什么不用 el-color-picker：它只支持纯色，而主题里的背景类颜色需要渐变
- * （如 `linear-gradient(90deg, #e11d48, #f43f5e)`）。这里引入 `vue3-colorpicker`
- * 与参考站点（`../site/web` 的主题管理）保持同一套交互——这是 AGENTS「不引入新 UI 库」
- * 的**明确例外**：它是专用颜色组件而非 UI 框架，且只在主题管理里使用。
+ * （如 linear-gradient(90deg, #e11d48, #f43f5e)）。这里引入 vue3-colorpicker
+ * 与参考站点（../site/web 的主题管理）保持同一套交互——这是 AGENTS「不引入新 UI 库」
+ * 的明确例外：它是专用颜色组件而非 UI 框架，且只在主题管理里使用。
  *
- * 交互说明：库自带的 `isWidget=false` 点击弹面板在 el-dialog 里不弹（弹出层事件被弹窗吞掉），
- * 所以这里改成 **el-popover 挂触发器 + 库的内联面板（isWidget）**：
+ * 交互说明：库自带的 isWidget=false 点击弹面板在 el-dialog 里不弹（弹出层事件被弹窗吞掉），
+ * 所以这里改成 el-popover 挂触发器 + 库的内联面板（isWidget）：
  * 由 Element Plus 负责弹出与层级，库只负责渲染选色面板，稳且不挑环境。
  *
- * 值格式：纯色存 `#rrggbb` 等；渐变存完整 CSS `linear-gradient(...)` 串
+ * 值格式：纯色存 #rrggbb 等；渐变存完整 CSS linear-gradient(...) 串
  * （后端已放宽正则与字段长度，列表色板/预览也能直接渲染渐变）。
  */
 const props = defineProps<{
@@ -47,7 +47,7 @@ function extractFirstColor(gradient: string): string {
 /**
  * 我最后一次「推给库」的镜像值（纯色 / 渐变各一份）.
  *
- * 库在 props 被动变化时也会抛 `pure-color-change` / `gradient-color-change`，
+ * 库在 props 被动变化时也会抛 pure-color-change / gradient-color-change，
  * 若照单回写就会把「外部刚设进来的渐变」用同步出来的纯色覆盖回去——这正是
  * 「点一次『套用示例配色』没有渐变、渐变色被截成第一个色」的原因。
  *
@@ -59,8 +59,8 @@ let pushedGradientColor = ''
 
 /**
  * 外部值变化时同步内部两份状态：
- * - 含 `gradient` 视为渐变，同时从渐变里取第一个色作为纯色的兜底（切回「纯色」标签不是空色块）；
- * - 是纯色时**也要给 gradientColor 一个合法初值**：留空会让面板的「渐变」标签首次打开是空白的、
+ * 含 gradient 视为渐变，同时从渐变里取第一个色作为纯色的兜底（切回「纯色」标签不是空色块）；
+ * 是纯色时也要给 gradientColor 一个合法初值：留空会让面板的「渐变」标签首次打开是空白的、
  *   得再点一次才渲染出来（实测过的问题）。用「同色渐变」占位，用户不动它就不会改到原纯色。
  */
 watch(() => props.modelValue, (value) => {

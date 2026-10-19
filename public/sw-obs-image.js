@@ -1,7 +1,7 @@
 /*
  * OBS 图片解密 Service Worker.
  *
- * 背景：图片在 OBS 里是 AES-256-GCM 密文（`OBSE1` + iv + tag + ciphertext），
+ * 背景：图片在 OBS 里是 AES-256-GCM 密文（OBSE1 + iv + tag + ciphertext），
  * 后端响应里的 url 已经改成「图片域名 + 对象键」的直连地址，浏览器不能直接当图片渲染。
  *
  * 这里全局拦截「配置过的图片来源」发出的 <img> 请求：
