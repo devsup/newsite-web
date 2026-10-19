@@ -24,7 +24,7 @@ const {
   dictName?: string
   // 字典数据
   data?: Dictionary[] | (() => Dictionary[])
-  // 渲染模式：`normal: el-checkbox` | `button: el-checkbox-button`
+  // 渲染模式：normal: el-checkbox | button: el-checkbox-button
   renderMode?: 'normal' | 'button'
   // 翻译范围
   transScope?: 'global' | 'local'

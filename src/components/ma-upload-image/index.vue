@@ -39,7 +39,7 @@ const {
   showTextInput = false,
   showTextInputPlaceholder = '',
 } = defineProps<{
-  /** 普通模式传 string / string[]；开了 showTextInput 时传 `{ url, text }[]`（图文成对） */
+  /** 普通模式传 string / string[]；开了 showTextInput 时传 { url, text }[]（图文成对） */
   modelValue: string | string[] | UploadTextItem[] | null
   title?: string
   size?: number

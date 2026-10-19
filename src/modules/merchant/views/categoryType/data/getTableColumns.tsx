@@ -15,7 +15,7 @@ import { Status } from '@/constants/status.ts'
  * 统计列统一显示占位符：后端当前不返回统计值。
  *
  * 这里刻意不显示 0——0 会被误读成「真实统计为 0」，
- * 用 `--` + 悬浮说明表示「数据中心接入后展示」更准确。
+ * 用 -- + 悬浮说明表示「数据中心接入后展示」更准确。
  */
 function renderStatsPlaceholder(t: any) {
   return (

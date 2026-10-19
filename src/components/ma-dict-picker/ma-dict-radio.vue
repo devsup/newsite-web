@@ -24,7 +24,7 @@ const {
   dictName?: string
   // 字典数据
   data?: Dictionary[] | (() => Dictionary[])
-  // 渲染模式：`normal: el-radio` | `button: el-radio-button`
+  // 渲染模式：normal: el-radio | button: el-radio-button
   renderMode?: 'normal' | 'button'
   // 翻译范围
   transScope?: 'global' | 'local'

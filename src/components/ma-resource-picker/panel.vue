@@ -94,6 +94,7 @@ import { deleteById } from '~/base/api/attachment.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
 import { useImageViewer } from '@/hooks/useImageViewer.ts'
+import { copyText as writeClipboard } from '@/utils/clipboard.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import type { Resources } from '#/global'
 
@@ -434,45 +435,17 @@ function getAbsolutePath(resource: Resource): string {
 }
 
 /**
- * 复制文本到剪贴板.
- *
- * 优先 Clipboard API（HTTPS / localhost 可用），失败或不可用时退化到临时 textarea + execCommand；
- * 内网 http 地址属于非安全上下文，navigator.clipboard 直接不可用，必须有兜底。
- * 与渠道 / 商户列表里的复制逻辑保持一致。
+ * 复制资源路径并提示结果.
  */
-function copyText(text: string): void {
+async function copyText(text: string): Promise<void> {
   if (!text) {
     msg.error(t('copyFail'))
 
     return
   }
 
-  const done = (ok: boolean): void => {
-    ok ? msg.success(t('copySuccess')) : msg.error(t('copyFail'))
-  }
-
-  const fallback = (): boolean => {
-    const textarea = document.createElement('textarea')
-    textarea.value = text
-    textarea.style.position = 'fixed'
-    textarea.style.opacity = '0'
-    document.body.appendChild(textarea)
-    textarea.select()
-    const ok = document.execCommand('copy')
-    document.body.removeChild(textarea)
-
-    return ok
-  }
-
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => done(true))
-      .catch(() => done(fallback()))
-
-    return
-  }
-
-  done(fallback())
+  const ok = await writeClipboard(text)
+  ok ? msg.success(t('copySuccess')) : msg.error(t('copyFail'))
 }
 
 /**

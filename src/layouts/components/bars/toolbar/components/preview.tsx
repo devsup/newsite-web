@@ -13,6 +13,7 @@ import { computed, onBeforeUnmount, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import useHttp from '@/hooks/auto-imports/useHttp'
 import { useMessage } from '@/hooks/useMessage'
+import { copyText as writeClipboard } from '@/utils/clipboard'
 
 type PreviewMode = 'app' | 'h5' | 'tablet' | 'pc'
 
@@ -109,24 +110,6 @@ function normalizePreviewUrl(raw: string): string {
   }
   const isLocalHost = /^(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?(?:\/|$)/i.test(value)
   return `${isLocalHost ? 'http' : 'https'}://${value}`
-}
-
-/** 非安全上下文（例如 http 内网地址）下 navigator.clipboard 不可用时的兜底复制 */
-function fallbackCopy(text: string): boolean {
-  const textarea = document.createElement('textarea')
-  textarea.value = text
-  textarea.style.position = 'fixed'
-  textarea.style.opacity = '0'
-  textarea.style.pointerEvents = 'none'
-  document.body.appendChild(textarea)
-  textarea.select()
-
-  try {
-    return document.execCommand('copy')
-  }
-  finally {
-    document.body.removeChild(textarea)
-  }
 }
 
 export default defineComponent({
@@ -273,10 +256,8 @@ export default defineComponent({
       }
 
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(state.previewUrl)
-        }
-        else if (!fallbackCopy(state.previewUrl)) {
+        const ok = await writeClipboard(state.previewUrl)
+        if (!ok) {
           throw new Error('copy failed')
         }
 

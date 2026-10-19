@@ -143,8 +143,8 @@ const useUserStore = defineStore(
 
     /**
      * 第一步：提交账号密码。
-     * - 未绑定 TOTP：直接登录，返回 { loggedIn: true, totp_enabled }
-     * - 已绑定：返回 { require: 'totp_verify', challenge }，前端弹动态码输入框
+     * 未绑定 TOTP：直接登录，返回 { loggedIn: true, totp_enabled }
+     * 已绑定：返回 { require: 'totp_verify', challenge }，前端弹动态码输入框
      */
     async function login(data: { username: string, password: string, code: string, [key: string]: any }): Promise<{ loggedIn: true, totp_enabled: boolean } | TotpChallenge> {
       await usePluginStore().callHooks('loginBefore', data)

@@ -126,6 +126,7 @@ zh_TW:
 
 <script setup lang="ts">
 import UcContainer from './components/container.vue'
+import { copyText as writeClipboard } from '@/utils/clipboard'
 import UcModifyInfo from './components/modify-info.vue'
 import UcTitle from './components/title.vue'
 import QRCode from 'qrcode'
@@ -234,20 +235,21 @@ async function disableTotp(): Promise<void> {
 }
 
 async function copyTotpSecret(): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(totpSecret.value)
-    // 弹窗里的局部「已复制」状态，避免全局 toast 被弹窗层级盖住
-    totpCopied.value = true
-    if (totpCopiedTimer) {
-      clearTimeout(totpCopiedTimer)
-    }
-    totpCopiedTimer = setTimeout(() => {
-      totpCopied.value = false
-    }, 1800)
-  }
-  catch {
+  const ok = await writeClipboard(totpSecret.value)
+  if (!ok) {
     msg.error(t('totp.copyFailed'))
+
+    return
   }
+
+  // 弹窗里的局部「已复制」状态，避免全局 toast 被弹窗层级盖住
+  totpCopied.value = true
+  if (totpCopiedTimer) {
+    clearTimeout(totpCopiedTimer)
+  }
+  totpCopiedTimer = setTimeout(() => {
+    totpCopied.value = false
+  }, 1800)
 }
 
 function resetTotpDialog(): void {

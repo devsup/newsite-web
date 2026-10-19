@@ -55,7 +55,7 @@ export default function getTableColumns(
     })
   }, 400)
 
-  /** 图标列：资源库返回的是图片地址，空值显示 `--` */
+  /** 图标列：资源库返回的是图片地址，空值显示 -- */
   function renderIcon(url?: string, name?: string) {
     if (!url) {
       return <span style={{ color: 'var(--el-text-color-placeholder)' }}>--</span>

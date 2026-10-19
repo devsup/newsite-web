@@ -20,6 +20,7 @@ import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { Status } from '@/constants/status.ts'
 import { OPEN_MODE, PUSH_TYPE } from '~/channel/constants.ts'
+import { copyText as writeClipboard } from '@/utils/clipboard.ts'
 
 export default function getTableColumns(dialog: UseDialogExpose, t: any, proTableRef?: Ref<MaProTableExpose>): MaProTableColumns[] {
   const msg = useMessage()
@@ -83,46 +84,23 @@ export default function getTableColumns(dialog: UseDialogExpose, t: any, proTabl
   }, 400)
 
   /**
-   * 复制推广链接：优先用 Clipboard API（localhost / HTTPS 下可用），
-   * 失败（如非安全上下文）时退化到临时 textarea + execCommand，仍失败才提示手动复制。
+   * 复制推广链接，失败时提示手动复制.
    */
-  function copyUrl(url?: string): void {
+  async function copyUrl(url?: string): Promise<void> {
     if (!url) {
       return
     }
 
-    const done = (ok: boolean): void => {
-      ok ? msg.success(t('channel.copySuccess')) : msg.error(t('channel.copyFail'))
-    }
-
-    const fallback = (): boolean => {
-      const textarea = document.createElement('textarea')
-      textarea.value = url
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      const ok = document.execCommand('copy')
-      document.body.removeChild(textarea)
-      return ok
-    }
-
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url)
-        .then(() => done(true))
-        .catch(() => done(fallback()))
-      return
-    }
-
-    done(fallback())
+    const ok = await writeClipboard(url)
+    ok ? msg.success(t('channel.copySuccess')) : msg.error(t('channel.copyFail'))
   }
 
   /**
    * 链接信息列：三行「落地页 / 导航页 / 自动跳转」，点链接即复制。
    *
    * 链接由后端按渠道编码 + 站点设置的域名拼出；域名没配时后端返回的是半截地址
-   *（如 `/A70001.html`），这里用红色 + 悬浮提示引导去系统设置补配置。
-   * 链接较长，单行截断（`truncate`）+ 悬浮显示完整地址，避免换行把行高撑得乱七八糟。
+   *（如 /A70001.html），这里用红色 + 悬浮提示引导去系统设置补配置。
+   * 链接较长，单行截断（truncate）+ 悬浮显示完整地址，避免换行把行高撑得乱七八糟。
    */
   function renderLinks(row: ChannelVo) {
     const items = [

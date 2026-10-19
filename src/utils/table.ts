@@ -9,7 +9,7 @@ import type { Ref } from 'vue'
 /**
  * 清空 MaProTable 的选中状态.
  *
- * 只把页面里的 `selections` 置空是不够的：pro-table 内部缓存了上一次选中的行，
+ * 只把页面里的 selections 置空是不够的：pro-table 内部缓存了上一次选中的行，
  * 刷新后会自动按缓存恢复勾选（表现为「批量操作完还勾着」），所以还要直接调用
  * el-table 实例的 clearSelection()。
  *

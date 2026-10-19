@@ -1,7 +1,7 @@
 import type { ResponseStruct } from '#/global'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
-/** 免鉴权接口 `GET /admin/passport/site-info` 的返回结构 */
+/** 免鉴权接口 GET /admin/passport/site-info 的返回结构 */
 export interface SiteInfo {
   /** 系统设置 → 站点名称 */
   site_name: string
@@ -17,15 +17,15 @@ const DEFAULT_TITLE = (import.meta.env.VITE_APP_TITLE as string) || 'MineAdmin'
 /**
  * 站点基础信息（左上角 logo 与名称、登录页标题）.
  *
- * 数据来自系统设置 `site_name` / `site_icon`，走免鉴权接口，登录页也能拿到。
- * 只在第一次渲染 logo 时请求一次，后续复用；设置页保存后会 `load(true)` 强制刷新。
+ * 数据来自系统设置 site_name / site_icon，走免鉴权接口，登录页也能拿到。
+ * 只在第一次渲染 logo 时请求一次，后续复用；设置页保存后会 load(true) 强制刷新。
  */
 /**
  * 用 canvas 把图标裁成圆角，返回 PNG dataURL.
  *
- * favicon 是浏览器自己渲染的，CSS 加不了圆角，只能先在 canvas 里裁好再喂给 `<link rel="icon">`。
- * 站点图标与应用可能不同源（本地前端 2888 → 后端 9501），必须带 `crossOrigin` 才能读 canvas，
- * 否则 `toDataURL()` 会因画布被污染直接抛安全错误。
+ * favicon 是浏览器自己渲染的，CSS 加不了圆角，只能先在 canvas 里裁好再喂给 <link rel="icon">。
+ * 站点图标与应用可能不同源（本地前端 2888 → 后端 9501），必须带 crossOrigin 才能读 canvas，
+ * 否则 toDataURL() 会因画布被污染直接抛安全错误。
  *
  * @param url 图标地址
  * @param size 输出尺寸（favicon 64px 足够，太大只增加内存）
@@ -63,10 +63,10 @@ function roundedIconDataUrl(url: string, size = 64): Promise<string> {
 /**
  * 把浏览器标签页图标换成系统设置里的「站点图标」（圆角版）.
  *
- * 直接操作 `<link rel="icon">`：`index.html` 里写死的是内置 `favicon.ico`（带 `type="image/x-icon"`），
+ * 直接操作 <link rel="icon">：index.html 里写死的是内置 favicon.ico（带 type="image/x-icon"），
  * 换成 jpg/png 时必须把旧的 link 整个替换掉——只改 href 会保留错误 type，浏览器按 ico 解析失败、图标不生效。
  *
- * @param url 站点图标地址；为空时回到内置 `/favicon.ico`
+ * @param url 站点图标地址；为空时回到内置 /favicon.ico
  */
 async function applyFavicon(url: string): Promise<void> {
   let href = '/favicon.ico'

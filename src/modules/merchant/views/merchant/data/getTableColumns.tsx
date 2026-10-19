@@ -11,6 +11,7 @@ import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { Status } from '@/constants/status.ts'
 import { SHOW_TYPE_COLORS } from '~/merchant/constants'
+import { copyText as writeClipboard } from '@/utils/clipboard.ts'
 
 export default function getTableColumns(
   dialog: UseDialogExpose,
@@ -71,29 +72,13 @@ export default function getTableColumns(
     )
   }
 
-  function copyLink(url?: string): void {
+  async function copyLink(url?: string): Promise<void> {
     if (!url) {
       return
     }
-    const fallback = (): boolean => {
-      const textarea = document.createElement('textarea')
-      textarea.value = url
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      const ok = document.execCommand('copy')
-      document.body.removeChild(textarea)
-      return ok
-    }
-    const done = (ok: boolean): void => {
-      ok ? msg.success(t('merchantInfo.copySuccess')) : msg.error(t('merchantInfo.copyFail'))
-    }
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).then(() => done(true)).catch(() => done(fallback()))
-      return
-    }
-    done(fallback())
+
+    const ok = await writeClipboard(url)
+    ok ? msg.success(t('merchantInfo.copySuccess')) : msg.error(t('merchantInfo.copyFail'))
   }
 
   return [
