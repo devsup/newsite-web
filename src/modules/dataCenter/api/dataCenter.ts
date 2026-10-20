@@ -20,6 +20,10 @@ export interface DataCenterSummary {
   download_uv: number
   merchant_pv: number
   merchant_uv: number
+  /** 商户 UV（按渠道维度去重） */
+  merchant_channel_uv?: number
+  /** 商户跳转 PV（与商户点击 PV 同源） */
+  jump_pv?: number
   install_ratio: number
   download_ratio: number
   merchant_click_ratio: number
@@ -45,6 +49,10 @@ export interface DataCenterDailyVo {
   download_uv: number
   merchant_pv: number
   merchant_uv: number
+  /** 商户 UV（按渠道维度去重） */
+  merchant_channel_uv: number
+  /** 商户跳转 PV */
+  jump_pv: number
   install_ratio: number
   download_ratio: number
   merchant_click_ratio: number
@@ -76,6 +84,10 @@ export interface DataCenterMerchantVo {
   id: number
   merchant_id: number
   merchant_name?: string
+  /** 该商户当天点击涉及的渠道名称（多个用「、」连接） */
+  channel_names?: string
+  /** 显示名称：#ID 商户名 · 应用名 */
+  display_name?: string
   stat_date: string
   click_pv: number
   click_uv: number
@@ -221,9 +233,46 @@ export function merchantRecordPage(params: DataCenterQuery): Promise<ResponseStr
   return useHttp().get('/admin/data-center/merchant-record/list', { params })
 }
 
+/** 重复访问汇总（同一 IP 当天点击次数 ≥ repeat_count） */
+export interface DataCenterRepeatVo {
+  ip: string
+  /** 访问次数 */
+  visit_count: number
+  /** 涉及的商户数 */
+  merchant_count: number
+  /** 涉及的渠道数 */
+  channel_count: number
+  first_visit_at: string
+  last_visit_at: string
+  /** 是否已在黑名单里 */
+  is_blacklisted?: boolean
+  /** 黑名单状态：0 未加入 / 1 已启用 / 2 未启用 */
+  blacklist_status?: number
+}
+
+/** GET /admin/data-center/merchant-record/repeat - 商户点击记录（重复访问汇总） */
+export function merchantRepeatPage(params: DataCenterQuery): Promise<ResponseStruct<DataCenterEventPage<DataCenterRepeatVo>>> {
+  return useHttp().get('/admin/data-center/merchant-record/repeat', { params })
+}
+
+/** DELETE /admin/data-center/merchant-record/repeat - 删除指定 IP 当天的商户点击明细 */
+export function merchantRepeatDelete(params: { date: string, ips: string[] }): Promise<ResponseStruct<{ deleted: number, ips: string[] }>> {
+  return useHttp().delete('/admin/data-center/merchant-record/repeat', { data: params })
+}
+
 /** GET /admin/data-center/download-record/list - App 下载记录 */
 export function downloadRecordPage(params: DataCenterQuery): Promise<ResponseStruct<DataCenterEventPage<DataCenterEventVo>>> {
   return useHttp().get('/admin/data-center/download-record/list', { params })
+}
+
+/** 渠道下拉统一格式：#ID · 渠道名称 · 渠道编码（没有编码时省略最后一段） */
+export function formatChannelOptionLabel(item: { value: number | string, label: string, code?: string }): string {
+  const parts = [`#${item.value}`, item.label]
+  if (item.code) {
+    parts.push(item.code)
+  }
+
+  return parts.join(' · ')
 }
 
 /** GET /admin/data-center/channel/options - 渠道下拉 */

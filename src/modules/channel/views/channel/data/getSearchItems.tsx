@@ -19,7 +19,7 @@ import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
  * 名称下拉的值是完整渠道名（后端按 name like 匹配），这样不用改搜索接口、
  * 同名渠道也能一次筛出来。
  */
-export default function getSearchItems(t: any, channels: Array<{ id: number, name: string }> = []): MaSearchItem[] {
+export default function getSearchItems(t: any, channels: Array<{ id: number, name: string, code?: string }> = []): MaSearchItem[] {
   return [
     {
       label: () => t('ID'),
@@ -34,7 +34,11 @@ export default function getSearchItems(t: any, channels: Array<{ id: number, nam
         clearable: true,
         filterable: true,
         placeholder: t('form.pleaseSelect', { msg: t('channel.name') }),
-        options: channels.map(item => ({ label: item.name, value: item.name })),
+        // 与数据中心一致：渠道下拉统一展示「#ID · 名称 · 编码」
+        options: channels.map(item => ({
+          label: [`#${item.id}`, item.name, item.code].filter(Boolean).join(' · '),
+          value: item.name,
+        })),
       },
     },
     {

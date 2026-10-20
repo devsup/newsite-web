@@ -65,8 +65,8 @@ export function page(data: ChannelSearchVo): Promise<ResponseStruct<PageList<Cha
   return useHttp().get('/admin/channel/list', { params: data })
 }
 
-/** GET /admin/channel/options - 下拉用精简列表（id + 名称） */
-export function options(): Promise<ResponseStruct<Array<{ id: number, name: string }>>> {
+/** GET /admin/channel/options - 下拉用精简列表（id + 名称 + 编码） */
+export function options(): Promise<ResponseStruct<Array<{ id: number, name: string, code: string }>>> {
   return useHttp().get('/admin/channel/options')
 }
 

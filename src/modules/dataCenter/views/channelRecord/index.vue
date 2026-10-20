@@ -11,6 +11,6 @@ defineOptions({ name: 'dataCenter:channelRecord' })
     title-key="dataCenter.channelRecord.title"
     subtitle-key="dataCenter.channelRecord.subtitle"
     :event-types="[1, 2, 5]"
-    show-deducted
+    variant="channel"
   />
 </template>

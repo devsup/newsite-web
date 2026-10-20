@@ -16,7 +16,7 @@ import type { DataCenterChannelSummaryDayVo, DataCenterChannelSummaryVo } from '
 import { ElButton, ElTable, ElTableColumn } from 'element-plus'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
-import { channelOptions, channelSummary } from '~/dataCenter/api/dataCenter'
+import { channelOptions, channelSummary, formatChannelOptionLabel } from '~/dataCenter/api/dataCenter'
 
 import ChannelMerchantDialog from './components/ChannelMerchantDialog.vue'
 
@@ -73,7 +73,7 @@ const searchItems: any[] = [
       placeholder: t('dataCenter.selectedChannel'),
       api: channelOptions,
       dataHandle: (response: any) => (response.data || []).map((item: any) => ({
-        label: `${item.label}（${item.code}）`,
+        label: formatChannelOptionLabel(item),
         value: item.value,
       })),
     },
@@ -88,7 +88,7 @@ const searchItems: any[] = [
 /** 展开行：该渠道每天的明细，列与参考站点保持一致（含「操作」） */
 function renderDayTable(channel: DataCenterChannelSummaryVo): VNode {
   return (
-    <div class="w-full box-border overflow-x-auto pl-12 pr-4">
+    <div class="box-border w-full overflow-x-auto pl-12 pr-4">
       <ElTable data={channel.date_list} size="small" border class="w-full">
         <ElTableColumn prop="stat_date" min-width="120" label={t('dataCenter.statDate')} />
         <ElTableColumn prop="channel_uv" min-width="100" label={t('dataCenter.channelLog.channelUv')} />
@@ -128,7 +128,7 @@ const tableColumns: any[] = [
     cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => renderDayTable(row),
   },
   { label: () => t('ID'), prop: 'id', width: '80px' },
-  { label: () => t('dataCenter.channel'), prop: 'channel_name', width: '200px', showOverflowTooltip: true },
+  { label: () => t('dataCenter.columns.channelName'), prop: 'channel_name', width: '200px', showOverflowTooltip: true },
   { label: () => t('dataCenter.channelCode'), prop: 'channel_code', width: '120px' },
   { label: () => t('dataCenter.channelLog.statDays'), prop: 'stat_days', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.channelUv'), prop: 'channel_uv', minWidth: '100px' },
@@ -170,14 +170,18 @@ const options = ref<MaProTableOptions>({
     adaption: false,
   },
   searchOptions: {
-    fold: false,
-    foldButtonShow: false,
+    // 筛选项较多：默认收起，保留「展开 / 收起」按钮
+    fold: true,
+    foldButtonShow: true,
     defaultValue: {
       date_range: [today, today],
     },
     text: {
       searchBtn: () => t('crud.search'),
       resetBtn: () => t('crud.reset'),
+      // 展开状态显示「收起」、收起状态显示「展开」（组件默认是「折叠 / 展开」）
+      isFoldBtn: () => t('crud.searchFold'),
+      notFoldBtn: () => t('crud.searchUnFold'),
     },
   },
   searchFormOptions: { labelWidth: '100px' },

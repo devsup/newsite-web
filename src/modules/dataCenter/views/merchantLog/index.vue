@@ -9,7 +9,6 @@
 -->
 <script setup lang="tsx">
 import type { MaProTableOptions, MaProTableSchema } from '@mineadmin/pro-table'
-import type { DataCenterMerchantVo } from '~/dataCenter/api/dataCenter'
 
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import { merchantOptions, merchantPage } from '~/dataCenter/api/dataCenter'
@@ -49,19 +48,16 @@ const searchItems: any[] = [
   },
 ]
 
+// 列与顺序按参考站点：统计日期 / 商户ID / 商户名称 / 显示名称 / 商户PV / 商户UV / 来源渠道
 const tableColumns: any[] = [
-  { type: 'index', width: '60px' },
+  { label: () => t('dataCenter.statDate'), prop: 'stat_date', width: '130px' },
   { label: () => t('dataCenter.merchantId'), prop: 'merchant_id', width: '90px' },
-  { label: () => t('dataCenter.merchant'), prop: 'merchant_name', minWidth: '200px' },
+  { label: () => t('dataCenter.columns.merchantName'), prop: 'merchant_name', minWidth: '180px' },
+  // 后端按参考站点格式拼接：#ID 商户名 · 应用名（show_info.app_name）
+  { label: () => t('dataCenter.merchantLog.displayName'), prop: 'display_name', minWidth: '220px' },
   { label: () => t('dataCenter.merchantLog.clickPv'), prop: 'click_pv', minWidth: '110px' },
   { label: () => t('dataCenter.merchantLog.clickUv'), prop: 'click_uv', minWidth: '110px' },
-  {
-    label: () => t('dataCenter.merchantLog.clickRate'),
-    prop: 'click_rate',
-    minWidth: '130px',
-    cellRender: ({ row }: { row: DataCenterMerchantVo }) => `${Number(row.click_rate || 0).toFixed(2)}%`,
-  },
-  { label: () => t('dataCenter.statDate'), prop: 'stat_date', width: '130px' },
+  { label: () => t('dataCenter.merchantLog.channelNames'), prop: 'channel_names', minWidth: '180px' },
 ]
 
 const options = ref<MaProTableOptions>({
@@ -75,14 +71,18 @@ const options = ref<MaProTableOptions>({
     border: true,
   },
   searchOptions: {
-    fold: false,
-    foldButtonShow: false,
+    // 筛选项较多：默认收起，保留「展开 / 收起」按钮
+    fold: true,
+    foldButtonShow: true,
     defaultValue: {
       date_range: [today, today],
     },
     text: {
       searchBtn: () => t('crud.search'),
       resetBtn: () => t('crud.reset'),
+      // 展开状态显示「收起」、收起状态显示「展开」（组件默认是「折叠 / 展开」）
+      isFoldBtn: () => t('crud.searchFold'),
+      notFoldBtn: () => t('crud.searchUnFold'),
     },
   },
   searchFormOptions: { labelWidth: '100px' },

@@ -54,6 +54,8 @@ const EMPTY_ROW: DataCenterDailyVo = {
   download_uv: 0,
   merchant_pv: 0,
   merchant_uv: 0,
+  merchant_channel_uv: 0,
+  jump_pv: 0,
   install_ratio: 0,
   download_ratio: 0,
   merchant_click_ratio: 0,

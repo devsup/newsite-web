@@ -10,13 +10,15 @@ dataCenterMenu:
   merchantLog: 商戶訪問統計
   merchantLogIndex: 商戶統計查看
   merchantRecord: 商戶訪問記錄
+  merchantRecordDelete: 刪除重複IP明細
   merchantRecordIndex: 商戶點擊記錄查看
   downloadRecord: 下載訪問記錄
   downloadRecordIndex: 下載記錄查看
 
 dataCenter:
+  queryDate: 查詢日期
   dateRange: 日期範圍
-  statDate: 日期
+  statDate: 統計日期
   startDate: 開始日期
   endDate: 結束日期
   channel: 渠道
@@ -28,7 +30,7 @@ dataCenter:
   clientType: 客戶端類型
   serverType: 服務端識別
   userAgent: User-Agent
-  eventType: 事件類型
+  eventType: 記錄類型
   occurredAt: 發生時間
   requestId: 請求ID
   deducted: 扣量
@@ -38,18 +40,65 @@ dataCenter:
   totalRecords: 共 {total} 條
   selectedChannel: 請選擇渠道
   selectedMerchant: 請選擇商戶
+  repeat:
+    filter: 篩選重複次數
+    promptTitle: 系統提示
+    prompt: 請輸入重複訪問次數，至少為 2
+    min: 重複訪問次數至少為 2
+    title: 重複訪問統計（{date}，≥{count} 次）
+    ip: IP
+    visitCount: 訪問次數
+    merchantCount: 涉及商戶數
+    channelCount: 涉及渠道數
+    firstVisit: 首次訪問
+    lastVisit: 最後訪問
+    blacklistStatus: 黑名單狀態
+    blacklisted: 已啟用
+    blacklistDisabled: 未啟用
+    notBlacklisted: 未加入
+    addBlacklist: 加入黑名單
+    deleteIp: 刪除IP
+    batchBlacklist: 批量加入黑名單
+    batchDelete: 批量刪除IP
+    selectFirst: 請先勾選要操作的 IP
+    blacklistConfirm: 確認將 {count} 個 IP 加入黑名單嗎？（{ips}）
+    banReason: 重複訪問刷量
+    banRemark: 數據中心 - 重複IP篩選（{date}）
+    threshold: 重複閾值
+    hint: 結果按IP聚合統計，並支持直接加入黑名單
+    banReasonPlaceholder: 請輸入封禁原因
+    banRemarkPlaceholder: 請輸入備註
+    banReasonRequired: 請填寫封禁原因
+    blacklistSuccess: 已加入黑名單 {created} 個，跳過 {skipped} 個
+    deleteConfirm: 確認刪除 {date} 這 {count} 個 IP 的商戶點擊明細嗎？刪除後不可恢復，並會同步扣減商戶統計。
+    deleteSuccess: 已刪除 {deleted} 條明細
+  columns:
+    serial: 編號
+    client: 客戶端
+    server: 服務端
+    userIp: 用戶IP
+    uniqueId: 唯一標識
+    deducted: 是否扣量
+    channelName: 渠道名稱
+    sourceChannel: 來源渠道
+    merchantName: 商戶名稱
+    merchantJump: 跳轉商戶
+    visitTime: 訪問時間
+    jumpTime: 跳轉時間
+    downloadTime: 下載時間
   clientTypes:
     android: Android
     ios: iOS
     windows: Windows
     mac: macOS
-    other: 其他
+    other: Other
   eventTypes:
     landing: 落地頁
     navigation: 導航頁
     merchantClick: 商戶點擊
     download: App下載
     install: App安裝
+    jump: 跳轉鏈接
   comprehensive:
     title: 綜合統計數據
     subtitle: 按天彙總渠道訪問、商戶點擊、App 安裝與下載；資料來自上報接口，約 1 秒內可見
@@ -61,45 +110,51 @@ dataCenter:
     groupDownload: App 下載
     groupCoverage: 覆蓋範圍
     channelPv: 訪問 PV
-    channelUv: 獨立訪客
-    landPv: 落地頁 PV
-    landUv: 落地頁 UV
-    naviPv: 導航頁 PV
-    naviUv: 導航頁 UV
-    merchantPv: 點擊 PV
-    merchantUv: 點擊 UV
+    channelUv: 渠道UV
+    landPv: 落地頁PV
+    landUv: 落地頁UV
+    naviPv: 導航頁PV
+    naviUv: 導航頁UV
+    merchantPv: 商戶PV
+    merchantUv: 商戶UV(商)
+    merchantUvChannel: 商戶UV(渠)
+    jumpPv: 跳轉PV
     installNum: 安裝量
-    installDeducted: 扣量數
-    installRatio: 安裝轉化率
-    downloadPv: 下載 PV
-    downloadUv: 下載 UV
+    installDeducted: 安裝扣量
+    installRatio: 安裝率
+    downloadPv: 下載PV
+    downloadUv: 下載UV
     downloadRatio: 下載轉化率
-    merchantClickRatio: 商戶點擊率
+    merchantClickRatio: 點擊比
     channelDetail: 渠道明細
     merchantDetail: 商戶明細
     channelCount: 有資料渠道
     merchantCount: 有點擊商戶
+    sourceChannel: 來源渠道
+    merchantJump: 跳轉商戶
   channelLog:
     title: 渠道訪問統計
     subtitle: 按渠道展開查看所選日期範圍內的每日統計數據
     channelPv: 訪問 PV
-    channelUv: 獨立訪客
+    channelUv: 渠道UV
     statDays: 統計天數
-    merchantPv: 商戶 PV
-    merchantUv: 商戶 UV
-    landPv: 落地頁 PV
-    landUv: 落地頁 UV
-    naviPv: 導航頁 PV
-    naviUv: 導航頁 UV
-    installNum: 安裝量
-    installDeducted: 扣量數
-    installRatio: 安裝轉化率
-    downloadPv: 下載 PV
-    downloadUv: 下載 UV
+    merchantPv: 商戶PV
+    merchantUv: 商戶UV
+    merchantUvChannel: 商戶UV(渠)
+    jumpPv: 跳轉PV
+    landPv: 落地頁PV
+    landUv: 落地頁UV
+    naviPv: 導航頁PV
+    naviUv: 導航頁UV
+    installNum: App安裝量
+    installDeducted: 安裝扣量
+    installRatio: 安裝率
+    downloadPv: 下載PV
+    downloadUv: 下載UV
     downloadRatio: 下載轉化率
     clickRatio: 點擊比
     jumpMerchant: 跳轉商戶
-    merchantDialogTitle: "渠道 [{channel}] {date} 商戶跳轉數據"
+    merchantDialogTitle: '渠道 [{channel}] {date} 商戶跳轉數據'
     merchantCount: 商戶數量
     merchantName: 商戶名稱
     selectMerchantName: 請選擇商戶名稱
@@ -108,9 +163,11 @@ dataCenter:
     subtitle: 落地頁、導航頁與 App 安裝的逐條上報記錄；預設展示最近 7 天
   merchantLog:
     title: 商戶訪問統計
+    displayName: 顯示名稱
+    channelNames: 來源渠道
     subtitle: 按商戶 + 日期查看點擊 PV/UV；預設展示今天
-    clickPv: 點擊 PV
-    clickUv: 點擊 UV
+    clickPv: 商戶PV
+    clickUv: 商戶UV
     clickRate: 點擊 UV 佔比
   merchantRecord:
     title: 商戶訪問記錄

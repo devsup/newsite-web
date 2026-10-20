@@ -11,6 +11,6 @@ defineOptions({ name: 'dataCenter:merchantRecord' })
     title-key="dataCenter.merchantRecord.title"
     subtitle-key="dataCenter.merchantRecord.subtitle"
     :event-types="[3]"
-    show-merchant
+    variant="merchant"
   />
 </template>

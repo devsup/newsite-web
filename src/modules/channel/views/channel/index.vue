@@ -109,7 +109,7 @@ const options = ref<MaProTableOptions>({
  *
  * 渠道名会被当作筛选值，所以取的是全量清单（1000+ 条）；下拉可输入过滤。
  */
-const channelOptions = ref<Array<{ id: number, name: string }>>([])
+const channelOptions = ref<Array<{ id: number, name: string, code: string }>>([])
 
 // 等渠道清单加载完再渲染表格：MaSearch 只在初始化时读一次 searchItems，
 // 之后改 schema.searchItems 不会生效（组件内部没有 watch），所以必须先拿到选项再建 schema

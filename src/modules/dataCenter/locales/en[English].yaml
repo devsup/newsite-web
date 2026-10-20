@@ -10,13 +10,15 @@ dataCenterMenu:
   merchantLog: Merchant Visit Stats
   merchantLogIndex: View merchant stats
   merchantRecord: Merchant Visit Records
+  merchantRecordDelete: Delete repeated IP records
   merchantRecordIndex: View merchant clicks
   downloadRecord: Download Visit Records
   downloadRecordIndex: View download records
 
 dataCenter:
+  queryDate: Query date
   dateRange: Date range
-  statDate: Date
+  statDate: Stat date
   startDate: Start date
   endDate: End date
   channel: Channel
@@ -28,7 +30,7 @@ dataCenter:
   clientType: Client type
   serverType: Detected device
   userAgent: User-Agent
-  eventType: Event type
+  eventType: Record type
   occurredAt: Occurred at
   requestId: Request ID
   deducted: Deducted
@@ -38,6 +40,52 @@ dataCenter:
   totalRecords: '{total} records'
   selectedChannel: Select a channel
   selectedMerchant: Select a merchant
+  repeat:
+    filter: Filter repeat count
+    promptTitle: System prompt
+    prompt: Enter the repeat visit count (minimum 2)
+    min: The repeat visit count must be at least 2
+    title: Repeated visits ({date}, ≥{count} times)
+    ip: IP
+    visitCount: Visits
+    merchantCount: Merchants involved
+    channelCount: Channels involved
+    firstVisit: First visit
+    lastVisit: Last visit
+    blacklistStatus: Blacklist
+    blacklisted: Enabled
+    blacklistDisabled: Disabled
+    notBlacklisted: Not added
+    addBlacklist: Add to blacklist
+    deleteIp: Delete IP
+    batchBlacklist: Add selected to blacklist
+    batchDelete: Delete selected IPs
+    selectFirst: Select at least one IP first
+    blacklistConfirm: Add {count} IP(s) to the blacklist? ({ips})
+    banReason: Repeated visits (traffic fraud)
+    banRemark: Data center - repeated IP filter ({date})
+    threshold: Threshold
+    hint: Aggregated by IP; supports adding to the blacklist directly
+    banReasonPlaceholder: Enter ban reason
+    banRemarkPlaceholder: Enter remark
+    banReasonRequired: Ban reason is required
+    blacklistSuccess: '{created} IP(s) added to blacklist, {skipped} skipped'
+    deleteConfirm: Delete merchant click records of {count} IP(s) on {date}? This cannot be undone and merchant statistics will be reduced.
+    deleteSuccess: '{deleted} record(s) deleted'
+  columns:
+    serial: No.
+    client: Client
+    server: Server
+    userIp: User IP
+    uniqueId: Unique ID
+    deducted: Deducted
+    channelName: Channel name
+    sourceChannel: Source channel
+    merchantName: Merchant name
+    merchantJump: Jump merchant
+    visitTime: Visit time
+    jumpTime: Jump time
+    downloadTime: Download time
   clientTypes:
     android: Android
     ios: iOS
@@ -50,6 +98,7 @@ dataCenter:
     merchantClick: Merchant click
     download: App download
     install: App install
+    jump: Jump link
   comprehensive:
     title: Overview Statistics
     subtitle: Daily channel visits, merchant clicks, app installs and downloads. Data comes from report APIs and is visible within about one second.
@@ -61,45 +110,51 @@ dataCenter:
     groupDownload: App downloads
     groupCoverage: Coverage
     channelPv: Visit PV
-    channelUv: Unique visitors
+    channelUv: Channel UV
     landPv: Landing PV
     landUv: Landing UV
     naviPv: Navigation PV
     naviUv: Navigation UV
-    merchantPv: Click PV
-    merchantUv: Click UV
+    merchantPv: Merchant PV
+    merchantUv: Merchant UV (merchant)
+    merchantUvChannel: Merchant UV (channel)
+    jumpPv: Jump PV
     installNum: Installs
-    installDeducted: Deducted
+    installDeducted: Install deducted
     installRatio: Install rate
     downloadPv: Download PV
     downloadUv: Download UV
     downloadRatio: Download rate
-    merchantClickRatio: Merchant click rate
+    merchantClickRatio: Click ratio
     channelDetail: Channel detail
     merchantDetail: Merchant detail
     channelCount: Channels with data
     merchantCount: Merchants clicked
+    sourceChannel: Source channel
+    merchantJump: Jump merchant
   channelLog:
     title: Channel Visit Stats
     subtitle: Expand a channel to see daily statistics for the selected date range
     channelPv: Page views
-    channelUv: Unique visitors
+    channelUv: Channel UV
     statDays: Days
     merchantPv: Merchant PV
     merchantUv: Merchant UV
+    merchantUvChannel: Merchant UV (channel)
+    jumpPv: Jump PV
     landPv: Landing PV
     landUv: Landing UV
     naviPv: Navigation PV
     naviUv: Navigation UV
-    installNum: Installs
-    installDeducted: Deducted
+    installNum: App installs
+    installDeducted: Install deducted
     installRatio: Install rate
     downloadPv: Download PV
     downloadUv: Download UV
     downloadRatio: Download rate
     clickRatio: Click ratio
     jumpMerchant: Merchants
-    merchantDialogTitle: "Channel [{channel}] {date} merchant clicks"
+    merchantDialogTitle: 'Channel [{channel}] {date} merchant clicks'
     merchantCount: Merchants
     merchantName: Merchant
     selectMerchantName: Select a merchant
@@ -108,9 +163,11 @@ dataCenter:
     subtitle: Individual reports for landing pages, navigation pages and app installs. The last 7 days are shown by default.
   merchantLog:
     title: Merchant Visit Stats
+    displayName: Display name
+    channelNames: Source channels
     subtitle: Click PV/UV by merchant and date. Today is shown by default.
-    clickPv: Click PV
-    clickUv: Click UV
+    clickPv: Merchant PV
+    clickUv: Merchant UV
     clickRate: Click UV rate
   merchantRecord:
     title: Merchant Visit Records

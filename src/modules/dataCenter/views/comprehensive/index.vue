@@ -40,6 +40,8 @@ const summary = ref<DataCenterSummary>({
   download_uv: 0,
   merchant_pv: 0,
   merchant_uv: 0,
+  merchant_channel_uv: 0,
+  jump_pv: 0,
   install_ratio: 0,
   download_ratio: 0,
   merchant_click_ratio: 0,
@@ -92,6 +94,8 @@ const overviewCards = computed<Array<{ title: string, items: OverviewItem[] }>>(
     items: [
       { label: t('dataCenter.comprehensive.merchantPv'), value: summary.value.merchant_pv, unit: 'PV' },
       { label: t('dataCenter.comprehensive.merchantUv'), value: summary.value.merchant_uv, unit: 'UV' },
+      { label: t('dataCenter.comprehensive.merchantUvChannel'), value: summary.value.merchant_channel_uv ?? 0, unit: 'UV' },
+      { label: t('dataCenter.comprehensive.jumpPv'), value: summary.value.jump_pv ?? 0, unit: 'PV' },
     ],
   },
   {
@@ -137,50 +141,52 @@ const searchItems: any[] = [
   },
 ]
 
+// 列与顺序按参考站点：统计日期 / 商户PV / 商户UV(商) / 商户UV(渠) / 渠道UV /
+// 落地页PV·UV / 导航页PV·UV / 跳转PV / 安装量 / 安装扣量 / 下载PV·UV / 安装率 / 点击比 / 来源渠道 / 跳转商户
 const tableColumns: any[] = [
   { label: () => t('dataCenter.statDate'), prop: 'stat_date', width: '130px' },
-  { label: () => t('dataCenter.comprehensive.channelPv'), prop: 'channel_pv', minWidth: '100px' },
+  { label: () => t('dataCenter.comprehensive.merchantPv'), prop: 'merchant_pv', minWidth: '100px' },
+  { label: () => t('dataCenter.comprehensive.merchantUv'), prop: 'merchant_uv', minWidth: '110px' },
+  { label: () => t('dataCenter.comprehensive.merchantUvChannel'), prop: 'merchant_channel_uv', minWidth: '120px' },
   { label: () => t('dataCenter.comprehensive.channelUv'), prop: 'channel_uv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.landPv'), prop: 'land_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.landUv'), prop: 'land_uv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.naviPv'), prop: 'navi_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.naviUv'), prop: 'navi_uv', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.merchantPv'), prop: 'merchant_pv', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.merchantUv'), prop: 'merchant_uv', minWidth: '100px' },
+  { label: () => t('dataCenter.comprehensive.jumpPv'), prop: 'jump_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.installNum'), prop: 'install_num', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.installDeducted'), prop: 'install_deducted', minWidth: '100px' },
-  {
-    label: () => t('dataCenter.comprehensive.installRatio'),
-    prop: 'install_ratio',
-    minWidth: '120px',
-    cellRender: ({ row }: { row: DataCenterDailyVo }) => percent(Number(row.install_ratio || 0)),
-  },
+  { label: () => t('dataCenter.comprehensive.installDeducted'), prop: 'install_deducted', minWidth: '110px' },
   { label: () => t('dataCenter.comprehensive.downloadPv'), prop: 'download_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.downloadUv'), prop: 'download_uv', minWidth: '100px' },
   {
-    label: () => t('dataCenter.comprehensive.downloadRatio'),
-    prop: 'download_ratio',
-    minWidth: '120px',
-    cellRender: ({ row }: { row: DataCenterDailyVo }) => percent(Number(row.download_ratio || 0)),
+    label: () => t('dataCenter.comprehensive.installRatio'),
+    prop: 'install_ratio',
+    minWidth: '100px',
+    cellRender: ({ row }: { row: DataCenterDailyVo }) => percent(Number(row.install_ratio || 0)),
   },
   {
     label: () => t('dataCenter.comprehensive.merchantClickRatio'),
     prop: 'merchant_click_ratio',
-    minWidth: '130px',
+    minWidth: '100px',
     cellRender: ({ row }: { row: DataCenterDailyVo }) => percent(Number(row.merchant_click_ratio || 0)),
   },
   {
-    label: () => t('crud.operation'),
-    width: '190px',
+    // 参考站点把两个明细入口直接做成两列文字链接，不再单独放「操作」列
+    label: () => t('dataCenter.columns.sourceChannel'),
+    width: '120px',
     cellRender: ({ row }: { row: DataCenterDailyVo }) => (
-      <div class="flex-center gap-2">
-        <ElButton link type="primary" onClick={() => openChannelDetail(row)}>
-          {t('dataCenter.comprehensive.channelDetail')}
-        </ElButton>
-        <ElButton link type="primary" onClick={() => openMerchantDetail(row)}>
-          {t('dataCenter.comprehensive.merchantDetail')}
-        </ElButton>
-      </div>
+      <ElButton link type="primary" onClick={() => openChannelDetail(row)}>
+        {t('dataCenter.columns.sourceChannel')}
+      </ElButton>
+    ),
+  },
+  {
+    label: () => t('dataCenter.columns.merchantJump'),
+    width: '120px',
+    cellRender: ({ row }: { row: DataCenterDailyVo }) => (
+      <ElButton link type="primary" onClick={() => openMerchantDetail(row)}>
+        {t('dataCenter.columns.merchantJump')}
+      </ElButton>
     ),
   },
 ]
@@ -197,14 +203,18 @@ const options = ref<MaProTableOptions>({
     border: true,
   },
   searchOptions: {
-    fold: false,
-    foldButtonShow: false,
+    // 筛选项较多：默认收起，保留「展开 / 收起」按钮
+    fold: true,
+    foldButtonShow: true,
     defaultValue: {
       date_range: defaultRange,
     },
     text: {
       searchBtn: () => t('crud.search'),
       resetBtn: () => t('crud.reset'),
+      // 展开状态显示「收起」、收起状态显示「展开」（组件默认是「折叠 / 展开」）
+      isFoldBtn: () => t('crud.searchFold'),
+      notFoldBtn: () => t('crud.searchUnFold'),
     },
   },
   searchFormOptions: { labelWidth: '100px' },
