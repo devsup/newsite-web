@@ -1,0 +1,111 @@
+dataCenterMenu:
+  index: Data Center
+  options: Data center filter options
+  comprehensive: Overview Statistics
+  comprehensiveIndex: View overview
+  channelLog: Channel Visit Stats
+  channelLogIndex: View channel stats
+  channelRecord: Channel Visit Records
+  channelRecordIndex: View channel records
+  merchantLog: Merchant Visit Stats
+  merchantLogIndex: View merchant stats
+  merchantRecord: Merchant Visit Records
+  merchantRecordIndex: View merchant clicks
+  downloadRecord: Download Visit Records
+  downloadRecordIndex: View download records
+
+dataCenter:
+  dateRange: Date range
+  statDate: Date
+  startDate: Start date
+  endDate: End date
+  channel: Channel
+  channelCode: Channel code
+  merchant: Merchant
+  merchantId: Merchant ID
+  ip: Client IP
+  browserId: Browser ID
+  clientType: Client type
+  serverType: Detected device
+  userAgent: User-Agent
+  eventType: Event type
+  occurredAt: Occurred at
+  requestId: Request ID
+  deducted: Deducted
+  yes: Yes
+  no: No
+  noData: No data
+  totalRecords: '{total} records'
+  selectedChannel: Select a channel
+  selectedMerchant: Select a merchant
+  clientTypes:
+    android: Android
+    ios: iOS
+    windows: Windows
+    mac: macOS
+    other: Other
+  eventTypes:
+    landing: Landing page
+    navigation: Navigation page
+    merchantClick: Merchant click
+    download: App download
+    install: App install
+  comprehensive:
+    title: Overview
+    subtitle: Daily channel visits, merchant clicks, app installs and downloads. Data comes from report APIs and is visible within about one second.
+    groupChannel: Channel visits
+    groupLanding: Landing page
+    groupNavi: Navigation page
+    groupMerchant: Merchant clicks
+    groupInstall: App installs
+    groupDownload: App downloads
+    groupCoverage: Coverage
+    channelPv: Visit PV
+    channelUv: Unique visitors
+    landPv: Landing PV
+    landUv: Landing UV
+    naviPv: Navigation PV
+    naviUv: Navigation UV
+    merchantPv: Click PV
+    merchantUv: Click UV
+    installNum: Installs
+    installDeducted: Deducted
+    installRatio: Install rate
+    downloadPv: Download PV
+    downloadUv: Download UV
+    downloadRatio: Download rate
+    merchantClickRatio: Merchant click rate
+    channelDetail: Channel detail
+    merchantDetail: Merchant detail
+    channelCount: Channels with data
+    merchantCount: Merchants clicked
+  channelLog:
+    title: Channel Stats
+    subtitle: Visits, landing, navigation, installs and downloads by channel and date. Today is shown by default.
+    channelPv: Visit PV
+    channelUv: Unique visitors
+    landPv: Landing PV
+    landUv: Landing UV
+    naviPv: Navigation PV
+    naviUv: Navigation UV
+    installNum: Installs
+    installDeducted: Deducted
+    installRatio: Install rate
+    downloadPv: Download PV
+    downloadUv: Download UV
+    downloadRatio: Download rate
+  channelRecord:
+    title: Channel Records
+    subtitle: Individual reports for landing pages, navigation pages and app installs. The last 7 days are shown by default.
+  merchantLog:
+    title: Merchant Stats
+    subtitle: Click PV/UV by merchant and date. Today is shown by default.
+    clickPv: Click PV
+    clickUv: Click UV
+    clickRate: Click UV rate
+  merchantRecord:
+    title: Merchant Clicks
+    subtitle: Individual merchant click reports. The last 7 days are shown by default.
+  downloadRecord:
+    title: Download Records
+    subtitle: Individual app download reports from landing pages. The last 7 days are shown by default.

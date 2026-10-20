@@ -1,0 +1,111 @@
+dataCenterMenu:
+  index: 資料中心
+  options: 資料中心篩選下拉
+  comprehensive: 綜合統計數據
+  comprehensiveIndex: 綜合統計查看
+  channelLog: 渠道訪問統計
+  channelLogIndex: 渠道統計查看
+  channelRecord: 渠道訪問記錄
+  channelRecordIndex: 渠道訪問記錄查看
+  merchantLog: 商戶訪問統計
+  merchantLogIndex: 商戶統計查看
+  merchantRecord: 商戶訪問記錄
+  merchantRecordIndex: 商戶點擊記錄查看
+  downloadRecord: 下載訪問記錄
+  downloadRecordIndex: 下載記錄查看
+
+dataCenter:
+  dateRange: 日期範圍
+  statDate: 日期
+  startDate: 開始日期
+  endDate: 結束日期
+  channel: 渠道
+  channelCode: 渠道編碼
+  merchant: 商戶
+  merchantId: 商戶ID
+  ip: 客戶端 IP
+  browserId: 瀏覽器指紋
+  clientType: 客戶端類型
+  serverType: 服務端識別
+  userAgent: User-Agent
+  eventType: 事件類型
+  occurredAt: 發生時間
+  requestId: 請求ID
+  deducted: 扣量
+  yes: 是
+  no: 否
+  noData: 暫無資料
+  totalRecords: 共 {total} 條
+  selectedChannel: 請選擇渠道
+  selectedMerchant: 請選擇商戶
+  clientTypes:
+    android: Android
+    ios: iOS
+    windows: Windows
+    mac: macOS
+    other: 其他
+  eventTypes:
+    landing: 落地頁
+    navigation: 導航頁
+    merchantClick: 商戶點擊
+    download: App下載
+    install: App安裝
+  comprehensive:
+    title: 綜合統計
+    subtitle: 按天彙總渠道訪問、商戶點擊、App 安裝與下載；資料來自上報接口，約 1 秒內可見
+    groupChannel: 渠道訪問
+    groupLanding: 落地頁
+    groupNavi: 導航頁
+    groupMerchant: 商戶點擊
+    groupInstall: App 安裝
+    groupDownload: App 下載
+    groupCoverage: 覆蓋範圍
+    channelPv: 訪問 PV
+    channelUv: 獨立訪客
+    landPv: 落地頁 PV
+    landUv: 落地頁 UV
+    naviPv: 導航頁 PV
+    naviUv: 導航頁 UV
+    merchantPv: 點擊 PV
+    merchantUv: 點擊 UV
+    installNum: 安裝量
+    installDeducted: 扣量數
+    installRatio: 安裝轉化率
+    downloadPv: 下載 PV
+    downloadUv: 下載 UV
+    downloadRatio: 下載轉化率
+    merchantClickRatio: 商戶點擊率
+    channelDetail: 渠道明細
+    merchantDetail: 商戶明細
+    channelCount: 有資料渠道
+    merchantCount: 有點擊商戶
+  channelLog:
+    title: 渠道統計
+    subtitle: 按渠道 + 日期查看訪問、落地、導航、安裝與下載資料；預設展示今天
+    channelPv: 訪問 PV
+    channelUv: 獨立訪客
+    landPv: 落地頁 PV
+    landUv: 落地頁 UV
+    naviPv: 導航頁 PV
+    naviUv: 導航頁 UV
+    installNum: 安裝量
+    installDeducted: 扣量數
+    installRatio: 安裝轉化率
+    downloadPv: 下載 PV
+    downloadUv: 下載 UV
+    downloadRatio: 下載轉化率
+  channelRecord:
+    title: 渠道訪問記錄
+    subtitle: 落地頁、導航頁與 App 安裝的逐條上報記錄；預設展示最近 7 天
+  merchantLog:
+    title: 商戶統計
+    subtitle: 按商戶 + 日期查看點擊 PV/UV；預設展示今天
+    clickPv: 點擊 PV
+    clickUv: 點擊 UV
+    clickRate: 點擊 UV 佔比
+  merchantRecord:
+    title: 商戶點擊記錄
+    subtitle: 商戶點擊的逐條上報記錄；預設展示最近 7 天
+  downloadRecord:
+    title: 下載記錄
+    subtitle: App 落地頁下載的逐條上報記錄；預設展示最近 7 天

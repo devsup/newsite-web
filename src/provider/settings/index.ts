@@ -29,8 +29,8 @@ const defaultGlobalConfigSettings: RecursiveRequired<SystemSettings.all> = {
   welcomePage: {
     name: 'welcome',
     path: '/welcome',
-    title: '欢迎页',
-    icon: 'icon-park-outline:jewelry',
+    title: '工作台',
+    icon: 'material-symbols:space-dashboard-outline',
   },
   mainAside: {
     showIcon: true,

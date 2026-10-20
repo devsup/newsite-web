@@ -178,7 +178,7 @@ declare namespace SystemSettings {
     loadUserSetting?: boolean
     /**
      * 水印文字
-     * @默认值 `'MineAdmin'`
+     * @默认值 `'SiteAdmin'`
      */
     watermarkText?: string | string[]
   }

@@ -168,3 +168,64 @@ basePost:
     attachmentList: 附件列表
     attachmentUpload: 上傳附件
     attachmentDelete: 刪除附件
+
+workbench:
+  greetingMorning: 早上好
+  greetingForenoon: 上午好
+  greetingNoon: 中午好
+  greetingAfternoon: 下午好
+  greetingEvening: 晚上好
+  role: 角色
+  department: 部門
+  refresh: 刷新數據
+  overviewTitle: 今日概覽
+  overviewSubtitle: 統計口徑與「數據中心 - 綜合統計數據」一致
+  updatedAt: "更新於 {time}"
+  compareYesterday: 較昨日
+  trendTitle: 訪問趨勢
+  trendSubtitle: "近 {days} 天渠道訪問與商戶點擊"
+  trendDays7: 近 7 天
+  trendDays14: 近 14 天
+  trendDays30: 近 30 天
+  trendPv: 訪問量
+  trendUv: 獨立訪客
+  trendMerchant: 商戶點擊
+  topChannelTitle: 今日渠道 TOP 10
+  topChannelSubtitle: 按訪問量排序，含獨立訪客
+  topChannelEmpty: 今日暫無渠道訪問數據
+  viewAll: 查看全部
+  quickEntryTitle: 快捷入口
+  quickEntrySubtitle: 只展示當前賬號有權限的頁面
+  recentTitle: 最近訪問動態
+  recentSubtitle: 最近 10 條渠道訪問記錄
+  recentEmpty: 暫無訪問記錄
+  noDataPermission: 當前賬號沒有數據中心權限，今日概覽已隱藏
+  metrics:
+    channelPv: 訪問量
+    channelUv: 獨立訪客
+    landPv: 落地頁訪問
+    naviPv: 導航頁訪問
+    installNum: App 安裝
+    merchantClick: 商戶點擊
+  eventTypes:
+    landing: 落地頁
+    navigation: 導航頁
+    install: 安裝
+    other: 其他
+  entries:
+    channel: 渠道管理
+    channelDesc: 推廣鏈接、扣量與推送類型
+    merchant: 商戶信息
+    merchantDesc: 商戶展示與跳轉配置
+    category: 頂部Tab
+    categoryDesc: 分類、區域與排序
+    tabFooter: 底部Tab
+    tabFooterDesc: 底部菜單與綁定關係
+    dataCenter: 綜合統計
+    dataCenterDesc: 訪問、安裝與商戶點擊
+    themes: 主題管理
+    themesDesc: 站點配色與實時預覽
+    setting: 系統設置
+    settingDesc: 站點信息與落地頁配置
+    attachment: 資源管理
+    attachmentDesc: 圖片、視頻與文件

@@ -168,3 +168,64 @@ basePost:
     attachmentList: Resource List
     attachmentUpload: Resource Upload
     attachmentDelete: Resource Delete
+
+workbench:
+  greetingMorning: Good morning
+  greetingForenoon: Good morning
+  greetingNoon: Good afternoon
+  greetingAfternoon: Good afternoon
+  greetingEvening: Good evening
+  role: Role
+  department: Department
+  refresh: Refresh
+  overviewTitle: Today at a glance
+  overviewSubtitle: Same metrics as Data Center - Overview Statistics
+  updatedAt: "Updated at {time}"
+  compareYesterday: vs. yesterday
+  trendTitle: Traffic trend
+  trendSubtitle: "Channel visits and merchant clicks in the last {days} days"
+  trendDays7: Last 7 days
+  trendDays14: Last 14 days
+  trendDays30: Last 30 days
+  trendPv: Page views
+  trendUv: Unique visitors
+  trendMerchant: Merchant clicks
+  topChannelTitle: Top 10 channels today
+  topChannelSubtitle: Ranked by page views, including unique visitors
+  topChannelEmpty: No channel traffic today
+  viewAll: View all
+  quickEntryTitle: Quick access
+  quickEntrySubtitle: Only pages allowed for the current account are shown
+  recentTitle: Recent activity
+  recentSubtitle: Latest 10 channel visit records
+  recentEmpty: No visit records
+  noDataPermission: This account has no Data Center permission, so the overview is hidden
+  metrics:
+    channelPv: Page views
+    channelUv: Unique visitors
+    landPv: Landing visits
+    naviPv: Navigation visits
+    installNum: App installs
+    merchantClick: Merchant clicks
+  eventTypes:
+    landing: Landing
+    navigation: Navigation
+    install: Install
+    other: Other
+  entries:
+    channel: Channels
+    channelDesc: Promo links, deduction and push type
+    merchant: Merchants
+    merchantDesc: Display and jump configuration
+    category: Top tabs
+    categoryDesc: Categories, areas and sorting
+    tabFooter: Bottom tabs
+    tabFooterDesc: Bottom menu and bindings
+    dataCenter: Overview
+    dataCenterDesc: Visits, installs and clicks
+    themes: Themes
+    themesDesc: Site colors and live preview
+    setting: Settings
+    settingDesc: Site info and landing page
+    attachment: Resources
+    attachmentDesc: Images, videos and files

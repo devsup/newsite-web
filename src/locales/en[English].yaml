@@ -134,7 +134,7 @@ menu:
   uc:logs: Logs
   login: Login
   uc:message: Message
-  welcome: Welcome Page
+  welcome: Workbench
 crud:
   cancel: Cancel
   close: Close

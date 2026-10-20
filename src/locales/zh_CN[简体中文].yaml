@@ -134,7 +134,7 @@ menu:
   uc:logs: 日志
   login: 登录
   uc:message: 消息
-  welcome: 欢迎页
+  welcome: 工作台
 crud:
   cancel: 取消
   close: 关闭

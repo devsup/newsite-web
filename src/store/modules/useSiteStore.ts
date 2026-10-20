@@ -12,7 +12,7 @@ export interface SiteInfo {
 }
 
 /** 站点名称 / 图标都为空时的兜底：前端构建时注入的品牌名 */
-const DEFAULT_TITLE = (import.meta.env.VITE_APP_TITLE as string) || 'MineAdmin'
+const DEFAULT_TITLE = (import.meta.env.VITE_APP_TITLE as string) || 'SiteAdmin'
 
 /**
  * 站点基础信息（左上角 logo 与名称、登录页标题）.

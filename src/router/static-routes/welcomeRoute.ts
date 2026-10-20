@@ -13,9 +13,9 @@ const welcomeRoute: RouteRecordRaw = {
   name: 'welcome',
   path: '/welcome',
   meta: {
-    title: '欢迎页',
+    title: '工作台',
     i18n: 'menu.welcome',
-    icon: 'icon-park-outline:jewelry',
+    icon: 'material-symbols:space-dashboard-outline',
   },
   component: () => import('~/base/views/welcome/index.vue'),
 }
