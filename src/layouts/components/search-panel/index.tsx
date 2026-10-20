@@ -58,7 +58,14 @@ export default defineComponent({
         <div class="mine-search-panel-container">
           <div class="mine-search-input-container">
             <ma-svg-icon name="heroicons:magnifying-glass-solid" size={20} class="text-gray-4 dark-text-gray-4" />
-            <input v-model={routeKey.value} class="mine-search-input" placeholder={useTrans('mineAdmin.search.placeholder')} ref={searchInputEl} />
+            <input
+              v-model={routeKey.value}
+              name="global-search"
+              aria-label={useTrans('mineAdmin.search.placeholder')}
+              class="mine-search-input"
+              placeholder={useTrans('mineAdmin.search.placeholder')}
+              ref={searchInputEl}
+            />
             <ma-svg-icon name="material-symbols:close-rounded" size={20} class="cursor-pointer dark-text-stone-2" onClick={() => setSearchPanelEnable(false)} />
           </div>
 

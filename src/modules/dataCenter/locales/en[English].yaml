@@ -51,7 +51,7 @@ dataCenter:
     download: App download
     install: App install
   comprehensive:
-    title: Overview
+    title: Overview Statistics
     subtitle: Daily channel visits, merchant clicks, app installs and downloads. Data comes from report APIs and is visible within about one second.
     groupChannel: Channel visits
     groupLanding: Landing page
@@ -80,10 +80,13 @@ dataCenter:
     channelCount: Channels with data
     merchantCount: Merchants clicked
   channelLog:
-    title: Channel Stats
-    subtitle: Visits, landing, navigation, installs and downloads by channel and date. Today is shown by default.
-    channelPv: Visit PV
+    title: Channel Visit Stats
+    subtitle: Expand a channel to see daily statistics for the selected date range
+    channelPv: Page views
     channelUv: Unique visitors
+    statDays: Days
+    merchantPv: Merchant PV
+    merchantUv: Merchant UV
     landPv: Landing PV
     landUv: Landing UV
     naviPv: Navigation PV
@@ -94,18 +97,24 @@ dataCenter:
     downloadPv: Download PV
     downloadUv: Download UV
     downloadRatio: Download rate
+    clickRatio: Click ratio
+    jumpMerchant: Merchants
+    merchantDialogTitle: "Channel [{channel}] {date} merchant clicks"
+    merchantCount: Merchants
+    merchantName: Merchant
+    selectMerchantName: Select a merchant
   channelRecord:
     title: Channel Records
     subtitle: Individual reports for landing pages, navigation pages and app installs. The last 7 days are shown by default.
   merchantLog:
-    title: Merchant Stats
+    title: Merchant Visit Stats
     subtitle: Click PV/UV by merchant and date. Today is shown by default.
     clickPv: Click PV
     clickUv: Click UV
     clickRate: Click UV rate
   merchantRecord:
-    title: Merchant Clicks
+    title: Merchant Visit Records
     subtitle: Individual merchant click reports. The last 7 days are shown by default.
   downloadRecord:
-    title: Download Records
+    title: Download Visit Records
     subtitle: Individual app download reports from landing pages. The last 7 days are shown by default.

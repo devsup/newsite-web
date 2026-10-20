@@ -128,6 +128,8 @@ const searchItems: any[] = [
     renderProps: {
       type: 'daterange',
       valueFormat: 'YYYY-MM-DD',
+      // Element Plus 的 range 控件 name 期望数组（两个内部 input 各一个）
+      name: ['date_range_start', 'date_range_end'],
       startPlaceholder: t('dataCenter.startDate'),
       endPlaceholder: t('dataCenter.endDate'),
       clearable: true,

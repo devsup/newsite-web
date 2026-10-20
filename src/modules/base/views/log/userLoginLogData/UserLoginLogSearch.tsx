@@ -29,6 +29,7 @@ export default function getSearchItems(t: any): MaSearchItem[] {
       span: 2,
       renderProps: {
         type: 'datetimerange',
+        name: ['date_range_start', 'date_range_end'],
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
         startPlaceholder: t('baseLoginLog.startTime'),
         endPlaceholder: t('baseLoginLog.endTime'),

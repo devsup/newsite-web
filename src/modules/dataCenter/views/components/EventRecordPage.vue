@@ -97,6 +97,7 @@ searchItems.push({
   span: 2,
   renderProps: {
     type: 'daterange',
+    name: ['date_range_start', 'date_range_end'],
     valueFormat: 'YYYY-MM-DD',
     startPlaceholder: t('dataCenter.startDate'),
     endPlaceholder: t('dataCenter.endDate'),

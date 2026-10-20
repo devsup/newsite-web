@@ -51,7 +51,7 @@ dataCenter:
     download: App下载
     install: App安装
   comprehensive:
-    title: 综合统计
+    title: 综合统计数据
     subtitle: 按天汇总渠道访问、商户点击、App 安装与下载；数据来自上报接口，约 1 秒内可见
     groupChannel: 渠道访问
     groupLanding: 落地页
@@ -80,10 +80,13 @@ dataCenter:
     channelCount: 有数据渠道
     merchantCount: 有点击商户
   channelLog:
-    title: 渠道统计
-    subtitle: 按渠道 + 日期查看访问、落地、导航、安装与下载数据；默认展示今天
+    title: 渠道访问统计
+    subtitle: 按渠道展开查看所选日期范围内的每日统计数据
     channelPv: 访问 PV
     channelUv: 独立访客
+    statDays: 统计天数
+    merchantPv: 商户 PV
+    merchantUv: 商户 UV
     landPv: 落地页 PV
     landUv: 落地页 UV
     naviPv: 导航页 PV
@@ -94,18 +97,24 @@ dataCenter:
     downloadPv: 下载 PV
     downloadUv: 下载 UV
     downloadRatio: 下载转化率
+    clickRatio: 点击比
+    jumpMerchant: 跳转商户
+    merchantDialogTitle: "渠道 [{channel}] {date} 商户跳转数据"
+    merchantCount: 商户数量
+    merchantName: 商户名称
+    selectMerchantName: 请选择商户名称
   channelRecord:
     title: 渠道访问记录
     subtitle: 落地页、导航页与 App 安装的逐条上报记录；默认展示最近 7 天
   merchantLog:
-    title: 商户统计
+    title: 商户访问统计
     subtitle: 按商户 + 日期查看点击 PV/UV；默认展示今天
     clickPv: 点击 PV
     clickUv: 点击 UV
     clickRate: 点击 UV 占比
   merchantRecord:
-    title: 商户点击记录
+    title: 商户访问记录
     subtitle: 商户点击的逐条上报记录；默认展示最近 7 天
   downloadRecord:
-    title: 下载记录
+    title: 下载访问记录
     subtitle: App 落地页下载的逐条上报记录；默认展示最近 7 天

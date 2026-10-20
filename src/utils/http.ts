@@ -20,7 +20,8 @@ function createHttp(baseUrl: string | null = null, config: AxiosRequestConfig = 
   const env = import.meta.env
   return axios.create({
     baseURL: baseUrl ?? (env.VITE_OPEN_PROXY === 'true' ? env.VITE_PROXY_PREFIX : env.VITE_APP_API_BASEURL),
-    timeout: 1000 * 5,
+    // 默认 15 秒：菜单树 / 列表在远端库上单次可到 5 秒以上，5 秒会把正常请求误判成超时（ERR_ABORTED）
+    timeout: 1000 * 15,
     responseType: 'json',
     ...config,
   })

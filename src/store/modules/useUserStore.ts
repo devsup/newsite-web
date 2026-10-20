@@ -86,7 +86,15 @@ const useUserStore = defineStore(
     const cache = useCache()
     const router = useRouter()
     const setting = useSettingStore()
-    const token = ref<string | null>(cache.get('token', null))
+    /**
+     * 缓存里可能残留字符串 "null"/"undefined"（历史写入或异常退出造成），
+     * 直接 !!(token) 会把它当成已登录，请求头变成 Bearer null，后端 401 后又把登录态清掉。
+     * 这里统一归一化成 null。
+     */
+    const cachedToken = cache.get('token', null)
+    const token = ref<string | null>(
+      cachedToken && cachedToken !== 'null' && cachedToken !== 'undefined' ? cachedToken : null,
+    )
     const locales = ref<any[]>([])
     const language = ref(cache.get('language', 'zh_CN'))
     const isLogin = computed(() => !!token.value)

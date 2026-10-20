@@ -195,6 +195,7 @@ function closeTotp() {
         v-model="form.username"
         class="!bg-white !text-black !ring-gray-2 !focus-ring-[rgb(var(--ui-primary))] !placeholder-stone-4"
         name="username"
+        autocomplete="username"
         :placeholder="t('loginForm.usernamePlaceholder')"
         @blur="easyValidate"
       />
@@ -208,6 +209,7 @@ function closeTotp() {
         class="!bg-white !text-black !ring-gray-2 !focus-ring-[rgb(var(--ui-primary))] !placeholder-stone-4"
         name="password"
         type="password"
+        autocomplete="current-password"
         :placeholder="t('loginForm.passwordPlaceholder')"
         @blur="easyValidate"
       />

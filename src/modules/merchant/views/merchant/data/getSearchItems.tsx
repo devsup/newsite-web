@@ -59,6 +59,7 @@ export default function getSearchItems(t: any, options: MerchantOptions): MaSear
       span: 2,
       renderProps: {
         type: 'datetimerange',
+        name: ['date_range_start', 'date_range_end'],
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
         startPlaceholder: t('merchantInfo.startTime'),
         endPlaceholder: t('merchantInfo.endTime'),

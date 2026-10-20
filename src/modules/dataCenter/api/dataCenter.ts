@@ -148,6 +148,64 @@ export function channelPage(params: DataCenterQuery): Promise<ResponseStruct<Dat
   return useHttp().get('/admin/data-center/channel/list', { params })
 }
 
+/** 渠道访问统计 - 每日明细 */
+export interface DataCenterChannelSummaryDayVo {
+  stat_date: string
+  channel_pv: number
+  channel_uv: number
+  merchant_pv: number
+  merchant_uv: number
+  land_pv: number
+  land_uv: number
+  navi_pv: number
+  navi_uv: number
+  install_num: number
+  install_deducted: number
+  download_pv: number
+  download_uv: number
+  install_ratio: string
+  click_ratio: string
+}
+
+/** 渠道访问统计 - 渠道行（区间汇总 + 每日明细） */
+export interface DataCenterChannelSummaryVo extends Omit<DataCenterChannelSummaryDayVo, 'stat_date'> {
+  id: number
+  channel_id: number
+  channel_name: string
+  channel_code: string
+  stat_days: number
+  date_list: DataCenterChannelSummaryDayVo[]
+}
+
+/** GET /admin/data-center/channel/summary - 渠道访问统计（按渠道聚合 + 每日明细） */
+export function channelSummary(params: DataCenterQuery): Promise<ResponseStruct<{ list: DataCenterChannelSummaryVo[], total: number }>> {
+  return useHttp().get('/admin/data-center/channel/summary', { params })
+}
+
+/** 渠道商户跳转明细 - 单行 */
+export interface DataCenterChannelMerchantVo {
+  merchant_id: number
+  merchant_name: string
+  merchant_pv: number
+  merchant_uv: number
+}
+
+/** 渠道商户跳转明细 - 汇总 */
+export interface DataCenterChannelMerchantSummary {
+  merchant_count: number
+  merchant_pv: number
+  merchant_uv: number
+}
+
+/** GET /admin/data-center/channel/merchants - 某渠道某天的商户跳转明细 */
+export function channelMerchants(params: DataCenterQuery): Promise<ResponseStruct<{
+  list: DataCenterChannelMerchantVo[]
+  total: number
+  summary: DataCenterChannelMerchantSummary
+}>> {
+  return useHttp().get('/admin/data-center/channel/merchants', { params })
+}
+
 /** GET /admin/data-center/merchant/list - 商户日统计 */
 export function merchantPage(params: DataCenterQuery): Promise<ResponseStruct<DataCenterPage<DataCenterMerchantVo>>> {
   return useHttp().get('/admin/data-center/merchant/list', { params })

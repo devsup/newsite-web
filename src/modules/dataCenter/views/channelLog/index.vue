@@ -8,18 +8,45 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="tsx">
+import type { VNode } from 'vue'
 import type { MaProTableOptions, MaProTableSchema } from '@mineadmin/pro-table'
-import type { DataCenterChannelVo } from '~/dataCenter/api/dataCenter'
+import type { UseDialogExpose } from '@/hooks/useDialog.ts'
+import type { DataCenterChannelSummaryDayVo, DataCenterChannelSummaryVo } from '~/dataCenter/api/dataCenter'
 
+import { ElButton, ElTable, ElTableColumn } from 'element-plus'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
-import { channelOptions, channelPage } from '~/dataCenter/api/dataCenter'
+import useDialog from '@/hooks/useDialog.ts'
+import { channelOptions, channelSummary } from '~/dataCenter/api/dataCenter'
+
+import ChannelMerchantDialog from './components/ChannelMerchantDialog.vue'
 
 defineOptions({ name: 'dataCenter:channelLog' })
 
 const t = useTrans().globalTrans
 const today = useDayjs().format('YYYY-MM-DD')
 
-/** 渠道日统计：按渠道 + 日期展示上报汇总，数值全部来自 channel_daily_stat */
+/**
+ * 渠道访问统计（与参考站点一致）.
+ *
+ * 主表一个渠道一行，展示区间汇总；展开行是该渠道每天的指标，
+ * 每天带「跳转商户」操作，打开该渠道当天的商户点击明细。
+ * date_list 由后端一次带回（最多 90 天），展开时不再发请求。
+ */
+
+const merchantDialog: UseDialogExpose = useDialog({ width: '860px', footer: false })
+
+function openMerchants(channel: DataCenterChannelSummaryVo, day: DataCenterChannelSummaryDayVo): void {
+  merchantDialog.setTitle(t('dataCenter.channelLog.merchantDialogTitle', {
+    channel: channel.channel_name,
+    date: day.stat_date,
+  }))
+  merchantDialog.open({
+    channelId: channel.channel_id,
+    channelName: channel.channel_name,
+    statDate: day.stat_date,
+  })
+}
+
 const searchItems: any[] = [
   {
     label: () => t('dataCenter.dateRange'),
@@ -29,6 +56,8 @@ const searchItems: any[] = [
     renderProps: {
       type: 'daterange',
       valueFormat: 'YYYY-MM-DD',
+      // Element Plus 的 range 控件 name 必须是数组（两个内部 input 各一个）
+      name: ['date_range_start', 'date_range_end'],
       startPlaceholder: t('dataCenter.startDate'),
       endPlaceholder: t('dataCenter.endDate'),
       clearable: true,
@@ -56,33 +85,75 @@ const searchItems: any[] = [
   },
 ]
 
+/** 展开行：该渠道每天的明细，列与参考站点保持一致（含「操作」） */
+function renderDayTable(channel: DataCenterChannelSummaryVo): VNode {
+  return (
+    <div class="w-full box-border overflow-x-auto pl-12 pr-4">
+      <ElTable data={channel.date_list} size="small" border class="w-full">
+        <ElTableColumn prop="stat_date" min-width="120" label={t('dataCenter.statDate')} />
+        <ElTableColumn prop="channel_uv" min-width="100" label={t('dataCenter.channelLog.channelUv')} />
+        <ElTableColumn prop="merchant_pv" min-width="100" label={t('dataCenter.channelLog.merchantPv')} />
+        <ElTableColumn prop="merchant_uv" min-width="100" label={t('dataCenter.channelLog.merchantUv')} />
+        <ElTableColumn prop="land_pv" min-width="100" label={t('dataCenter.channelLog.landPv')} />
+        <ElTableColumn prop="land_uv" min-width="100" label={t('dataCenter.channelLog.landUv')} />
+        <ElTableColumn prop="navi_pv" min-width="100" label={t('dataCenter.channelLog.naviPv')} />
+        <ElTableColumn prop="navi_uv" min-width="100" label={t('dataCenter.channelLog.naviUv')} />
+        <ElTableColumn prop="download_pv" min-width="100" label={t('dataCenter.channelLog.downloadPv')} />
+        <ElTableColumn prop="download_uv" min-width="100" label={t('dataCenter.channelLog.downloadUv')} />
+        <ElTableColumn prop="install_num" min-width="100" label={t('dataCenter.channelLog.installNum')} />
+        <ElTableColumn prop="install_deducted" min-width="110" label={t('dataCenter.channelLog.installDeducted')} />
+        <ElTableColumn prop="click_ratio" min-width="100" label={t('dataCenter.channelLog.clickRatio')} />
+        <ElTableColumn prop="install_ratio" min-width="110" label={t('dataCenter.channelLog.installRatio')} />
+        <ElTableColumn
+          label={t('crud.operation')}
+          width="110"
+          fixed="right"
+          v-slots={{
+            default: ({ row: day }: { row: DataCenterChannelSummaryDayVo }) => (
+              <ElButton link type="primary" onClick={() => openMerchants(channel, day)}>
+                {t('dataCenter.channelLog.jumpMerchant')}
+              </ElButton>
+            ),
+          }}
+        />
+      </ElTable>
+    </div>
+  )
+}
+
 const tableColumns: any[] = [
-  { type: 'index', width: '60px' },
-  { label: () => t('dataCenter.channel'), prop: 'channel_name', minWidth: '150px' },
-  { label: () => t('dataCenter.channelCode'), prop: 'channel_code', minWidth: '120px' },
-  { label: () => t('dataCenter.channelLog.channelPv'), prop: 'channel_pv', minWidth: '100px' },
+  {
+    type: 'expand',
+    width: '48px',
+    cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => renderDayTable(row),
+  },
+  { label: () => t('ID'), prop: 'id', width: '80px' },
+  { label: () => t('dataCenter.channel'), prop: 'channel_name', width: '200px', showOverflowTooltip: true },
+  { label: () => t('dataCenter.channelCode'), prop: 'channel_code', width: '120px' },
+  { label: () => t('dataCenter.channelLog.statDays'), prop: 'stat_days', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.channelUv'), prop: 'channel_uv', minWidth: '100px' },
+  { label: () => t('dataCenter.channelLog.merchantPv'), prop: 'merchant_pv', minWidth: '100px' },
+  { label: () => t('dataCenter.channelLog.merchantUv'), prop: 'merchant_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.landPv'), prop: 'land_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.landUv'), prop: 'land_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.naviPv'), prop: 'navi_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.naviUv'), prop: 'navi_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.installNum'), prop: 'install_num', minWidth: '100px' },
-  { label: () => t('dataCenter.channelLog.installDeducted'), prop: 'install_deducted', minWidth: '100px' },
-  {
-    label: () => t('dataCenter.channelLog.installRatio'),
-    prop: 'install_ratio',
-    minWidth: '120px',
-    cellRender: ({ row }: { row: DataCenterChannelVo }) => `${Number(row.install_ratio || 0).toFixed(2)}%`,
-  },
+  { label: () => t('dataCenter.channelLog.installDeducted'), prop: 'install_deducted', minWidth: '110px' },
   { label: () => t('dataCenter.channelLog.downloadPv'), prop: 'download_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.downloadUv'), prop: 'download_uv', minWidth: '100px' },
   {
-    label: () => t('dataCenter.channelLog.downloadRatio'),
-    prop: 'download_ratio',
-    minWidth: '120px',
-    cellRender: ({ row }: { row: DataCenterChannelVo }) => `${Number(row.download_ratio || 0).toFixed(2)}%`,
+    label: () => t('dataCenter.channelLog.clickRatio'),
+    prop: 'click_ratio',
+    minWidth: '100px',
+    cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.click_ratio || '0.00%',
   },
-  { label: () => t('dataCenter.statDate'), prop: 'stat_date', width: '130px' },
+  {
+    label: () => t('dataCenter.channelLog.installRatio'),
+    prop: 'install_ratio',
+    minWidth: '110px',
+    cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.install_ratio || '0.00%',
+  },
 ]
 
 const options = ref<MaProTableOptions>({
@@ -94,6 +165,9 @@ const options = ref<MaProTableOptions>({
   tableOptions: {
     stripe: true,
     border: true,
+    rowKey: 'id',
+    // 不固定表头：关闭高度自适应，让表格跟随页面整体滚动
+    adaption: false,
   },
   searchOptions: {
     fold: false,
@@ -116,7 +190,7 @@ const options = ref<MaProTableOptions>({
       query.start_date = range[0]
       query.end_date = range[1]
       delete query.date_range
-      return channelPage(query)
+      return channelSummary(query)
     },
   },
 })
@@ -130,8 +204,16 @@ const schema = ref<MaProTableSchema>({
 <template>
   <div class="mine-layout pt-3">
     <MaProTable :options="options" :schema="schema" />
+
+    <component :is="merchantDialog.Dialog">
+      <template #default="{ channelId, channelName, statDate }">
+        <ChannelMerchantDialog
+          v-if="statDate"
+          :channel-id="channelId"
+          :channel-name="channelName"
+          :stat-date="statDate"
+        />
+      </template>
+    </component>
   </div>
 </template>
-
-<style scoped lang="scss">
-</style>
