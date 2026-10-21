@@ -60,6 +60,7 @@ baseDeptLeader:
     user_id: 請選擇要設置為負責人的用戶
 baseMenuManage:
   addError: 此操作已執行過，請點擊左側選單重新操作。
+  linkProtocol: '菜單鏈接只允許 http:// 或 https:// 地址'
   deleteChildren: 該菜單存在子菜單，請先刪除子級。
   addTopMenu: 新增頂級菜單
   parentMenu: 上級菜單

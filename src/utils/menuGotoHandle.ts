@@ -9,12 +9,39 @@
  */
 import type { Router } from 'vue-router'
 import type { MineRoute } from '#/global'
+import { ElMessage } from 'element-plus'
+
+/**
+ * 外链只允许 http / https.
+ *
+ * 菜单的 meta.link 由后台配置（permission:menu:save），如果不校验协议，
+ * 配成 javascript: / data: 时 window.open 可能执行脚本，属于存储型 XSS 面。
+ */
+function isSafeHttpLink(link?: string): boolean {
+  if (!link) {
+    return false
+  }
+
+  try {
+    const url = new URL(link, window.location.origin)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  }
+  catch {
+    return false
+  }
+}
 
 export default async function menuGotoHandle(router: Router, route: MineRoute.routeRecord) {
   const setting = useSettingStore().getSettings('mainAside')
   switch (route?.meta?.type) {
     case 'L':
-      window.open(route.meta?.link, '_blank')
+      if (route.meta?.link && isSafeHttpLink(route.meta.link)) {
+        window.open(route.meta.link, '_blank', 'noopener,noreferrer')
+      }
+      else {
+        // 非法协议直接拦下，不执行 window.open
+        ElMessage.warning(useTrans().globalTrans('menu.invalidLink'))
+      }
       break
     case 'I':
       await router.push({ path: route.path })

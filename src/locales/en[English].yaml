@@ -135,6 +135,7 @@ menu:
   login: Login
   uc:message: Message
   welcome: Workbench
+  invalidLink: 'Menu links must use http:// or https://'
 crud:
   cancel: Cancel
   close: Close

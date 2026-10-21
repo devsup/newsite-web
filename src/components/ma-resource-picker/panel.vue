@@ -603,66 +603,64 @@ onMounted(async () => {
         v-if="loading || resources.length" class="max-h-full"
         :options="{ scrollbars: { autoHide: 'leave', autoHideDelay: 100 } }"
       >
-        <div class="flex flex-wrap px-[2px] pt-[2px]">
-          <el-space fill wrap :fill-ratio="9">
-            <template v-for="resource in resources" :key="resource.id">
-              <div
-                class="resource-item" :class="{ active: isSelected(resource) }" @click="handleClick(resource)"
-                @dblclick="handleDbClick(resource)" @contextmenu="(e: MouseEvent) => executeContextmenu(e, resource)"
-              >
-                <div class="resource-item__cover">
-                  <template v-if="getCover(resource)">
-                    <!--
+        <div class="resource-grid">
+          <template v-for="resource in resources" :key="resource.id">
+            <div
+              class="resource-item" :class="{ active: isSelected(resource) }" @click="handleClick(resource)"
+              @dblclick="handleDbClick(resource)" @contextmenu="(e: MouseEvent) => executeContextmenu(e, resource)"
+            >
+              <div class="resource-item__cover">
+                <template v-if="getCover(resource)">
+                  <!--
                       用原生 img 而不是 el-image：
                       ① el-image 的 lazy 依赖 IntersectionObserver 认滚动容器，在 OverlayScrollbars 内层失效、图片请求根本不发（列表一片空白）；
                       ② 原生 loading="lazy" 由浏览器实现，无论外层谁滚动都按视口加载，一页 100 张时只请求可见的那些。
                     -->
-                    <img
-                      :src="getCover(resource)"
-                      class="h-full w-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                      alt=""
-                      @error="($event.target as HTMLImageElement).style.display = 'none'"
-                    >
-                  </template>
-                  <template v-else>
-                    <div
-                      class="relative m-[8px] h-[calc(100%-16px)] w-[calc(100%-16px)] flex items-center justify-center overflow-hidden"
-                    >
-                      <div class="cursor-default overflow-hidden text-ellipsis whitespace-pre-wrap">
-                        {{ resource.origin_name }}
-                      </div>
-                    </div>
-                  </template>
-                </div>
-                <div v-if="getCover(resource)" class="resource-item__name cursor-default">
-                  {{ resource.origin_name }}
-                </div>
-                <!-- 视频始终显示播放按钮，便于快速和图片区分；点按钮预览播放 -->
-                <button
-                  v-if="isVideo(resource)"
-                  class="resource-item__play"
-                  type="button"
-                  :title="t('videoPreview')"
-                  @click.stop="openVideoPreview(resource)"
-                >
-                  <ma-svg-icon name="ph:play-fill" :size="34" />
-                </button>
-                <div class="resource-item__selected">
-                  <ma-svg-icon class="resource-item__selected-icon" name="gravity-ui:circle-check-fill" :size="18" />
-                </div>
-              </div>
-            </template>
-            <template v-if="resources.length === 0">
-              <el-skeleton v-for="i in skeletonNum" :key="i" class="resource-skeleton relative" animated>
-                <template #template>
-                  <el-skeleton-item class="absolute h-full w-full" variant="rect" />
+                  <img
+                    :src="getCover(resource)"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    alt=""
+                    @error="($event.target as HTMLImageElement).style.display = 'none'"
+                  >
                 </template>
-              </el-skeleton>
-            </template>
-            <div v-for="i in 10" :key="i" class="resource-placeholder" />
-          </el-space>
+                <template v-else>
+                  <div
+                    class="relative m-[8px] h-[calc(100%-16px)] w-[calc(100%-16px)] flex items-center justify-center overflow-hidden"
+                  >
+                    <div class="cursor-default overflow-hidden text-ellipsis whitespace-pre-wrap">
+                      {{ resource.origin_name }}
+                    </div>
+                  </div>
+                </template>
+              </div>
+              <div v-if="getCover(resource)" class="resource-item__name cursor-default">
+                {{ resource.origin_name }}
+              </div>
+              <!-- 视频始终显示播放按钮，便于快速和图片区分；点按钮预览播放 -->
+              <button
+                v-if="isVideo(resource)"
+                class="resource-item__play"
+                type="button"
+                :title="t('videoPreview')"
+                @click.stop="openVideoPreview(resource)"
+              >
+                <ma-svg-icon name="ph:play-fill" :size="34" />
+              </button>
+              <div class="resource-item__selected">
+                <ma-svg-icon class="resource-item__selected-icon" name="gravity-ui:circle-check-fill" :size="18" />
+              </div>
+            </div>
+          </template>
+          <template v-if="resources.length === 0">
+            <el-skeleton v-for="i in skeletonNum" :key="i" class="resource-skeleton relative" animated>
+              <template #template>
+                <el-skeleton-item class="absolute h-full w-full" variant="rect" />
+              </template>
+            </el-skeleton>
+          </template>
+          <div v-for="i in 10" :key="i" class="resource-placeholder" />
         </div>
       </OverlayScrollbarsComponent>
       <div v-else class="h-full w-full flex flex-1 items-center justify-center">
@@ -733,7 +731,6 @@ onMounted(async () => {
 
 .ma-resource-panel{
   @apply relative;
-  --resource-item-size:120px;
 
   .ma-resource-dock {
     @apply flex items-center gap-2;
@@ -778,10 +775,25 @@ onMounted(async () => {
     @apply whitespace-nowrap;
   }
 }
+.resource-grid {
+  display: grid;
+  /* 固定 10 列：资源管理页与资源选择器弹窗都按 10×10（每页 100 条）展示 */
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+  padding: 2px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
 .resource-item{
   animation: fadeIn 0.38s ease-out forwards;
   --un-bg-opacity: 0.3;
-  @apply relative min-w-[var(--resource-item-size)] pb-[100%] rounded overflow-hidden border-box bg-gray-1  dark-bg-dark-3;
+  @apply relative min-w-0 pb-[100%] rounded overflow-hidden border-box bg-gray-1  dark-bg-dark-3;
 }
 .resource-item__cover{
   @apply absolute bottom-0 left-0 h-full w-full;
@@ -818,10 +830,10 @@ onMounted(async () => {
 }
 
 .resource-placeholder{
-  @apply min-w-[var(--resource-item-size)] h-0 pointer-events-none p-0;
+  @apply min-w-0 h-0 pointer-events-none p-0;
 }
 .resource-skeleton{
-  @apply min-w-[var(--resource-item-size)] pb-[100%];
+  @apply min-w-0 pb-[100%];
 }
 
 .resource-item:hover,

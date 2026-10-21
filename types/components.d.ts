@@ -25,7 +25,6 @@ declare module 'vue' {
     MaJsonViewer: typeof import('./../src/components/ma-json-viewer/index.vue')['default']
     MaKeyValue: typeof import('./../src/components/ma-key-value/index.vue')['default']
     MaRemoteSelect: typeof import('./../src/components/ma-remote-select/index.vue')['default']
-    MaRemoteSfcLoader: typeof import('./../src/components/ma-remote-sfc-loader/index.vue')['default']
     MaResourcePicker: typeof import('./../src/components/ma-resource-picker/index.vue')['default']
     MaSelectTable: typeof import('./../src/components/ma-select-table/index.vue')['default']
     MaSvgIcon: typeof import('./../src/components/ma-svg-icon/index.vue')['default']

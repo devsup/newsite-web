@@ -53,8 +53,8 @@ const resourceDefaultButtons: Resources.Button[] = [
     icon: 'solar:upload-square-broken',
     upload: handleResourceUpload,
     uploadConfig: {
-      // accept 只是选择器的过滤条件；multiple 让用户一次能选多张（原来 limit: 1 只能选一个）
-      accept: 'image/*',
+      // 只允许图片（不含 SVG：SVG 可内嵌脚本，后端也会拒绝）
+      accept: '.jpg,.jpeg,.png,.gif,.webp,.bmp,.avif',
       multiple: true,
     },
     order: 0,
@@ -65,8 +65,8 @@ const resourceDefaultButtons: Resources.Button[] = [
     icon: 'hugeicons:file-upload',
     upload: handleResourceUpload,
     uploadConfig: {
-      // 文档 + 压缩包 + 视频 + 音频（后端不限类型，只是选择器按这里过滤，别漏了视频）
-      accept: '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.pdf,.zip,.rar,.7z,.mp4,.mov,.avi,.mkv,.webm,.flv,.m4v,.mp3,.wav,.aac,.flac,.m4a',
+      // 资源库只收媒体文件：视频 + 音频（文档/压缩包由后端白名单拒绝）
+      accept: '.mp4,.mov,.avi,.mkv,.webm,.flv,.m4v,.3gp,.wmv,.mpeg,.mpg,.mp3,.wav,.aac,.flac,.m4a,.ogg,.wma,.opus',
       multiple: true,
     },
     order: 1,

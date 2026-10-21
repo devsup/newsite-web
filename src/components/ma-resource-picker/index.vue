@@ -54,6 +54,7 @@ const attrs = omit(useAttrs(), ['onConfirm', 'onCancel'])
     destroy-on-close
     align-center
     :footer="false"
+    width="min(1280px, 92vw)"
   >
     <div class="resource-picker-body">
       <MaResourcePanel v-bind="attrs" :page-size="100" @cancel="onCancel" @confirm="onConfirm" />

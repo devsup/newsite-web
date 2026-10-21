@@ -60,6 +60,7 @@ baseDeptLeader:
     user_id: Select the user to set as the department leader
 baseMenuManage:
   addError: This operation has already been performed. Please click the left menu to try again.
+  linkProtocol: 'Menu links must use http:// or https://'
   deleteChildren: The current menu has child menus. Please delete the child first.
   addTopMenu: Add Top Menu
   parentMenu: Parent Menu

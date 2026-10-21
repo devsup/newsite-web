@@ -135,6 +135,7 @@ menu:
   login: 登录
   uc:message: 消息
   welcome: 工作台
+  invalidLink: '菜单链接只允许 http:// 或 https:// 地址'
 crud:
   cancel: 取消
   close: 关闭

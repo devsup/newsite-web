@@ -136,7 +136,20 @@ const formItems = ref<MaFormItem[]>([
       placeholder: 'baseMenuManage.placeholder.link',
     },
     itemProps: {
-      rules: [{ required: true, message: 'baseMenuManage.placeholder.link' }],
+      rules: [
+        { required: true, message: 'baseMenuManage.placeholder.link' },
+        {
+          // 外链 / iFrame 只允许 http(s)：javascript:、data: 等协议会被 window.open / iframe 执行
+          validator: (_rule: any, value: string, callback: (error?: Error) => void) => {
+            if (!value || /^https?:\/\//i.test(value)) {
+              callback()
+            }
+            else {
+              callback(new Error(t('baseMenuManage.linkProtocol')))
+            }
+          },
+        },
+      ],
     },
   },
   {
