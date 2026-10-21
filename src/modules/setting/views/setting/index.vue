@@ -696,7 +696,7 @@ useEventListener(window, 'resize', syncCardHeight)
   color: var(--el-text-color-regular);
 }
 
-/* 分组标题：主色小色块 + 文字，放在浅灰容器顶部 */
+/* 分组标题：主色小色块 + 文字，放在区块卡片顶部 */
 .site-setting__section-title {
   display: flex;
   align-items: center;
@@ -730,7 +730,7 @@ useEventListener(window, 'resize', syncCardHeight)
   align-items: start;
 }
 
-/* 分组两列排布：每个分组是一块浅灰底的容器（不用再套一层卡片边框），
+/* 分组两列排布：每个分组是一块白底卡片（与「定时任务」一致：细边框 + 轻阴影，悬停时主色描边并上浮 1px），
    组内字段照常「label + 控件 + 图标」，视觉上分组清楚、也不会像纯标题那样零碎 */
 .site-setting__sections {
   display: grid;
@@ -743,8 +743,19 @@ useEventListener(window, 'resize', syncCardHeight)
 
 .site-setting__section {
   padding: 16px 20px 6px;
-  background: var(--el-fill-color-lighter);
-  border-radius: 8px;
+  // 与「定时任务」的卡片一致：白底 + 细边框 + 轻阴影，悬停时主色描边、阴影加深并上浮 1px
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  box-shadow: var(--el-box-shadow-light);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    border-color: var(--el-color-primary-light-3);
+    box-shadow: var(--el-box-shadow);
+    // 只上浮 1px：幅度再大会和相邻区块的边框叠在一起、看着抖动
+    transform: translateY(-1px);
+  }
 }
 
 /* 项数多的组（如「文本输入」15 项）跨整行、组内两列：

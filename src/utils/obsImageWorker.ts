@@ -11,7 +11,22 @@
  */
 const SW_URL = '/sw-obs-image.js'
 
-export function registerObsImageWorker(): void {
+/**
+ * 是否已经等过 controller 接管（避免同一页面重复等 1.5s）
+ */
+let controllerReady = false
+
+/**
+ * 注册并等待图片解密 Worker 接管当前页面.
+ *
+ * 必须等它 resolve 后再 `app.mount()`：首屏 <img> 在挂载时立刻发请求，如果此时页面
+ * 还没有 Service Worker 控制器（首次访问 / SW 刚更新），请求会直接拿到 OBS 密文并显示
+ * 「加载失败」，只有手动刷新才恢复。等到 controller 存在且密钥下发完成后再挂载，
+ * 首屏图片就能一次成功。
+ *
+ * 未配置密钥 / 非安全上下文 / 注册失败时直接 resolve，不阻塞页面。
+ */
+export async function registerObsImageWorker(): Promise<void> {
   if (!('serviceWorker' in navigator)) {
     return
   }
@@ -33,30 +48,76 @@ export function registerObsImageWorker(): void {
     return
   }
 
-  const sendConfig = (worker: ServiceWorker | null | undefined): void => {
-    worker?.postMessage({ type: 'obs-image-config', key, origins })
+  /**
+   * 给 Worker 下发密钥，并等它回执.
+   *
+   * postMessage 是异步的，只发不等的话挂载后立刻发出的图片请求可能仍落在「没有密钥」的
+   * Worker 里（透传密文 → 加载失败）。超时 1s 兜底，Worker 异常时也不能把页面卡死。
+   */
+  const sendConfig = async (worker: ServiceWorker | null | undefined): Promise<void> => {
+    if (!worker) {
+      return
+    }
+
+    await new Promise<void>((resolve) => {
+      let timer: number | undefined
+
+      const done = (): void => {
+        window.clearTimeout(timer)
+        resolve()
+      }
+
+      const onMessage = (event: MessageEvent): void => {
+        if ((event.data as { type?: string } | null)?.type !== 'obs-image-config-ack') {
+          return
+        }
+        navigator.serviceWorker.removeEventListener('message', onMessage)
+        done()
+      }
+
+      timer = window.setTimeout(() => {
+        navigator.serviceWorker.removeEventListener('message', onMessage)
+        done()
+      }, 1000)
+      navigator.serviceWorker.addEventListener('message', onMessage)
+      worker.postMessage({ type: 'obs-image-config', key, origins })
+    })
   }
 
-  navigator.serviceWorker.register(SW_URL)
-    .then(async (registration) => {
-      sendConfig(registration.active)
+  try {
+    const registration = await navigator.serviceWorker.register(SW_URL)
 
-      const pending = registration.active || registration.waiting || registration.installing
-      pending?.addEventListener('statechange', () => {
-        if (pending.state === 'activated') {
-          sendConfig(pending)
-        }
+    // active Worker 就绪（首次注册时 register 返回的 active 可能还是 null）；
+    // SW 安装失败时 ready 会一直 pending，3s 兜底避免页面永远不挂载
+    await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 3000)
+      }),
+    ])
+
+    // 首次访问时页面还没有 controller，等 activate 里的 clients.claim() 触发 controllerchange；
+    // 1.5s 超时兜底，避免 SW 异常时页面一直不挂载
+    if (!navigator.serviceWorker.controller && !controllerReady) {
+      await new Promise<void>((resolve) => {
+        // 超时后监听器仍保留：它只会 resolve 已经完成的 Promise，没有副作用
+        const timer = window.setTimeout(resolve, 1500)
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.clearTimeout(timer)
+          resolve()
+        }, { once: true })
       })
+      controllerReady = true
+    }
 
-      await navigator.serviceWorker.ready
-      sendConfig(navigator.serviceWorker.controller)
-    })
-    .catch((error) => {
-      console.warn('[obs-image] Service Worker 注册失败，图片将以密文显示', error)
-    })
+    await sendConfig(navigator.serviceWorker.controller || registration.active)
 
-  // SW 更新接管后重新下发配置（内存里的密钥会随旧实例销毁）
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    sendConfig(navigator.serviceWorker.controller)
-  })
+    // SW 更新接管后重新下发配置（内存里的密钥会随旧实例销毁）
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      void sendConfig(navigator.serviceWorker.controller)
+    })
+  }
+  catch (error) {
+    console.warn('[obs-image] Service Worker 注册失败，图片将以密文显示', error)
+  }
 }

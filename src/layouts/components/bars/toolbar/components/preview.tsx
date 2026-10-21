@@ -203,7 +203,10 @@ export default defineComponent({
       state.loaded = false
       try {
         const response = await useHttp().get('/admin/passport/get-preview')
-        state.previewUrl = normalizePreviewUrl(String(response?.data?.navi_domain ?? ''))
+        const data = response?.data
+        // preview_url 是后端拼好的「导航域名 + 首个启用渠道编码」：导航页没有渠道参数会整页 404，
+        // 不能直接用裸域名预览；一个启用渠道都没有时后端给空串，退回 navi_domain
+        state.previewUrl = normalizePreviewUrl(String(data?.preview_url || data?.navi_domain || ''))
         state.reloadKey += 1
         if (state.previewUrl) {
           startIframeTimer()

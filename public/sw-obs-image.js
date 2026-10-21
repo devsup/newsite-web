@@ -50,6 +50,9 @@ self.addEventListener('message', (event) => {
     .filter(Boolean)
 
   config = { key: String(data.key || ''), origins }
+
+  // 回执：页面在挂载前要确认密钥已生效，否则首屏图片请求会拿到密文（显示加载失败）
+  event.source?.postMessage({ type: 'obs-image-config-ack' })
 })
 
 self.addEventListener('install', () => self.skipWaiting())

@@ -11,9 +11,6 @@ import App from './App.vue'
 import MineBootstrap from './bootstrap'
 import { registerObsImageWorker } from './utils/obsImageWorker'
 
-// OBS 图片是密文，先注册解密 Worker，再挂载页面（Worker 没配好时会自动跳过）
-registerObsImageWorker()
-
 const app = createApp(App)
 
 /**
@@ -52,8 +49,11 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 })
 
-MineBootstrap(app).then(() => {
-  app.mount('#app')
-}).catch((err) => {
-  console.error('MineAdmin-UI start fail', err)
+// OBS 图片是密文：等解密 Worker 接管当前页面后再挂载，否则首屏图片请求会拿到密文显示「加载失败」
+registerObsImageWorker().finally(() => {
+  MineBootstrap(app).then(() => {
+    app.mount('#app')
+  }).catch((err) => {
+    console.error('SiteAdmin-UI start fail', err)
+  })
 })
