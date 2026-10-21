@@ -11,7 +11,7 @@
 <script setup lang="tsx">
 import type { DepartmentVo } from '~/base/api/department.ts'
 import type { LeaderVo } from '~/base/api/leader.ts'
-import { create, deleteByDoubleKey, page, save } from '~/base/api/leader.ts'
+import { create, deleteByDoubleKey, page } from '~/base/api/leader.ts'
 import { page as userPage } from '~/base/api/user.ts'
 
 import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@mineadmin/pro-table'
@@ -54,7 +54,7 @@ const maDialog: UseDialogExpose = useDialog({
   lgWidth: '550px',
   ok: ({ formType }, okLoadingState: (state: boolean) => void) => {
     okLoadingState(true)
-    if (['add', 'edit'].includes(formType)) {
+    if (formType === 'add') {
       const elForm = leaderForm.value?.getElFormRef()
       // 验证通过后
       elForm?.validate?.().then(() => {
@@ -62,28 +62,14 @@ const maDialog: UseDialogExpose = useDialog({
           .map(item => item.id)
           .filter((id): id is number => typeof id === 'number')
         delete leaderModel.value.users
-        switch (formType) {
-          // 新增
-          case 'add':
-            create(leaderModel.value).then((res: any) => {
-              res.code === ResultCode.SUCCESS ? msg.success(t('crud.createSuccess')) : msg.error(res.message)
-              maDialog.close()
-              proTableRef.value?.refresh()
-            }).catch((err: any) => {
-              msg.alertError(err)
-            })
-            break
-          // 修改
-          case 'edit':
-            save(leaderModel.value?.id as number, leaderModel.value).then((res: any) => {
-              res.code === 200 ? msg.success(t('crud.updateSuccess')) : msg.error(res.message)
-              maDialog.close()
-              proTableRef.value?.refresh()
-            }).catch((err: any) => {
-              msg.alertError(err)
-            })
-            break
-        }
+        // 部门领导只有新增 / 移除（后端未提供编辑接口），这里不再保留 edit 分支
+        create(leaderModel.value).then((res: any) => {
+          res.code === ResultCode.SUCCESS ? msg.success(t('crud.createSuccess')) : msg.error(res.message)
+          maDialog.close()
+          proTableRef.value?.refresh()
+        }).catch((err: any) => {
+          msg.alertError(err)
+        })
       }).catch()
     }
     okLoadingState(false)
@@ -261,7 +247,7 @@ function handleBatchCommand(command: string): void {
   <component :is="maDialog.Dialog">
     <template #default="{ formType }">
       <ma-form
-        v-if="['add', 'edit'].includes(formType)"
+        v-if="formType === 'add'"
         ref="leaderForm"
         v-model="leaderModel"
         :options="{ labelWidth: 95 }"

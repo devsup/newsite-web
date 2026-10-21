@@ -7,17 +7,22 @@ import {
   merchantChannels,
 } from '~/dataCenter/api/dataCenter'
 import { ResultCode } from '@/utils/ResultCode.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 
 /**
  * 综合统计 → 跳转商户明细 → 「查看渠道」弹窗.
  *
  * 与参考站点一致：顶部渠道数量 / PV / UV 汇总，下面可按渠道筛选的明细（渠道ID / 名称 / 编码 / 商户PV / UV）。
  */
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   merchantId: number
   merchantName: string
   statDate: string
-}>()
+  /** 明细接口：商户访问统计页用 merchantLog 权限的接口，默认走综合统计的接口 */
+  api?: (params: any) => Promise<any>
+}>(), {
+  api: undefined,
+})
 
 const t = useTrans().globalTrans
 const loading = ref(false)
@@ -34,7 +39,7 @@ const channelApi: any = channelOptions
 async function load(): Promise<void> {
   loading.value = true
   try {
-    const response = await merchantChannels({
+    const response = await (props.api ?? merchantChannels)({
       merchant_id: props.merchantId,
       stat_date: props.statDate,
       channel_id: channelId.value || undefined,
@@ -82,6 +87,7 @@ watch([page, pageSize], () => {
         <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv) }}</span>
       </div>
       <MaRemoteSelect
+        v-if="hasAuth('dataCenter:options')"
         v-model="channelId"
         :api="channelApi"
         :data-handle="(response: any) => (response.data || []).map((item: any) => ({

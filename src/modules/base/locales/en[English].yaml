@@ -3,6 +3,8 @@ baseUserManage:
   username: Username
   nickname: Nickname
   phone: Phone
+  dept: Department
+  post: Post
   email: Email
   password: Password
   userType: User type
@@ -30,6 +32,32 @@ baseRoleManage:
   code: Role code
   permission: Permission Menu
   setPermission: Set permission
+baseDepartment:
+  name: Department Name
+  created_at: Creation Time
+  updated_at: Update Time
+  leaderCount: Leaders
+  positionsCount: Positions
+  usersCount: Users
+  parentDepartment: Parent Department
+  page:
+    mainTitle: Department Management
+    subTitle: Manage departments and department leaders.
+    setLeader: Set Leader
+    previewUser: View Users
+    managePost: Manage Posts
+  placeholder:
+    name: Please enter department name
+    parentDepartment: Please select parent department
+  error:
+    selfNotParent: Cannot select itself as the parent department; the default value has been restored.
+baseDeptLeader:
+  belongDept: Department
+  username: Username
+  nickname: Nickname
+  user_id: Select user
+  placeholder:
+    user_id: Select the user to set as the department leader
 baseMenuManage:
   addError: This operation has already been performed. Please click the left menu to try again.
   deleteChildren: The current menu has child menus. Please delete the child first.
@@ -143,17 +171,10 @@ baseMenu:
     positionSave: Edit post
     positionDelete: Delete post
     positionDataScope: Set post data scope
-basePost:
-  name: Post Name
-  belongPost: Belongs to Position
-  belongDept: Belongs to Department
-  created_at: Creation Time
-  updated_at: Update Time
-  dataScope: Data Permissions
-  selectDept: Selected Departments
-  callFunc: Function Call Name
-  placeholder:
-    name: Please enter position name
+    leaderList: Department leader list
+    leaderCreate: Add department leader
+    leaderSave: Edit department leader
+    leaderDelete: Remove department leader
   log:
     index: Log Management
     userLoginLog: Login Log
@@ -168,6 +189,17 @@ basePost:
     attachmentList: Resource List
     attachmentUpload: Resource Upload
     attachmentDelete: Resource Delete
+basePost:
+  name: Post Name
+  belongPost: Belongs to Position
+  belongDept: Belongs to Department
+  created_at: Creation Time
+  updated_at: Update Time
+  dataScope: Data Permissions
+  selectDept: Selected Departments
+  callFunc: Function Call Name
+  placeholder:
+    name: Please enter position name
 
 workbench:
   greetingMorning: Good morning
@@ -180,10 +212,10 @@ workbench:
   refresh: Refresh
   overviewTitle: Today at a glance
   overviewSubtitle: Same metrics as Data Center - Overview Statistics
-  updatedAt: "Updated at {time}"
+  updatedAt: 'Updated at {time}'
   compareYesterday: vs. yesterday
   trendTitle: Traffic trend
-  trendSubtitle: "Channel visits and merchant clicks in the last {days} days"
+  trendSubtitle: 'Channel visits and merchant clicks in the last {days} days'
   trendDays7: Last 7 days
   trendDays14: Last 14 days
   trendDays30: Last 30 days

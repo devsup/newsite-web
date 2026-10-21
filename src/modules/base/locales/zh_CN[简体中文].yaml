@@ -247,10 +247,10 @@ workbench:
   refresh: 刷新数据
   overviewTitle: 今日概览
   overviewSubtitle: 统计口径与「数据中心 - 综合统计数据」一致
-  updatedAt: "更新于 {time}"
+  updatedAt: '更新于 {time}'
   compareYesterday: 较昨日
   trendTitle: 访问趋势
-  trendSubtitle: "近 {days} 天渠道访问与商户点击"
+  trendSubtitle: '近 {days} 天渠道访问与商户点击'
   trendDays7: 近 7 天
   trendDays14: 近 14 天
   trendDays30: 近 30 天

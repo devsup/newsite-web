@@ -56,32 +56,6 @@ function setData(data: Record<string, any>) {
   form.value.dataType = data.id ? 'edit' : 'add'
 }
 
-const inputVisible = ref <Record<string, boolean>>({
-  auth: false,
-  role: false,
-  user: false,
-})
-
-function addTagRender(key: string, type: 'primary' | 'success' | 'info' | 'warning' | 'danger') {
-  return form.value.meta?.[key].map((item: string) => (
-    <>
-      <el-tag
-        closable={true}
-        type={type}
-        disable-transitions={false}
-        onClose={() => {
-          form.value.meta[key] = form.value.meta?.[key].filter((name: string) => name !== item)
-        }}
-      >
-        {item}
-      </el-tag>
-      {inputVisible.value[key] && (
-        <el-input />
-      )}
-    </>
-  ))
-}
-
 const formOptions = ref<MaFormOptions>({
   labelWidth: '110px',
 })

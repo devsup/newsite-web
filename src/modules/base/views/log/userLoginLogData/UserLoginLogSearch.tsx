@@ -15,20 +15,15 @@ import { DICT_SYSTEM_STATE } from '@/constants/dict.ts'
 export default function getSearchItems(t: any): MaSearchItem[] {
   return [
     {
-      // 登录时间范围：后端按 login_time 做 whereBetween，值是 ['开始', '结束'] 两段字符串。
-      // datetimerange + valueFormat 避免把 Date 对象直接丢给接口（默认 ISO 带时区，与 datetime 比较会偏）；
-      // defaultTime 让只选日期时自动补 00:00:00 / 23:59:59。
+      // 日志按天分表：只选单日，后端直接定位该日的日表，不再跨表 UNION 查询。
       label: () => t('baseLoginLog.login_time'),
       prop: 'login_time',
       render: 'DatePicker',
       span: 2,
       renderProps: {
-        type: 'datetimerange',
-        name: ['date_range_start', 'date_range_end'],
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        startPlaceholder: t('baseLoginLog.startTime'),
-        endPlaceholder: t('baseLoginLog.endTime'),
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)],
+        type: 'date',
+        valueFormat: 'YYYY-MM-DD',
+        placeholder: t('baseLoginLog.login_time'),
         clearable: true,
       },
     },

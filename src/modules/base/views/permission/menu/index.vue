@@ -14,6 +14,7 @@ import { useMessage } from '@/hooks/useMessage.ts'
 import getOnlyWorkAreaHeight from '@/utils/getOnlyWorkAreaHeight.ts'
 import { create, page, save } from '~/base/api/menu.ts'
 import type { MenuVo } from '~/base/api/menu.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 
 import MenuTree from './menu-tree.vue'
 import MenuForm from './menu-form.vue'
@@ -55,6 +56,9 @@ const newMenu = ref<MenuVo>({
 const loading = ref<boolean>(false)
 const t = useTrans().globalTrans
 const msg = useMessage()
+// 保存按钮同时服务「新增」（permission:menu:create）与「编辑」（permission:menu:save），
+// 有任一权限即可显示；接口侧仍按具体操作校验。
+const canSaveMenu = computed(() => hasAuth('permission:menu:create') || hasAuth('permission:menu:save'))
 
 async function getMenu() {
   const { data } = await page()
@@ -150,7 +154,7 @@ function createOrSaveMenu() {
       <div class="sticky top-0 z-2 flex items-center justify-between b-b-1 b-b-gray-1 b-b-solid bg-white pb-3 text-base dark-b-b-dark-4 dark-bg-dark-8">
         <span>{{ currentMenu ? (currentMenu.meta?.i18n ? t(currentMenu.meta?.i18n) : currentMenu.meta?.title) : t('baseMenuManage.addTopMenu') }}</span>
         <div>
-          <el-button type="primary" @click="createOrSaveMenu">
+          <el-button v-if="canSaveMenu" type="primary" @click="createOrSaveMenu">
             {{ t('crud.save') }}
           </el-button>
         </div>

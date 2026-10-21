@@ -11,7 +11,7 @@
 import MaResourcePanel from '@/components/ma-resource-picker/panel.vue'
 import getOnlyWorkAreaHeight from '@/utils/getOnlyWorkAreaHeight.ts'
 
-defineOptions({ name: 'dataCenter:attachment' })
+defineOptions({ name: 'attachment' })
 
 const model = ref<any>()
 

@@ -118,35 +118,39 @@ if (props.eventTypes.length > 1) {
   })
 }
 
-searchItems.push({
-  label: () => t('dataCenter.channel'),
-  prop: 'channel_id',
-  render: () => MaRemoteSelect,
-  renderProps: {
-    clearable: true,
-    filterable: true,
-    placeholder: t('dataCenter.selectedChannel'),
-    api: channelOptions,
-    dataHandle: (response: any) => (response.data || []).map((item: any) => ({
-      label: formatChannelOptionLabel(item),
-      value: item.value,
-    })),
-  },
-})
-
-if (props.variant === 'merchant') {
+// 渠道 / 商户下拉走 dataCenter:options 接口：没有该按钮权限时不渲染筛选项，
+// 否则下拉会请求并收到 403（页面本身可能只有 dataCenter:*:index 权限）。
+if (hasAuth('dataCenter:options')) {
   searchItems.push({
-    label: () => t('dataCenter.merchant'),
-    prop: 'merchant_id',
+    label: () => t('dataCenter.channel'),
+    prop: 'channel_id',
     render: () => MaRemoteSelect,
     renderProps: {
       clearable: true,
       filterable: true,
-      placeholder: t('dataCenter.selectedMerchant'),
-      api: merchantOptions,
-      dataHandle: (response: any) => response.data || [],
+      placeholder: t('dataCenter.selectedChannel'),
+      api: channelOptions,
+      dataHandle: (response: any) => (response.data || []).map((item: any) => ({
+        label: formatChannelOptionLabel(item),
+        value: item.value,
+      })),
     },
   })
+
+  if (props.variant === 'merchant') {
+    searchItems.push({
+      label: () => t('dataCenter.merchant'),
+      prop: 'merchant_id',
+      render: () => MaRemoteSelect,
+      renderProps: {
+        clearable: true,
+        filterable: true,
+        placeholder: t('dataCenter.selectedMerchant'),
+        api: merchantOptions,
+        dataHandle: (response: any) => response.data || [],
+      },
+    })
+  }
 }
 
 searchItems.push(

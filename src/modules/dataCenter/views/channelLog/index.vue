@@ -17,6 +17,7 @@ import { ElButton, ElTable, ElTableColumn } from 'element-plus'
 import MaSvgIcon from '@/components/ma-svg-icon/index.vue'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 import { channelOptions, channelSummary, formatChannelOptionLabel } from '~/dataCenter/api/dataCenter'
 
 import ChannelMerchantDialog from './components/ChannelMerchantDialog.vue'
@@ -64,21 +65,24 @@ const searchItems: any[] = [
       clearable: true,
     },
   },
-  {
-    label: () => t('dataCenter.channel'),
-    prop: 'channel_id',
-    render: () => MaRemoteSelect,
-    renderProps: {
-      clearable: true,
-      filterable: true,
-      placeholder: t('dataCenter.selectedChannel'),
-      api: channelOptions,
-      dataHandle: (response: any) => (response.data || []).map((item: any) => ({
-        label: formatChannelOptionLabel(item),
-        value: item.value,
-      })),
-    },
-  },
+  // 渠道下拉走 dataCenter:options 接口：没有该按钮权限时不渲染，避免下拉请求 403
+  ...(hasAuth('dataCenter:options')
+    ? [{
+        label: () => t('dataCenter.channel'),
+        prop: 'channel_id',
+        render: () => MaRemoteSelect,
+        renderProps: {
+          clearable: true,
+          filterable: true,
+          placeholder: t('dataCenter.selectedChannel'),
+          api: channelOptions,
+          dataHandle: (response: any) => (response.data || []).map((item: any) => ({
+            label: formatChannelOptionLabel(item),
+            value: item.value,
+          })),
+        },
+      }]
+    : []),
   {
     label: () => t('dataCenter.channelCode'),
     prop: 'code',

@@ -12,6 +12,7 @@ import type { DataCenterChannelMerchantVo } from '~/dataCenter/api/dataCenter'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import { channelMerchants, merchantOptions } from '~/dataCenter/api/dataCenter'
 import { ResultCode } from '@/utils/ResultCode.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 
 /**
  * 渠道访问统计 → 展开行「跳转商户」弹窗.
@@ -92,6 +93,7 @@ watch([page, pageSize], () => {
         <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv) }}</span>
       </div>
       <MaRemoteSelect
+        v-if="hasAuth('dataCenter:options')"
         v-model="merchantId"
         :api="merchantApi"
         :data-handle="(response: any) => response.data || []"

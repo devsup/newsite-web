@@ -16,7 +16,8 @@ import { ElButton } from 'element-plus'
 import MaSvgIcon from '@/components/ma-svg-icon/index.vue'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
-import { merchantOptions, merchantPage } from '~/dataCenter/api/dataCenter'
+import hasAuth from '@/utils/permission/hasAuth.ts'
+import { merchantLogChannels, merchantOptions, merchantPage } from '~/dataCenter/api/dataCenter'
 import MerchantChannelDialog from '~/dataCenter/views/comprehensive/components/MerchantChannelDialog.vue'
 
 defineOptions({ name: 'dataCenter:merchantLog' })
@@ -57,18 +58,21 @@ const searchItems: any[] = [
       clearable: true,
     },
   },
-  {
-    label: () => t('dataCenter.merchant'),
-    prop: 'merchant_id',
-    render: () => MaRemoteSelect,
-    renderProps: {
-      clearable: true,
-      filterable: true,
-      placeholder: t('dataCenter.selectedMerchant'),
-      api: merchantOptions,
-      dataHandle: (response: any) => response.data || [],
-    },
-  },
+  // 商户下拉走 dataCenter:options 接口：没有该按钮权限时不渲染，避免下拉请求 403
+  ...(hasAuth('dataCenter:options')
+    ? [{
+        label: () => t('dataCenter.merchant'),
+        prop: 'merchant_id',
+        render: () => MaRemoteSelect,
+        renderProps: {
+          clearable: true,
+          filterable: true,
+          placeholder: t('dataCenter.selectedMerchant'),
+          api: merchantOptions,
+          dataHandle: (response: any) => response.data || [],
+        },
+      }]
+    : []),
 ]
 
 // 列与顺序按参考站点：统计日期 / 商户ID / 商户名称 / 显示名称 / 商户PV / 商户UV / 来源渠道
@@ -153,6 +157,7 @@ const schema = ref<MaProTableSchema>({
         :merchant-id="nestedMerchant.id"
         :merchant-name="nestedMerchant.name"
         :stat-date="nestedMerchant.date"
+        :api="merchantLogChannels"
       />
     </component>
   </div>

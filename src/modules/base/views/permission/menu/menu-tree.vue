@@ -84,7 +84,7 @@ onMounted(async () => {
           </el-tag>
           <el-button
             v-if="data.meta?.type === 'M'"
-            v-auth="['permission:menu:save']"
+            v-auth="['permission:menu:create']"
             size="small" circle type="primary"
             @click.stop="addMenu(data)"
           >
@@ -120,6 +120,7 @@ onMounted(async () => {
     </template>
     <template #extra>
       <el-button
+        v-auth="['permission:menu:create']"
         type="primary"
         class="w-full"
         @click="() => emit('menu-select', newMenu)"

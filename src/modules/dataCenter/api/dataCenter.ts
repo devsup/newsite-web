@@ -307,6 +307,20 @@ export function merchantChannels(params: DataCenterQuery): Promise<ResponseStruc
   return useHttp().get('/admin/data-center/comprehensive/merchant-channels', { params })
 }
 
+/**
+ * GET /admin/data-center/merchant/channels - 某商户某天的来源渠道明细（商户访问统计页入口）.
+ *
+ * 与 comprehensive/merchant-channels 返回结构一致，但鉴权用 dataCenter:merchantLog:index，
+ * 避免只授了商户统计权限的角色在「查看渠道」时被综合统计权限拦住。
+ */
+export function merchantLogChannels(params: DataCenterQuery): Promise<ResponseStruct<{
+  list: DataCenterMerchantChannelVo[]
+  total: number
+  summary: { channel_count: number, merchant_pv: number, merchant_uv: number }
+}>> {
+  return useHttp().get('/admin/data-center/merchant/channels', { params })
+}
+
 /** GET /admin/data-center/comprehensive/channel-merchants - 某渠道某天的商户明细（综合统计弹窗用） */
 export function comprehensiveChannelMerchants(params: DataCenterQuery): Promise<ResponseStruct<{
   list: DataCenterChannelMerchantVo[]

@@ -205,7 +205,7 @@ const quickEntries = computed(() => [
   { title: t('workbench.entries.dataCenter'), desc: t('workbench.entries.dataCenterDesc'), icon: 'material-symbols:bar-chart-outline', path: '/dataCenter/comprehensive', auth: 'dataCenter:comprehensive:index' },
   { title: t('workbench.entries.themes'), desc: t('workbench.entries.themesDesc'), icon: 'material-symbols:palette-outline', path: '/site/themes', auth: 'themes:index' },
   { title: t('workbench.entries.setting'), desc: t('workbench.entries.settingDesc'), icon: 'ant-design:setting-outlined', path: '/site/setting', auth: 'setting:index' },
-  { title: t('workbench.entries.attachment'), desc: t('workbench.entries.attachmentDesc'), icon: 'ri:attachment-line', path: '/dataCenter/attachment', auth: 'dataCenter:attachment:list' },
+  { title: t('workbench.entries.attachment'), desc: t('workbench.entries.attachmentDesc'), icon: 'ri:attachment-line', path: '/site/attachment', auth: 'attachment:list' },
 ].filter(entry => hasAuth(entry.auth)))
 
 function go(path: string): void {

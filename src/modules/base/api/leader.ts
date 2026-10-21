@@ -31,10 +31,6 @@ export function create(data: LeaderVo): Promise<ResponseStruct<null>> {
   return useHttp().post('/admin/leader', data)
 }
 
-export function save(id: number, data: LeaderVo): Promise<ResponseStruct<null>> {
-  return useHttp().put(`/admin/leader/${id}`, data)
-}
-
 export function deleteByDoubleKey(dept_id: number, user_ids: number[]): Promise<ResponseStruct<null>> {
   return useHttp().delete('/admin/leader', { data: { dept_id, user_ids } })
 }

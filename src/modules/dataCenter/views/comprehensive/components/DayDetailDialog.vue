@@ -9,6 +9,7 @@ import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
 import useTable from '@/hooks/useTable.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 import {
   channelOfDay,
   channelOptions,
@@ -223,8 +224,9 @@ watch(() => [props.mode, props.date], () => {
         :clearable="false"
         class="day-detail__date"
       />
+      <!-- 渠道 / 商户下拉走 dataCenter:options 接口：没有该按钮权限时不渲染，避免请求 403 -->
       <MaRemoteSelect
-        v-if="mode === 'channel'"
+        v-if="mode === 'channel' && hasAuth('dataCenter:options')"
         v-model="filters.channelId"
         :api="channelApi"
         :data-handle="(response: any) => (response.data || []).map((item: any) => ({
@@ -237,7 +239,7 @@ watch(() => [props.mode, props.date], () => {
         :placeholder="t('dataCenter.comprehensive.channelNamePlaceholder')"
       />
       <MaRemoteSelect
-        v-else
+        v-else-if="mode === 'merchant' && hasAuth('dataCenter:options')"
         v-model="filters.merchantId"
         :api="merchantApi"
         :data-handle="(response: any) => response.data || []"

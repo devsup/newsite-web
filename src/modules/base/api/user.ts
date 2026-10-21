@@ -102,8 +102,9 @@ export function resetTotp(id: number): Promise<ResponseStruct<null>> {
   return useHttp().delete(`/admin/user/${id}/totp`)
 }
 
+/** PUT /admin/user - 更新当前登录用户信息（后端 UserController::updateInfo） */
 export function updateInfo(data: UserVo): Promise<ResponseStruct<null>> {
-  return useHttp().put('/admin/user/info', data)
+  return useHttp().put('/admin/user', data)
 }
 
 export function getUserRole(id: number): Promise<ResponseStruct<any[]>> {
