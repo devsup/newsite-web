@@ -80,6 +80,7 @@ dataCenter:
     uniqueId: 唯一标识
     deducted: 是否扣量
     channelName: 渠道名称
+    channelId: 渠道ID
     sourceChannel: 来源渠道
     merchantName: 商户名称
     merchantJump: 跳转商户
@@ -132,6 +133,13 @@ dataCenter:
     merchantCount: 有点击商户
     sourceChannel: 来源渠道
     merchantJump: 跳转商户
+    channelDialogDesc: 渠道统计，展示渠道统计数据并支持查看商户跳转明细
+    merchantDialogDesc: 商户统计日志，按日期展示商户PV、UV，并支持查看来源渠道明细
+    channelNamePlaceholder: 请选择渠道名称
+    merchantNamePlaceholder: 请选择商户名称
+    merchantChannelTitle: 来源渠道明细 - {merchant} - {date}
+    viewChannels: 查看渠道
+    channelCountLabel: 渠道数量
   channelLog:
     title: 渠道访问统计
     subtitle: 按渠道展开查看所选日期范围内的每日统计数据

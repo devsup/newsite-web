@@ -77,6 +77,10 @@ export interface DataCenterChannelVo {
   download_uv: number
   install_ratio: number
   download_ratio: number
+  /** 当天该渠道的商户点击 PV/UV 与比率（来源渠道明细用） */
+  merchant_pv?: number
+  merchant_uv?: number
+  click_ratio?: string
 }
 
 /** 商户日统计行 */
@@ -285,12 +289,39 @@ export function merchantOptions(): Promise<ResponseStruct<DataCenterOption[]>> {
   return useHttp().get('/admin/data-center/merchant/options')
 }
 
+/** 商户 → 来源渠道明细 - 单行 */
+export interface DataCenterMerchantChannelVo {
+  channel_id: number
+  channel_name: string
+  channel_code: string
+  merchant_pv: number
+  merchant_uv: number
+}
+
+/** GET /admin/data-center/comprehensive/merchant-channels - 某商户某天的来源渠道明细 */
+export function merchantChannels(params: DataCenterQuery): Promise<ResponseStruct<{
+  list: DataCenterMerchantChannelVo[]
+  total: number
+  summary: { channel_count: number, merchant_pv: number, merchant_uv: number }
+}>> {
+  return useHttp().get('/admin/data-center/comprehensive/merchant-channels', { params })
+}
+
+/** GET /admin/data-center/comprehensive/channel-merchants - 某渠道某天的商户明细（综合统计弹窗用） */
+export function comprehensiveChannelMerchants(params: DataCenterQuery): Promise<ResponseStruct<{
+  list: DataCenterChannelMerchantVo[]
+  total: number
+  summary: DataCenterChannelMerchantSummary
+}>> {
+  return useHttp().get('/admin/data-center/comprehensive/channel-merchants', { params })
+}
+
 /** GET /admin/data-center/channel/day - 某天渠道明细 */
-export function channelOfDay(date: string): Promise<ResponseStruct<DataCenterChannelVo[]>> {
-  return useHttp().get('/admin/data-center/channel/day', { params: { date } })
+export function channelOfDay(date: string, params: Record<string, any> = {}): Promise<ResponseStruct<DataCenterChannelVo[]>> {
+  return useHttp().get('/admin/data-center/channel/day', { params: { ...params, date } })
 }
 
 /** GET /admin/data-center/merchant/day - 某天商户明细 */
-export function merchantOfDay(date: string): Promise<ResponseStruct<DataCenterMerchantVo[]>> {
-  return useHttp().get('/admin/data-center/merchant/day', { params: { date } })
+export function merchantOfDay(date: string, params: Record<string, any> = {}): Promise<ResponseStruct<DataCenterMerchantVo[]>> {
+  return useHttp().get('/admin/data-center/merchant/day', { params: { ...params, date } })
 }

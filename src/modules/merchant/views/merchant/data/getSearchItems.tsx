@@ -7,6 +7,23 @@ import { DICT_SYSTEM_STATUS } from '@/constants/dict.ts'
 /** 商户搜索：ID / 名称 / 展示类型 / 区域 / 类目 / 状态 / 跳转链接 / 创建时间 */
 export default function getSearchItems(t: any, options: MerchantOptions): MaSearchItem[] {
   return [
+    {
+      // 创建时间范围：时间筛选统一放第一位；
+      // valueFormat 必填，否则 el-date-picker 把 Date 交给 axios 会序列化成带时区的 ISO 串
+      label: () => t('merchantInfo.createdAt'),
+      prop: 'created_at',
+      render: 'DatePicker',
+      span: 2,
+      renderProps: {
+        type: 'datetimerange',
+        name: ['date_range_start', 'date_range_end'],
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        startPlaceholder: t('merchantInfo.startTime'),
+        endPlaceholder: t('merchantInfo.endTime'),
+        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)],
+        clearable: true,
+      },
+    },
     { label: () => t('ID'), prop: 'id', render: 'input' },
     { label: () => t('merchantInfo.name'), prop: 'name', render: 'input' },
     {
@@ -50,22 +67,5 @@ export default function getSearchItems(t: any, options: MerchantOptions): MaSear
       },
     },
     { label: () => t('merchantInfo.jumpUrl'), prop: 'jump_url', render: 'input' },
-    {
-      // 创建时间范围：折叠状态下只看得到前几项，时间筛选放到「展开」里即可；
-      // valueFormat 必填，否则 el-date-picker 把 Date 交给 axios 会序列化成带时区的 ISO 串
-      label: () => t('merchantInfo.createdAt'),
-      prop: 'created_at',
-      render: 'DatePicker',
-      span: 2,
-      renderProps: {
-        type: 'datetimerange',
-        name: ['date_range_start', 'date_range_end'],
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        startPlaceholder: t('merchantInfo.startTime'),
-        endPlaceholder: t('merchantInfo.endTime'),
-        defaultTime: [new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)],
-        clearable: true,
-      },
-    },
   ]
 }

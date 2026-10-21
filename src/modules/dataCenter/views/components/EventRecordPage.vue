@@ -14,6 +14,7 @@ import type { DataCenterEventVo, DataCenterRepeatVo } from '~/dataCenter/api/dat
 
 import { ElButton, ElMessageBox, ElTag, ElTooltip } from 'element-plus'
 import MaBatchActions from '@/components/ma-batch-actions/index.vue'
+import MaSvgIcon from '@/components/ma-svg-icon/index.vue'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
@@ -282,21 +283,27 @@ const REPEAT_COLUMNS: any[] = [
   },
   {
     label: () => t('crud.operation'),
-    width: '180px',
+    width: '230px',
     cellRender: ({ row }: { row: DataCenterRepeatVo }) => (
       <div class="flex-center gap-2">
         {canAddBlacklist.value && (
           <ElButton
-            link
-            type="primary"
+            size="small"
+            class="dc-row-action dc-row-action--merchant"
             disabled={Number(row.blacklist_status || 0) > 0}
             onClick={() => addToBlacklist([row.ip])}
           >
+            <MaSvgIcon name="material-symbols:block" size={15} class="mr-1" />
             {t('dataCenter.repeat.addBlacklist')}
           </ElButton>
         )}
         {canDeleteRepeat.value && (
-          <ElButton link type="danger" onClick={() => removeIps([row.ip])}>
+          <ElButton
+            size="small"
+            class="dc-row-action dc-row-action--danger"
+            onClick={() => removeIps([row.ip])}
+          >
+            <MaSvgIcon name="material-symbols:delete-outline" size={15} class="mr-1" />
             {t('dataCenter.repeat.deleteIp')}
           </ElButton>
         )}
@@ -702,6 +709,42 @@ const schema = ref<MaProTableSchema>({
 </template>
 
 <style scoped lang="scss">
+/* 行内操作：浅色底 + 彩色文字的小按钮，与其它页面统一 */
+:global(.dc-row-action.el-button) {
+  gap: 2px;
+  padding: 4px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+:global(.dc-row-action--merchant.el-button) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-9);
+}
+
+:global(.dc-row-action--merchant.el-button:hover) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-8);
+}
+
+:global(.dc-row-action--danger.el-button) {
+  color: var(--el-color-danger);
+  background: var(--el-color-danger-light-9);
+}
+
+:global(.dc-row-action--danger.el-button:hover) {
+  color: var(--el-color-danger);
+  background: var(--el-color-danger-light-8);
+}
+
+/* 已加入黑名单等禁用态：底色与文字一起变灰 */
+:global(.dc-row-action.el-button.is-disabled) {
+  color: var(--el-text-color-disabled);
+  background: var(--el-fill-color-light);
+}
 .repeat-panel {
   display: flex;
   flex-direction: column;

@@ -144,6 +144,8 @@ async function addDomains(): Promise<void> {
 
 useTable('domainTable').then((table: MaTableExpose) => {
   tableInstance = table
+  // border=true 才能拖动表头调整列宽
+  table.setOptions({ stripe: true, border: true, adaption: false })
   table.setColumns([
     { label: () => t('baota.siteId'), prop: 'pid', width: '90px' },
     { label: () => t('baota.domain'), prop: 'name', minWidth: '220px' },

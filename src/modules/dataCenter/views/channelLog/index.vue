@@ -14,6 +14,7 @@ import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import type { DataCenterChannelSummaryDayVo, DataCenterChannelSummaryVo } from '~/dataCenter/api/dataCenter'
 
 import { ElButton, ElTable, ElTableColumn } from 'element-plus'
+import MaSvgIcon from '@/components/ma-svg-icon/index.vue'
 import MaRemoteSelect from '@/components/ma-remote-select/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
 import { channelOptions, channelSummary, formatChannelOptionLabel } from '~/dataCenter/api/dataCenter'
@@ -100,17 +101,22 @@ function renderDayTable(channel: DataCenterChannelSummaryVo): VNode {
         <ElTableColumn prop="navi_uv" min-width="100" label={t('dataCenter.channelLog.naviUv')} />
         <ElTableColumn prop="download_pv" min-width="100" label={t('dataCenter.channelLog.downloadPv')} />
         <ElTableColumn prop="download_uv" min-width="100" label={t('dataCenter.channelLog.downloadUv')} />
-        <ElTableColumn prop="install_num" min-width="100" label={t('dataCenter.channelLog.installNum')} />
-        <ElTableColumn prop="install_deducted" min-width="110" label={t('dataCenter.channelLog.installDeducted')} />
-        <ElTableColumn prop="click_ratio" min-width="100" label={t('dataCenter.channelLog.clickRatio')} />
-        <ElTableColumn prop="install_ratio" min-width="110" label={t('dataCenter.channelLog.installRatio')} />
+        <ElTableColumn prop="install_num" min-width="120" label={t('dataCenter.channelLog.installNum')} />
+        <ElTableColumn prop="install_deducted" min-width="120" label={t('dataCenter.channelLog.installDeducted')} />
+        <ElTableColumn prop="click_ratio" min-width="135" label={t('dataCenter.channelLog.clickRatio')} />
+        <ElTableColumn prop="install_ratio" min-width="135" label={t('dataCenter.channelLog.installRatio')} />
         <ElTableColumn
           label={t('crud.operation')}
-          width="110"
+          width="140"
           fixed="right"
           v-slots={{
             default: ({ row: day }: { row: DataCenterChannelSummaryDayVo }) => (
-              <ElButton link type="primary" onClick={() => openMerchants(channel, day)}>
+              <ElButton
+                size="small"
+                class="dc-row-action dc-row-action--merchant"
+                onClick={() => openMerchants(channel, day)}
+              >
+                <MaSvgIcon name="material-symbols:storefront-outline" size={15} class="mr-1" />
                 {t('dataCenter.channelLog.jumpMerchant')}
               </ElButton>
             ),
@@ -138,20 +144,20 @@ const tableColumns: any[] = [
   { label: () => t('dataCenter.channelLog.landUv'), prop: 'land_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.naviPv'), prop: 'navi_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.naviUv'), prop: 'navi_uv', minWidth: '100px' },
-  { label: () => t('dataCenter.channelLog.installNum'), prop: 'install_num', minWidth: '100px' },
-  { label: () => t('dataCenter.channelLog.installDeducted'), prop: 'install_deducted', minWidth: '110px' },
+  { label: () => t('dataCenter.channelLog.installNum'), prop: 'install_num', minWidth: '120px' },
+  { label: () => t('dataCenter.channelLog.installDeducted'), prop: 'install_deducted', minWidth: '120px' },
   { label: () => t('dataCenter.channelLog.downloadPv'), prop: 'download_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.downloadUv'), prop: 'download_uv', minWidth: '100px' },
   {
     label: () => t('dataCenter.channelLog.clickRatio'),
     prop: 'click_ratio',
-    minWidth: '100px',
+    minWidth: '135px',
     cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.click_ratio || '0.00%',
   },
   {
     label: () => t('dataCenter.channelLog.installRatio'),
     prop: 'install_ratio',
-    minWidth: '110px',
+    minWidth: '135px',
     cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.install_ratio || '0.00%',
   },
 ]
@@ -221,3 +227,24 @@ const schema = ref<MaProTableSchema>({
     </component>
   </div>
 </template>
+
+<style scoped lang="scss">
+:global(.dc-row-action.el-button) {
+  gap: 2px;
+  padding: 4px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 6px;
+}
+
+:global(.dc-row-action--merchant.el-button) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-9);
+}
+
+:global(.dc-row-action--merchant.el-button:hover) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-8);
+}
+</style>

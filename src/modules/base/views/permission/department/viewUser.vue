@@ -58,6 +58,8 @@ useTable('tableRef')
   .then((table: MaTableExpose) => {
     tableRef.value = table
     table.setOptions({
+      stripe: true,
+      border: true,
       adaption: false,
       height: 400,
       rowKey: 'id',

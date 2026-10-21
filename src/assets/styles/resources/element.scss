@@ -72,3 +72,10 @@
 .el-button.is-link.el-button--danger {
   --el-button-hover-link-text-color: var(--el-color-danger);
 }
+
+/* 表格：表头与单元格一律单行展示，宽度不够时省略（悬浮可看全），
+   避免「App安装量」这类表头被挤成两行 */
+.el-table th .cell,
+.el-table td .cell {
+  white-space: nowrap;
+}

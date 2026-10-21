@@ -17,6 +17,7 @@ import { overview } from '~/dataCenter/api/dataCenter'
 import useDialog from '@/hooks/useDialog.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 
+import MaSvgIcon from '@/components/ma-svg-icon/index.vue'
 import DayDetailDialog from './components/DayDetailDialog.vue'
 
 defineOptions({ name: 'dataCenter:comprehensive' })
@@ -25,7 +26,7 @@ const t = useTrans().globalTrans
 const today = useDayjs().format('YYYY-MM-DD')
 const defaultRange = [useDayjs().subtract(9, 'day').format('YYYY-MM-DD'), today]
 
-const detailDialog: UseDialogExpose = useDialog({ width: '1080px', footer: false })
+const detailDialog: UseDialogExpose = useDialog({ width: '1320px', footer: false })
 
 const summary = ref<DataCenterSummary>({
   channel_pv: 0,
@@ -92,10 +93,11 @@ const overviewCards = computed<Array<{ title: string, items: OverviewItem[] }>>(
   {
     title: t('dataCenter.comprehensive.groupMerchant'),
     items: [
+      // 两个 UV 放同一排：商户PV / 跳转PV 在第一排，商户UV(商) / 商户UV(渠) 在第二排
       { label: t('dataCenter.comprehensive.merchantPv'), value: summary.value.merchant_pv, unit: 'PV' },
+      { label: t('dataCenter.comprehensive.jumpPv'), value: summary.value.jump_pv ?? 0, unit: 'PV' },
       { label: t('dataCenter.comprehensive.merchantUv'), value: summary.value.merchant_uv, unit: 'UV' },
       { label: t('dataCenter.comprehensive.merchantUvChannel'), value: summary.value.merchant_channel_uv ?? 0, unit: 'UV' },
-      { label: t('dataCenter.comprehensive.jumpPv'), value: summary.value.jump_pv ?? 0, unit: 'PV' },
     ],
   },
   {
@@ -154,8 +156,8 @@ const tableColumns: any[] = [
   { label: () => t('dataCenter.comprehensive.naviPv'), prop: 'navi_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.naviUv'), prop: 'navi_uv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.jumpPv'), prop: 'jump_pv', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.installNum'), prop: 'install_num', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.installDeducted'), prop: 'install_deducted', minWidth: '110px' },
+  { label: () => t('dataCenter.comprehensive.installNum'), prop: 'install_num', minWidth: '120px' },
+  { label: () => t('dataCenter.comprehensive.installDeducted'), prop: 'install_deducted', minWidth: '120px' },
   { label: () => t('dataCenter.comprehensive.downloadPv'), prop: 'download_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.downloadUv'), prop: 'download_uv', minWidth: '100px' },
   {
@@ -171,11 +173,16 @@ const tableColumns: any[] = [
     cellRender: ({ row }: { row: DataCenterDailyVo }) => percent(Number(row.merchant_click_ratio || 0)),
   },
   {
-    // 参考站点把两个明细入口直接做成两列文字链接，不再单独放「操作」列
+    // 两个明细入口：带底色的文字按钮，比纯图标更醒目易懂
     label: () => t('dataCenter.columns.sourceChannel'),
     width: '120px',
     cellRender: ({ row }: { row: DataCenterDailyVo }) => (
-      <ElButton link type="primary" onClick={() => openChannelDetail(row)}>
+      <ElButton
+        size="small"
+        class="dc-row-action dc-row-action--channel"
+        onClick={() => openChannelDetail(row)}
+      >
+        <MaSvgIcon name="material-symbols:analytics-outline" size={15} class="mr-1" />
         {t('dataCenter.columns.sourceChannel')}
       </ElButton>
     ),
@@ -184,7 +191,12 @@ const tableColumns: any[] = [
     label: () => t('dataCenter.columns.merchantJump'),
     width: '120px',
     cellRender: ({ row }: { row: DataCenterDailyVo }) => (
-      <ElButton link type="primary" onClick={() => openMerchantDetail(row)}>
+      <ElButton
+        size="small"
+        class="dc-row-action dc-row-action--merchant"
+        onClick={() => openMerchantDetail(row)}
+      >
+        <MaSvgIcon name="material-symbols:storefront-outline" size={15} class="mr-1" />
         {t('dataCenter.columns.merchantJump')}
       </ElButton>
     ),
@@ -280,18 +292,51 @@ const schema = ref<MaProTableSchema>({
 </template>
 
 <style scoped lang="scss">
+/* 两个明细入口：浅色底 + 彩色文字的小按钮 */
+:global(.dc-row-action.el-button) {
+  gap: 2px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 0;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+:global(.dc-row-action--channel.el-button) {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+}
+
+:global(.dc-row-action--channel.el-button:hover) {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-8);
+}
+
+:global(.dc-row-action--merchant.el-button) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-9);
+}
+
+:global(.dc-row-action--merchant.el-button:hover) {
+  color: var(--el-color-warning);
+  background: var(--el-color-warning-light-8);
+}
 .data-center-overview {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  /* 最小宽度按「5 位数 + 单位」留足，窗口变窄时自动换行而不是把卡片挤扁 */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin: 0 12px 12px;
 }
 
 .data-center-overview__card {
+  min-width: 0;
+  overflow: hidden;
   border-radius: 8px;
 
   :deep(.el-card__body) {
     padding: 12px 14px;
+    min-width: 0;
   }
 }
 
@@ -305,24 +350,35 @@ const schema = ref<MaProTableSchema>({
 }
 
 .data-center-overview__metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
+  display: grid;
+  /* 固定两列 + minmax(0,1fr)：数字再长也只占自己的格子，不会把旁边的指标挤变形 */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
   margin-top: 10px;
 }
 
+.data-center-overview__metric {
+  min-width: 0;
+}
+
 .data-center-overview__label {
+  overflow: hidden;
   font-size: 12px;
   color: var(--el-text-color-secondary);
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .data-center-overview__value {
   margin-top: 2px;
-  font-size: 20px;
+  overflow: hidden;
+  font-size: clamp(17px, 1.4vw, 20px);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   line-height: 1.2;
   color: var(--el-text-color-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .data-center-overview__unit {
@@ -330,5 +386,15 @@ const schema = ref<MaProTableSchema>({
   font-size: 11px;
   font-weight: 400;
   color: var(--el-text-color-placeholder);
+}
+@media (max-width: 768px) {
+  .data-center-overview {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .data-center-overview__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
 }
 </style>

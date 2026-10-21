@@ -24,7 +24,6 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: MenuVo[]): void
 }>()
 const t = useTrans().globalTrans
-const data = ref<any[]>([])
 const buttonFormTable = ref()
 
 function addItem() {
@@ -38,6 +37,8 @@ function deleteItem(index: number) {
 }
 
 useTable('buttonFormTable').then((table: MaTableExpose) => {
+  // border=true 才能拖动表头调整列宽
+  table.setOptions({ stripe: true, border: true, adaption: false })
   table.setColumns([
     {
       label: '#',

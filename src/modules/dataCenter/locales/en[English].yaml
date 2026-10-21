@@ -80,6 +80,7 @@ dataCenter:
     uniqueId: Unique ID
     deducted: Deducted
     channelName: Channel name
+    channelId: Channel ID
     sourceChannel: Source channel
     merchantName: Merchant name
     merchantJump: Jump merchant
@@ -132,6 +133,13 @@ dataCenter:
     merchantCount: Merchants clicked
     sourceChannel: Source channel
     merchantJump: Jump merchant
+    channelDialogDesc: 'Channel stats: view channel statistics and merchant jump details'
+    merchantDialogDesc: 'Merchant stats: daily merchant PV/UV with source channel details'
+    channelNamePlaceholder: Select a channel
+    merchantNamePlaceholder: Select a merchant
+    merchantChannelTitle: Source channels - {merchant} - {date}
+    viewChannels: View channels
+    channelCountLabel: Channels
   channelLog:
     title: Channel Visit Stats
     subtitle: Expand a channel to see daily statistics for the selected date range
