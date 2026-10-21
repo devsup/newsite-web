@@ -19,7 +19,6 @@ import Logs from './logs.vue'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import type { UseDrawerExpose } from '@/hooks/useDrawer.ts'
 import useDrawer from '@/hooks/useDrawer.ts'
-import ToolsPageBar from '$/mineadmin/hyperf-crontab/views/components/toolsPageBar.vue'
 import getSearchItems from '$/mineadmin/hyperf-crontab/views/components/getSearchItems.tsx'
 
 defineOptions({ name: 'plugin:mine-admin:crontab' })
@@ -134,19 +133,6 @@ const maDialog: UseDialogExpose = useDialog({
   },
 })
 
-// 定义按钮配置数组
-const buttons = [
-  {
-    text: t('mineCrontab.menu.save'),
-    type: 'primary' as const, // 按钮类型
-    show: true, // 是否显示
-    action: () => {
-      maDialog.setTitle(t('mineCrontab.menu.save'))
-      maDialog.open({ formType: 'add' })
-    },
-  },
-]
-
 function handlePageChange(page: number) {
   pagination.value.page = page
   getCrontabList()
@@ -165,8 +151,29 @@ onMounted(() => {
 
 <template>
   <div class="mine-layout">
-    <!-- 标题 -->
-    <ToolsPageBar :title="t('mineCrontab.menu.index')" :show-buttons="true" :buttons="buttons" />
+    <div class="mine-card">
+      <!-- 表头：与 MaProTable 的 header 保持一致（主标题 16px + 副标题 14px 同一行，右侧按钮） -->
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0 flex items-baseline gap-4">
+          <span class="shrink-0 text-base font-500">{{ t('mineCrontab.menu.index') }}</span>
+          <span class="truncate text-sm text-[var(--el-text-color-regular)]">
+            {{ t('mineCrontab.menu.description') }}
+          </span>
+        </div>
+        <el-button
+          v-auth="['plugin:mine-admin:crontab:create']"
+          type="primary"
+          class="shrink-0"
+          @click="() => {
+            maDialog.setTitle(t('mineCrontab.menu.save'))
+            maDialog.open({ formType: 'add' })
+          }"
+        >
+          {{ t('mineCrontab.menu.save') }}
+        </el-button>
+      </div>
+    </div>
+
     <!-- 搜索框 -->
     <div class="mine-card">
       <ma-search
@@ -175,154 +182,175 @@ onMounted(() => {
         @reset="getCrontabList"
       />
     </div>
-    <!-- 表格 -->
-    <div>
-      <!-- 判断data.list数组 -->
-      <div v-if="data.list.length === 0" class="mine-card">
-        <el-empty>
-          <el-button
-            v-auth="['plugin:mine-admin:crontab:create']" type="primary" @click="() => {
-              maDialog.setTitle(t('mineCrontab.menu.save'))
-              maDialog.open({ formType: 'add' })
-            }"
+
+    <!-- 空态 -->
+    <div v-if="data.list.length === 0" class="mine-card">
+      <el-empty>
+        <el-button
+          v-auth="['plugin:mine-admin:crontab:create']" type="primary" @click="() => {
+            maDialog.setTitle(t('mineCrontab.menu.save'))
+            maDialog.open({ formType: 'add' })
+          }"
+        >
+          {{ t('mineCrontab.menu.save') }}
+        </el-button>
+      </el-empty>
+    </div>
+
+    <!-- 卡片列表 -->
+    <div v-else v-loading="loading" class="mine-card">
+      <div class="grid grid-cols-1 w-full gap-3 2xl:grid-cols-3 sm:grid-cols-2">
+        <template v-for="item in data.list">
+          <div
+            class="crontab_box"
           >
-            {{ t('mineCrontab.menu.save') }}
-          </el-button>
-        </el-empty>
-      </div>
-      <div v-else v-loading="loading" class="p-3">
-        <div class="grid grid-cols-1 w-full gap-[10px] lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2">
-          <template v-for="item in data.list">
-            <div
-              class="crontab_box relative max-h-[240px] min-h-[220px] rounded-md bg-[position:100%_0px] bg-no-repeat p-4"
-            >
-              <div class="relative z-2">
-                <div class="flex justify-between">
-                  <span>{{ item.id }} - {{ item.name }}</span>
-                  <el-text :type="item.status ? 'primary' : 'danger'">
-                    <ma-svg-icon size="1.5em" name="i-ph:dot-outline-fill" />
-                    <span>{{ item.status ? t('mineCrontab.status.running') : t('mineCrontab.status.stopped')
-                    }}</span>
-                  </el-text>
-                </div>
-                <div class="text-sm">
-                  <div class="flex items-center">
-                    <ElText :type="dictStore.t('crontab-type', item.type, 'color')">
-                      {{ t(dictStore.t('crontab-type', item.type, 'i18n')) }}
-                    </ElText>
-                    <el-divider direction="vertical" />
-                    <div class="memo">
-                      {{ item.memo ?? '-' }}
-                    </div>
-                  </div>
-                  <div class="mt-5 flex flex-col text-gray-400 dark-text-gray-3">
-                    <div class="w-full flex justify-between">
-                      <div>{{ t('mineCrontab.cols.rule') }}：</div>
-                      <el-text truncated>
-                        {{ item.rule }}
-                      </el-text>
-                    </div>
-                    <div class="w-full flex justify-between">
-                      <div class="inline-block w-400px">
-                        {{ t('mineCrontab.cols.value') }}：
-                      </div>
-                      <el-text truncated>
-                        {{ item.value }}
-                      </el-text>
-                    </div>
-                    <div class="w-full flex justify-between">
-                      {{ t('mineCrontab.cols.singleton') }}：
-                      <ma-svg-icon
-                        :name="item.is_singleton ? 'heroicons:check-16-solid' : 'heroicons:x-mark-16-solid'"
-                        class="relative top-[4px]" :size="18"
-                      />
-                    </div>
-                    <div class="w-full flex justify-between">
-                      {{ t('mineCrontab.cols.onOneServer') }}：
-                      <ma-svg-icon
-                        :name="item.is_on_one_server ? 'heroicons:check-16-solid' : 'heroicons:x-mark-16-solid'"
-                        class="relative top-[4px]" :size="18"
-                      />
-                    </div>
-                  </div>
-                </div>
+            <div class="relative z-2 flex flex-1 flex-col">
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="inline-flex items-center gap-1.5 text-[13px] font-medium"
+                  :class="item.status ? 'text-green-6 dark-text-green-4' : 'text-red-5 dark-text-red-4'"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full" :class="item.status ? 'bg-green-5' : 'bg-red-5'" />
+                  {{ item.status ? t('mineCrontab.status.running') : t('mineCrontab.status.stopped') }}
+                </span>
+                <span class="shrink-0 text-[13px] text-gray-4 dark-text-gray-5">
+                  {{ t(dictStore.t('crontab-type', item.type, 'i18n')) }}
+                </span>
               </div>
 
-              <div class="mt-[10px] w-full flex justify-between">
-                <div>
-                  <el-button v-auth="['plugin:mine-admin:crontab:save']" circle>
-                    <ma-svg-icon
-                      :name="item.status ? 'material-symbols:pause-rounded' : 'material-symbols:play-arrow-rounded'"
-                      :size="20" @click="enableOrDisable(item)"
-                    />
-                  </el-button>
+              <div class="mt-3 break-words text-[15px] font-600 leading-6">
+                {{ item.id }} - {{ item.name }}
+              </div>
+              <div class="mt-2 break-words text-[13px] text-gray-4 leading-5 dark-text-gray-5">
+                {{ item.memo ?? '-' }}
+              </div>
+
+              <div class="mt-4 flex flex-col gap-2 text-[13px]">
+                <div class="w-full flex items-start justify-between gap-3">
+                  <span class="shrink-0 text-gray-4 dark-text-gray-5">{{ t('mineCrontab.cols.rule') }}</span>
+                  <span class="min-w-0 break-all text-right text-gray-7 dark-text-gray-2">
+                    {{ item.rule }}
+                  </span>
                 </div>
-                <el-dropdown>
-                  <el-button text>
-                    <ma-svg-icon name="i-si:more-square-horiz-fill" />
-                  </el-button>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item
-                        v-if="hasAuth('plugin:mine-admin:crontab:execute')" key="executeOnce"
-                        @click="executeTask(item.id)"
-                      >
-                        {{ t('mineCrontab.op.executeOnce') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        key="runLogs" divided @click="() => {
-                          maDrawer.setTitle(`${item.name} - ${t('mineCrontab.op.runLogs')}`)
-                          maDrawer.open({ formType: null, data: item })
-                        }"
-                      >
-                        {{ t('mineCrontab.op.runLogs') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        v-if="hasAuth('plugin:mine-admin:crontab:save')" key="edit" @click="() => {
-                          maDialog.setTitle((`${t('mineCrontab.op.edit')} - ${item.name}`))
-                          maDialog.open({ formType: 'edit', crontabData: item })
-                        }"
-                      >
-                        {{ t('mineCrontab.op.edit') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        v-if="hasAuth('plugin:mine-admin:crontab:delete')" key="delete"
-                        @click="handleDelete(item.id)"
-                      >
-                        {{ t('mineCrontab.op.delete') }}
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
+                <div class="w-full flex items-start justify-between gap-3">
+                  <span class="shrink-0 text-gray-4 dark-text-gray-5">{{ t('mineCrontab.cols.value') }}</span>
+                  <span class="min-w-0 break-all text-right text-gray-7 dark-text-gray-2">
+                    {{ item.value }}
+                  </span>
+                </div>
+                <div class="mt-1 flex gap-3 text-gray-4 dark-text-gray-5">
+                  <span class="inline-flex items-center gap-1">
+                    <ma-svg-icon
+                      :name="item.is_singleton ? 'heroicons:check-16-solid' : 'heroicons:x-mark-16-solid'"
+                      :size="14"
+                    />
+                    {{ t('mineCrontab.cols.singleton') }}
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <ma-svg-icon
+                      :name="item.is_on_one_server ? 'heroicons:check-16-solid' : 'heroicons:x-mark-16-solid'"
+                      :size="14"
+                    />
+                    {{ t('mineCrontab.cols.onOneServer') }}
+                  </span>
+                </div>
               </div>
             </div>
-          </template>
-        </div>
-        <div class="mt-10 flex justify-end">
-          <el-pagination
-            background layout="total, sizes, prev, pager, next, jumper" :total="data.total"
-            @current-change="handlePageChange" @size-change="handleSizeChange"
-          />
-        </div>
-      </div>
 
-      <component :is="maDialog.Dialog">
-        <template #default="{ formType, crontabData }">
-          <!-- 新增、编辑任务表单 -->
-          <CrontabFrom v-if="formType" ref="formRef" :form-type="formType" :crontab-data="crontabData" />
+            <div class="mt-auto w-full flex items-center justify-between pt-4">
+              <div>
+                <el-button v-auth="['plugin:mine-admin:crontab:save']" circle size="small">
+                  <ma-svg-icon
+                    :name="item.status ? 'material-symbols:pause-rounded' : 'material-symbols:play-arrow-rounded'"
+                    :size="18" @click="enableOrDisable(item)"
+                  />
+                </el-button>
+              </div>
+              <el-dropdown>
+                <el-button text size="small">
+                  <ma-svg-icon name="i-si:more-square-horiz-fill" />
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-if="hasAuth('plugin:mine-admin:crontab:execute')" key="executeOnce"
+                      @click="executeTask(item.id)"
+                    >
+                      {{ t('mineCrontab.op.executeOnce') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      key="runLogs" divided @click="() => {
+                        maDrawer.setTitle(`${item.name} - ${t('mineCrontab.op.runLogs')}`)
+                        maDrawer.open({ formType: null, data: item })
+                      }"
+                    >
+                      {{ t('mineCrontab.op.runLogs') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      v-if="hasAuth('plugin:mine-admin:crontab:save')" key="edit" @click="() => {
+                        maDialog.setTitle((`${t('mineCrontab.op.edit')} - ${item.name}`))
+                        maDialog.open({ formType: 'edit', crontabData: item })
+                      }"
+                    >
+                      {{ t('mineCrontab.op.edit') }}
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      v-if="hasAuth('plugin:mine-admin:crontab:delete')" key="delete"
+                      @click="handleDelete(item.id)"
+                    >
+                      {{ t('mineCrontab.op.delete') }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </div>
         </template>
-      </component>
-      <component :is="maDrawer.Drawer">
-        <template #default="{ data }">
-          <!-- 运行日志 -->
-          <Logs :crontab-id="data.id" />
-        </template>
-      </component>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <el-pagination
+          background layout="total, sizes, prev, pager, next, jumper" :total="data.total"
+          @current-change="handlePageChange" @size-change="handleSizeChange"
+        />
+      </div>
     </div>
+
+    <component :is="maDialog.Dialog">
+      <template #default="{ formType, crontabData }">
+        <!-- 新增、编辑任务表单 -->
+        <CrontabFrom v-if="formType" ref="formRef" :form-type="formType" :crontab-data="crontabData" />
+      </template>
+    </component>
+    <component :is="maDrawer.Drawer">
+      <template #default="{ data }">
+        <!-- 运行日志 -->
+        <Logs :crontab-id="data.id" />
+      </template>
+    </component>
   </div>
 </template>
 
 <style scoped lang="scss">
+/* 搜索区未选择时占位文字默认偏浅（#a8abb2），提到次级文字色，白底上更清晰 */
+:deep(.el-select__placeholder.is-transparent),
+:deep(.el-input__inner::placeholder) {
+  color: var(--el-text-color-secondary);
+}
+
+.crontab_box {
+  @apply relative min-h-[220px] flex flex-col rounded-xl p-5 transition-all duration-200;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  box-shadow: var(--el-box-shadow-light);
+
+  /* 悬停时换主色描边并加深投影，静止态保持白底轻阴影，避免灰底发闷 */
+  &:hover {
+    border-color: var(--el-color-primary-light-3);
+    box-shadow: var(--el-box-shadow);
+    transform: translateY(-1px);
+  }
+}
+
 .run-state {
   @apply -top-25 text-green-8 -right-25 !absolute opacity-[0.1];
 }
@@ -337,16 +365,5 @@ onMounted(() => {
 
 .add-crontab {
   @apply flex justify-center items-center b-1 b-solid b-gray-3 hover:b-[rgb(var(--ui-primary))] rounded transition-all duration-200 ease-in-out cursor-pointer dark-b-dark-1 dark-hover:b-[rgb(var(--ui-primary))] text-gray-5 hover:text-[rgb(var(--ui-primary))];
-}
-
-.crontab_box {
-  background-color: white;
-  background-image: url("$/mineadmin/hyperf-crontab/assets/bg.png");
-  background-repeat: no-repeat;
-}
-
-.dark .crontab_box {
-  --un-bg-opacity: 1;
-  background-color: rgb(24 24 24 / var(--un-bg-opacity));
 }
 </style>

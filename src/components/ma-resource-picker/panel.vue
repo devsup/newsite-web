@@ -33,6 +33,7 @@ en:
   imageUpload: Upload image
   fileUpload: Upload file
   videoPreview: Preview video
+  refresh: Refresh
 zh_CN:
   searchPlaceholder: 搜索此分类下的资源
   tips: 你确定要删除这条数据吗？
@@ -58,6 +59,7 @@ zh_CN:
   imageUpload: 上传图片
   fileUpload: 上传文件
   videoPreview: 预览视频
+  refresh: 刷新
 
 zh_TW:
   searchPlaceholder: 搜索此分類下的資源
@@ -84,6 +86,7 @@ zh_TW:
   imageUpload: 上載圖片
   fileUpload: 上載文件
   videoPreview: 預覽視頻
+  refresh: 重新整理
 </i18n>
 
 <script setup lang="ts">
@@ -588,7 +591,7 @@ onMounted(async () => {
           </div>
         </div>
         <el-input
-          v-model="queryParams.origin_name" :placeholder="t('searchPlaceholder')" clearable class="w-full md:w-[180px]" @input="() => {
+          v-model="queryParams.origin_name" :placeholder="t('searchPlaceholder')" clearable class="w-full md:w-[260px]" @input="() => {
             getResourceList(queryParams)
           }"
         >
@@ -596,6 +599,12 @@ onMounted(async () => {
             <ma-svg-icon name="i-material-symbols:search-rounded" :size="20" />
           </template>
         </el-input>
+        <!-- 手动刷新：上传、删除已自动刷新，这里用于同步其它窗口/其它账号的改动 -->
+        <el-tooltip :content="t('refresh')" placement="top">
+          <el-button circle :loading="loading" @click="getResourceList(queryParams)">
+            <ma-svg-icon v-if="!loading" name="material-symbols:refresh-rounded" :size="18" />
+          </el-button>
+        </el-tooltip>
       </div>
     </div>
     <div class="mt-2 min-h-0 flex-1">

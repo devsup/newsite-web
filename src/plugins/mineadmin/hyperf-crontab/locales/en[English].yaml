@@ -15,6 +15,7 @@ mineCrontab:
   menu:
     crontabManage: Crontab task management
     index: Crontab task list
+    description: 'Manage scheduled tasks: check status, run once, edit tasks and view run logs'
     save: Add crontab task
     update: Edit crontab task
     delete: Delete crontab task
