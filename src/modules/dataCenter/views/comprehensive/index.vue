@@ -23,8 +23,10 @@ import DayDetailDialog from './components/DayDetailDialog.vue'
 defineOptions({ name: 'dataCenter:comprehensive' })
 
 const t = useTrans().globalTrans
-const today = useDayjs().format('YYYY-MM-DD')
-const defaultRange = [useDayjs().subtract(9, 'day').format('YYYY-MM-DD'), today]
+// 概览卡片固定展示今天：summary 由列表接口一并返回（后端固定按今天统计），
+// summary_date 用于展示卡片的统计日期，跨天时以接口返回为准
+const today = ref(useDayjs().format('YYYY-MM-DD'))
+const defaultRange = [useDayjs().subtract(9, 'day').format('YYYY-MM-DD'), today.value]
 
 const detailDialog: UseDialogExpose = useDialog({ width: '1320px', footer: false })
 
@@ -40,8 +42,8 @@ const summary = ref<DataCenterSummary>({
   download_pv: 0,
   download_uv: 0,
   merchant_pv: 0,
-  merchant_uv: 0,
-  merchant_channel_uv: 0,
+  merchant_uv_by_merchant: 0,
+  merchant_uv_by_channel: 0,
   jump_pv: 0,
   install_ratio: 0,
   download_ratio: 0,
@@ -69,18 +71,22 @@ interface OverviewItem { label: string, value: string | number, unit?: string }
 
 const overviewCards = computed<Array<{ title: string, items: OverviewItem[] }>>(() => [
   {
+    // 商户点击是核心转化指标，按数据重要性放第一张
+    title: t('dataCenter.comprehensive.groupMerchant'),
+    items: [
+      // 两个 UV 放同一排：商户PV / 跳转PV 在第一排，商户UV(商) / 商户UV(渠) 在第二排
+      { label: t('dataCenter.comprehensive.merchantPv'), value: summary.value.merchant_pv, unit: 'PV' },
+      { label: t('dataCenter.comprehensive.jumpPv'), value: summary.value.jump_pv ?? 0, unit: 'PV' },
+      { label: t('dataCenter.comprehensive.merchantUv'), value: summary.value.merchant_uv_by_merchant, unit: 'UV' },
+      { label: t('dataCenter.comprehensive.merchantUvChannel'), value: summary.value.merchant_uv_by_channel ?? 0, unit: 'UV' },
+    ],
+  },
+  {
     title: t('dataCenter.comprehensive.groupChannel'),
     items: [
       { label: t('dataCenter.comprehensive.channelPv'), value: summary.value.channel_pv, unit: 'PV' },
       { label: t('dataCenter.comprehensive.channelUv'), value: summary.value.channel_uv, unit: 'UV' },
       { label: t('dataCenter.comprehensive.merchantClickRatio'), value: percent(summary.value.merchant_click_ratio) },
-    ],
-  },
-  {
-    title: t('dataCenter.comprehensive.groupLanding'),
-    items: [
-      { label: t('dataCenter.comprehensive.landPv'), value: summary.value.land_pv, unit: 'PV' },
-      { label: t('dataCenter.comprehensive.landUv'), value: summary.value.land_uv, unit: 'UV' },
     ],
   },
   {
@@ -91,21 +97,10 @@ const overviewCards = computed<Array<{ title: string, items: OverviewItem[] }>>(
     ],
   },
   {
-    title: t('dataCenter.comprehensive.groupMerchant'),
+    title: t('dataCenter.comprehensive.groupLanding'),
     items: [
-      // 两个 UV 放同一排：商户PV / 跳转PV 在第一排，商户UV(商) / 商户UV(渠) 在第二排
-      { label: t('dataCenter.comprehensive.merchantPv'), value: summary.value.merchant_pv, unit: 'PV' },
-      { label: t('dataCenter.comprehensive.jumpPv'), value: summary.value.jump_pv ?? 0, unit: 'PV' },
-      { label: t('dataCenter.comprehensive.merchantUv'), value: summary.value.merchant_uv, unit: 'UV' },
-      { label: t('dataCenter.comprehensive.merchantUvChannel'), value: summary.value.merchant_channel_uv ?? 0, unit: 'UV' },
-    ],
-  },
-  {
-    title: t('dataCenter.comprehensive.groupInstall'),
-    items: [
-      { label: t('dataCenter.comprehensive.installNum'), value: summary.value.install_num },
-      { label: t('dataCenter.comprehensive.installDeducted'), value: summary.value.install_deducted },
-      { label: t('dataCenter.comprehensive.installRatio'), value: percent(summary.value.install_ratio) },
+      { label: t('dataCenter.comprehensive.landPv'), value: summary.value.land_pv, unit: 'PV' },
+      { label: t('dataCenter.comprehensive.landUv'), value: summary.value.land_uv, unit: 'UV' },
     ],
   },
   {
@@ -114,6 +109,14 @@ const overviewCards = computed<Array<{ title: string, items: OverviewItem[] }>>(
       { label: t('dataCenter.comprehensive.downloadPv'), value: summary.value.download_pv, unit: 'PV' },
       { label: t('dataCenter.comprehensive.downloadUv'), value: summary.value.download_uv, unit: 'UV' },
       { label: t('dataCenter.comprehensive.downloadRatio'), value: percent(summary.value.download_ratio) },
+    ],
+  },
+  {
+    title: t('dataCenter.comprehensive.groupInstall'),
+    items: [
+      { label: t('dataCenter.comprehensive.installNum'), value: summary.value.install_num },
+      { label: t('dataCenter.comprehensive.installDeducted'), value: summary.value.install_deducted },
+      { label: t('dataCenter.comprehensive.installRatio'), value: percent(summary.value.install_ratio) },
     ],
   },
   {
@@ -148,8 +151,8 @@ const searchItems: any[] = [
 const tableColumns: any[] = [
   { label: () => t('dataCenter.statDate'), prop: 'stat_date', width: '130px' },
   { label: () => t('dataCenter.comprehensive.merchantPv'), prop: 'merchant_pv', minWidth: '100px' },
-  { label: () => t('dataCenter.comprehensive.merchantUv'), prop: 'merchant_uv', minWidth: '110px' },
-  { label: () => t('dataCenter.comprehensive.merchantUvChannel'), prop: 'merchant_channel_uv', minWidth: '120px' },
+  { label: () => t('dataCenter.comprehensive.merchantUv'), prop: 'merchant_uv_by_merchant', minWidth: '110px' },
+  { label: () => t('dataCenter.comprehensive.merchantUvChannel'), prop: 'merchant_uv_by_channel', minWidth: '120px' },
   { label: () => t('dataCenter.comprehensive.channelUv'), prop: 'channel_uv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.landPv'), prop: 'land_pv', minWidth: '100px' },
   { label: () => t('dataCenter.comprehensive.landUv'), prop: 'land_uv', minWidth: '100px' },
@@ -240,9 +243,13 @@ const options = ref<MaProTableOptions>({
       query.end_date = range[1]
       delete query.date_range
 
+      // summary 由后端固定按「今天」统计，与列表区间解耦；搜索 / 翻页时一并刷新概览卡片
       const response = await overview(query)
       if (response.code === ResultCode.SUCCESS && response.data?.summary) {
         summary.value = response.data.summary
+        if (response.data.summary_date) {
+          today.value = response.data.summary_date
+        }
       }
 
       return response
@@ -258,6 +265,15 @@ const schema = ref<MaProTableSchema>({
 
 <template>
   <div class="mine-layout pt-3">
+    <div class="data-center-overview__caption">
+      <span class="data-center-overview__caption-title">
+        {{ t('dataCenter.comprehensive.todayOverview') }} · {{ today }}
+      </span>
+      <span class="data-center-overview__caption-hint">
+        {{ t('dataCenter.comprehensive.todayOverviewHint') }}
+      </span>
+    </div>
+
     <div class="data-center-overview">
       <el-card
         v-for="card in overviewCards"
@@ -327,6 +343,25 @@ const schema = ref<MaProTableSchema>({
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin: 0 12px 12px;
+}
+
+/* 概览口径说明：明确卡片固定统计今天，避免与下方表格的日期筛选混淆 */
+.data-center-overview__caption {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 12px 8px;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+.data-center-overview__caption-title {
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.data-center-overview__caption-hint {
+  font-size: 12px;
 }
 
 .data-center-overview__card {

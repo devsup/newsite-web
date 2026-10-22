@@ -28,7 +28,7 @@ const t = useTrans().globalTrans
 const loading = ref(false)
 const list = ref<DataCenterMerchantChannelVo[]>([])
 const total = ref(0)
-const summary = ref({ channel_count: 0, merchant_pv: 0, merchant_uv: 0 })
+const summary = ref({ channel_count: 0, merchant_pv: 0, merchant_uv_by_channel: 0 })
 const page = ref(1)
 const pageSize = ref(10)
 const channelId = ref<number>()
@@ -49,7 +49,7 @@ async function load(): Promise<void> {
     if (response.code === ResultCode.SUCCESS && response.data) {
       list.value = response.data.list || []
       total.value = Number(response.data.total || 0)
-      summary.value = response.data.summary || { channel_count: 0, merchant_pv: 0, merchant_uv: 0 }
+      summary.value = response.data.summary || { channel_count: 0, merchant_pv: 0, merchant_uv_by_channel: 0 }
     }
   }
   finally {
@@ -84,7 +84,7 @@ watch([page, pageSize], () => {
       <div class="merchant-channel-dialog__stats">
         <span class="stat-pill stat-pill--red">{{ t('dataCenter.comprehensive.channelCountLabel') }}: {{ formatNumber(summary.channel_count) }}</span>
         <span class="stat-pill stat-pill--purple">PV: {{ formatNumber(summary.merchant_pv) }}</span>
-        <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv) }}</span>
+        <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv_by_channel) }}</span>
       </div>
       <MaRemoteSelect
         v-if="hasAuth('dataCenter:options')"
@@ -113,7 +113,7 @@ watch([page, pageSize], () => {
       <el-table-column :label="t('dataCenter.columns.channelName')" prop="channel_name" show-overflow-tooltip />
       <el-table-column :label="t('dataCenter.channelCode')" prop="channel_code" align="center" />
       <el-table-column :label="t('dataCenter.channelLog.merchantPv')" prop="merchant_pv" align="center" />
-      <el-table-column :label="t('dataCenter.channelLog.merchantUv')" prop="merchant_uv" align="center" />
+      <el-table-column :label="t('dataCenter.channelLog.merchantUv')" prop="merchant_uv_by_channel" align="center" />
     </el-table>
 
     <div class="merchant-channel-dialog__pagination">

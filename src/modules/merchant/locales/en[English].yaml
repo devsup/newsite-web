@@ -19,7 +19,9 @@ merchantMenu:
 
 merchantInfo:
   mainTitle: Merchants
-  subTitle: Maintain merchant basic, display and popup information. Changing the display type updates areas and fields dynamically; statistics are placeholders for now.
+  subTitle: Maintain merchant basic, display and popup information. Changing the display type updates areas and fields dynamically; merchant PV/UV are aggregated from today s data.
+  totalPv: Total PV
+  totalUv: Total UV
   id: ID
   name: Merchant Name
   namePlaceholder: Please enter the merchant name
@@ -54,7 +56,6 @@ merchantInfo:
   showName: Display Name
   merchantPv: Merchant PV
   merchantUv: Merchant UV
-  statsPlaceholder: Statistics will be provided by the Data Center later
   basicInfo: Basic Information
   showInfoTitle: Display Information
   popupInfoTitle: Popup Information
@@ -115,7 +116,7 @@ merchantInfo:
 
 category:
   mainTitle: Top Tabs
-  subTitle: Configure the tabs at the top of the navigation page. Daily statistics will be provided by the Data Center later.
+  subTitle: Configure the tabs at the top of the navigation page. Merchant click statistics are aggregated from today's data.
   name: Name
   namePlaceholder: Please enter the top tab name
   weight: Sort
@@ -126,13 +127,12 @@ category:
   config: Configure
   daily: Daily Statistics
   areaTitle: Area Configuration [{name}]
-  dailyPlaceholderTitle: Daily Statistics [{name}]
-  dailyPlaceholderDesc: Daily statistics will be provided by the Data Center later. This entry is a placeholder for now.
+  dailyStatsTitle: 'Daily Statistics [{name}]'
   remarkPlaceholder: Note the purpose of this top tab
 
 categoryType:
   mainTitle: Categories
-  subTitle: Maintain merchant categories. Statistics are placeholders until the Data Center is connected.
+  subTitle: Maintain merchant categories. Merchant counts and click statistics are aggregated from today's data.
   name: Category Name
   namePlaceholder: Please enter the category name
   weight: Sort
@@ -142,7 +142,11 @@ categoryType:
   merchantPv: Merchant PV
   merchantUv: Merchant UV
   clickRate: Click Rate
-  statsPlaceholder: Statistics will be provided by the Data Center later
+  dailyStats: Daily Statistics
+  dailyStatsTitle: 'Daily Statistics - {name}'
+  statDate: Date
+  startDate: Start date
+  endDate: End date
   updatedBy: Updated By
   remarkPlaceholder: Note the purpose of this category
 

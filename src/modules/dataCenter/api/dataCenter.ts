@@ -19,9 +19,10 @@ export interface DataCenterSummary {
   download_pv: number
   download_uv: number
   merchant_pv: number
-  merchant_uv: number
-  /** 商户 UV（按渠道维度去重） */
-  merchant_channel_uv?: number
+  /** 商户UV(商)：同一 IP 点击同渠道下的不同商户分别计数 */
+  merchant_uv_by_merchant: number
+  /** 商户UV(渠)：同一 IP 在该渠道内只计一次 */
+  merchant_uv_by_channel?: number
   /** 商户跳转 PV（与商户点击 PV 同源） */
   jump_pv?: number
   install_ratio: number
@@ -48,9 +49,10 @@ export interface DataCenterDailyVo {
   download_pv: number
   download_uv: number
   merchant_pv: number
-  merchant_uv: number
-  /** 商户 UV（按渠道维度去重） */
-  merchant_channel_uv: number
+  /** 商户UV(商)：同一 IP 点击同渠道下的不同商户分别计数 */
+  merchant_uv_by_merchant: number
+  /** 商户UV(渠)：同一 IP 在该渠道内只计一次 */
+  merchant_uv_by_channel: number
   /** 商户跳转 PV */
   jump_pv: number
   install_ratio: number
@@ -79,7 +81,10 @@ export interface DataCenterChannelVo {
   download_ratio: number
   /** 当天该渠道的商户点击 PV/UV 与比率（来源渠道明细用） */
   merchant_pv?: number
-  merchant_uv?: number
+  /** 商户UV(商)：同一 IP 点击同渠道下的不同商户分别计数 */
+  merchant_uv_by_merchant?: number
+  /** 商户UV(渠)：同一 IP 在该渠道内只计一次 */
+  merchant_uv_by_channel?: number
   click_ratio?: string
 }
 
@@ -150,9 +155,11 @@ export interface DataCenterQuery {
   [key: string]: any
 }
 
-/** GET /admin/data-center/overview - 综合统计（按天 + 区间汇总） */
+/** GET /admin/data-center/overview - 综合统计（区间按天列表 + 固定统计今天的 summary） */
 export function overview(params: DataCenterQuery): Promise<ResponseStruct<{
   summary: DataCenterSummary
+  /** summary 的统计日期（固定为今天） */
+  summary_date?: string
   list: DataCenterDailyVo[]
   total: number
 }>> {
@@ -170,7 +177,7 @@ export interface DataCenterChannelSummaryDayVo {
   channel_pv: number
   channel_uv: number
   merchant_pv: number
-  merchant_uv: number
+  merchant_uv_by_channel: number
   land_pv: number
   land_uv: number
   navi_pv: number
@@ -202,15 +209,17 @@ export function channelSummary(params: DataCenterQuery): Promise<ResponseStruct<
 export interface DataCenterChannelMerchantVo {
   merchant_id: number
   merchant_name: string
+  /** 商户名称 + show_info 展示名称，格式：#ID 商户名 · 展示名称 */
+  merchant_display_name?: string
   merchant_pv: number
-  merchant_uv: number
+  merchant_uv_by_merchant: number
 }
 
 /** 渠道商户跳转明细 - 汇总 */
 export interface DataCenterChannelMerchantSummary {
   merchant_count: number
   merchant_pv: number
-  merchant_uv: number
+  merchant_uv_by_merchant: number
 }
 
 /** GET /admin/data-center/channel/merchants - 某渠道某天的商户跳转明细 */
@@ -295,14 +304,14 @@ export interface DataCenterMerchantChannelVo {
   channel_name: string
   channel_code: string
   merchant_pv: number
-  merchant_uv: number
+  merchant_uv_by_channel: number
 }
 
 /** GET /admin/data-center/comprehensive/merchant-channels - 某商户某天的来源渠道明细 */
 export function merchantChannels(params: DataCenterQuery): Promise<ResponseStruct<{
   list: DataCenterMerchantChannelVo[]
   total: number
-  summary: { channel_count: number, merchant_pv: number, merchant_uv: number }
+  summary: { channel_count: number, merchant_pv: number, merchant_uv_by_channel: number }
 }>> {
   return useHttp().get('/admin/data-center/comprehensive/merchant-channels', { params })
 }
@@ -316,7 +325,7 @@ export function merchantChannels(params: DataCenterQuery): Promise<ResponseStruc
 export function merchantLogChannels(params: DataCenterQuery): Promise<ResponseStruct<{
   list: DataCenterMerchantChannelVo[]
   total: number
-  summary: { channel_count: number, merchant_pv: number, merchant_uv: number }
+  summary: { channel_count: number, merchant_pv: number, merchant_uv_by_channel: number }
 }>> {
   return useHttp().get('/admin/data-center/merchant/channels', { params })
 }

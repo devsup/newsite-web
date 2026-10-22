@@ -103,6 +103,8 @@ dataCenter:
   comprehensive:
     title: Overview Statistics
     subtitle: Daily channel visits, merchant clicks, app installs and downloads. Data comes from report APIs and is visible within about one second.
+    todayOverview: Today's Overview
+    todayOverviewHint: Always counts today only and does not follow the date filter below
     groupChannel: Channel visits
     groupLanding: Landing page
     groupNavi: Navigation page

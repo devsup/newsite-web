@@ -98,7 +98,7 @@ function renderDayTable(channel: DataCenterChannelSummaryVo): VNode {
         <ElTableColumn prop="stat_date" min-width="120" label={t('dataCenter.statDate')} />
         <ElTableColumn prop="channel_uv" min-width="100" label={t('dataCenter.channelLog.channelUv')} />
         <ElTableColumn prop="merchant_pv" min-width="100" label={t('dataCenter.channelLog.merchantPv')} />
-        <ElTableColumn prop="merchant_uv" min-width="100" label={t('dataCenter.channelLog.merchantUv')} />
+        <ElTableColumn prop="merchant_uv_by_channel" min-width="100" label={t('dataCenter.channelLog.merchantUv')} />
         <ElTableColumn prop="land_pv" min-width="100" label={t('dataCenter.channelLog.landPv')} />
         <ElTableColumn prop="land_uv" min-width="100" label={t('dataCenter.channelLog.landUv')} />
         <ElTableColumn prop="navi_pv" min-width="100" label={t('dataCenter.channelLog.naviPv')} />
@@ -143,7 +143,7 @@ const tableColumns: any[] = [
   { label: () => t('dataCenter.channelLog.statDays'), prop: 'stat_days', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.channelUv'), prop: 'channel_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.merchantPv'), prop: 'merchant_pv', minWidth: '100px' },
-  { label: () => t('dataCenter.channelLog.merchantUv'), prop: 'merchant_uv', minWidth: '100px' },
+  { label: () => t('dataCenter.channelLog.merchantUv'), prop: 'merchant_uv_by_channel', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.landPv'), prop: 'land_pv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.landUv'), prop: 'land_uv', minWidth: '100px' },
   { label: () => t('dataCenter.channelLog.naviPv'), prop: 'navi_pv', minWidth: '100px' },

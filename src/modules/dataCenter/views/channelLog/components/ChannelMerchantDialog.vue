@@ -34,7 +34,7 @@ const t = useTrans().globalTrans
 const loading = ref(false)
 const list = ref<DataCenterChannelMerchantVo[]>([])
 const total = ref(0)
-const summary = ref({ merchant_count: 0, merchant_pv: 0, merchant_uv: 0 })
+const summary = ref({ merchant_count: 0, merchant_pv: 0, merchant_uv_by_merchant: 0 })
 const page = ref(1)
 const pageSize = ref(10)
 // MaRemoteSelect 的 api 泛型签名较宽，这里按组件期望的形态透传
@@ -54,7 +54,7 @@ async function load(): Promise<void> {
     if (response.code === ResultCode.SUCCESS && response.data) {
       list.value = response.data.list || []
       total.value = Number(response.data.total || 0)
-      summary.value = response.data.summary || { merchant_count: 0, merchant_pv: 0, merchant_uv: 0 }
+      summary.value = response.data.summary || { merchant_count: 0, merchant_pv: 0, merchant_uv_by_merchant: 0 }
     }
   }
   finally {
@@ -90,7 +90,7 @@ watch([page, pageSize], () => {
       <div class="channel-merchant-dialog__stats">
         <span class="stat-pill stat-pill--red">{{ t('dataCenter.channelLog.merchantCount') }}: {{ formatNumber(summary.merchant_count) }}</span>
         <span class="stat-pill stat-pill--purple">PV: {{ formatNumber(summary.merchant_pv) }}</span>
-        <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv) }}</span>
+        <span class="stat-pill stat-pill--blue">UV: {{ formatNumber(summary.merchant_uv_by_merchant) }}</span>
       </div>
       <MaRemoteSelect
         v-if="hasAuth('dataCenter:options')"
@@ -112,13 +112,14 @@ watch([page, pageSize], () => {
       class="w-full"
       :header-cell-style="{ background: 'var(--el-fill-color-light)', color: 'var(--el-text-color-primary)' }"
     >
+      <!-- 商户名称直接展示后端拼好的「#ID 商户名 · show_info 展示名称」，悬浮可看全 -->
       <el-table-column
         :label="t('dataCenter.channelLog.merchantName')"
-        prop="merchant_name"
+        prop="merchant_display_name"
         show-overflow-tooltip
       />
       <el-table-column :label="t('dataCenter.channelLog.merchantPv')" prop="merchant_pv" align="center" />
-      <el-table-column :label="t('dataCenter.channelLog.merchantUv')" prop="merchant_uv" align="center" />
+      <el-table-column :label="t('dataCenter.channelLog.merchantUv')" prop="merchant_uv_by_merchant" align="center" />
     </el-table>
 
     <div class="channel-merchant-dialog__pagination">

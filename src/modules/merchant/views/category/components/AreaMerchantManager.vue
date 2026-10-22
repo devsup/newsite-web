@@ -198,7 +198,14 @@ useTable('tableRef').then((table: MaTableExpose) => {
   table.setColumns([
     { label: () => t('merchantInfo.id'), prop: 'id', width: '70px' },
     { label: () => t('merchantInfo.name'), prop: 'name', minWidth: '150px', showOverflowTooltip: true },
-    { label: () => t('merchantInfo.showName'), prop: 'show_name', minWidth: '150px', showOverflowTooltip: true },
+    {
+      label: () => t('merchantInfo.showName'),
+      prop: 'show_name',
+      minWidth: '150px',
+      showOverflowTooltip: true,
+      // 展示名称为空时统一显示 -，避免出现空白单元格
+      cellRender: ({ row }): any => (row as MerchantVo).show_name || '-',
+    },
     { label: () => t('merchantInfo.showType'), prop: 'show_type_name', width: '120px' },
     { label: () => t('merchantInfo.weight'), prop: 'weight', width: '90px' },
     {
@@ -380,6 +387,9 @@ onBeforeUnmount(destroySortable)
 
 .area-merchant-sort__id {
   flex-shrink: 0;
+  /* 固定宽度：ID 位数不同（#1 / #146）时图片与文字仍能纵向对齐，避免卡片间错位 */
+  justify-content: center;
+  width: 44px;
   font-variant-numeric: tabular-nums;
 }
 

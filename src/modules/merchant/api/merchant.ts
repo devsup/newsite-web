@@ -68,7 +68,14 @@ export interface MerchantOptions {
 }
 
 /** GET /admin/merchant/list - 商户分页列表 */
-export function page(data: MerchantSearchVo): Promise<ResponseStruct<PageList<MerchantVo>>> {
+export interface MerchantPageSummary {
+  /** 今日商户点击合计 PV */
+  merchant_pv: number
+  /** 今日商户点击合计 UV（商户维度） */
+  merchant_uv_by_merchant: number
+}
+
+export function page(data: MerchantSearchVo): Promise<ResponseStruct<PageList<MerchantVo> & { summary?: MerchantPageSummary }>> {
   return useHttp().get('/admin/merchant/list', { params: data })
 }
 

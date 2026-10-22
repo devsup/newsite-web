@@ -61,17 +61,6 @@ export default function getTableColumns(
     })
   }, 400)
 
-  /** 统计列占位：数据中心统一接入前不展示伪 0 */
-  function renderStatsPlaceholder() {
-    return (
-      <div class="flex-center">
-        <ElTooltip content={t('merchantInfo.statsPlaceholder')} placement="top" showAfter={100}>
-          <span style={{ color: 'var(--el-text-color-placeholder)', cursor: 'help' }}>--</span>
-        </ElTooltip>
-      </div>
-    )
-  }
-
   async function copyLink(url?: string): Promise<void> {
     if (!url) {
       return
@@ -90,13 +79,14 @@ export default function getTableColumns(
       label: () => t('merchantInfo.merchantPv'),
       prop: 'merchant_pv',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(),
+      // 商户 PV/UV 取当天点击统计（后端 handleItems 补充），没有数据时显示 0
+      cellRender: ({ row }) => String(Number((row as MerchantVo).merchant_pv ?? 0)),
     },
     {
       label: () => t('merchantInfo.merchantUv'),
-      prop: 'merchant_uv',
+      prop: 'merchant_uv_by_merchant',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(),
+      cellRender: ({ row }) => String(Number((row as MerchantVo).merchant_uv_by_merchant ?? 0)),
     },
     {
       label: () => t('merchantInfo.showType'),

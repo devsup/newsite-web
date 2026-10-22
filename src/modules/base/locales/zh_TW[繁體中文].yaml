@@ -216,16 +216,30 @@ workbench:
   updatedAt: '更新於 {time}'
   compareYesterday: 較昨日
   trendTitle: 訪問趨勢
-  trendSubtitle: '近 {days} 天渠道訪問與商戶點擊'
-  trendDays7: 近 7 天
-  trendDays14: 近 14 天
-  trendDays30: 近 30 天
-  trendPv: 訪問量
-  trendUv: 獨立訪客
-  trendMerchant: 商戶點擊
+  trendSubtitle: 最近 7 天渠道、轉化與商戶走勢
+  trendChannelPv: 今日渠道PV
+  trendChannelUv: 今日渠道UV
+  trendLandPv: 今日落地頁PV
+  trendLandUv: 今日落地頁UV
+  trendGroupTraffic: 渠道訪問
+  trendGroupFunnel: 安裝轉化
+  trendGroupMerchant: 商戶點擊
+  trendNaviPv: 今日導航頁PV
+  trendNaviUv: 今日導航頁UV
+  trendInstallNum: 今日安裝量
+  trendInstallDeducted: 今日安裝扣量
+  trendMerchantPv: 商戶站內點擊PV
+  trendMerchantUv: 商戶站內有效UV
+  trendInstallRatio: 安裝率
+  trendClickRatio: 點擊比
   topChannelTitle: 今日渠道 TOP 10
   topChannelSubtitle: 按訪問量排序，含獨立訪客
   topChannelEmpty: 今日暫無渠道訪問數據
+  topMerchantTitle: 今日商戶 TOP 10
+  topMerchantSubtitle: 按點擊量排序，含獨立訪客
+  topMerchantEmpty: 今日暫無商戶點擊數據
+  topTabChannel: 渠道
+  topTabMerchant: 商戶
   viewAll: 查看全部
   quickEntryTitle: 快捷入口
   quickEntrySubtitle: 只展示當前賬號有權限的頁面

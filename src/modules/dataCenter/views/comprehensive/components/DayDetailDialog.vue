@@ -109,7 +109,9 @@ function applyColumns(): void {
       { label: () => t('dataCenter.channelCode'), prop: 'channel_code', minWidth: '110px' },
       { label: () => t('dataCenter.channelLog.channelUv'), prop: 'channel_uv', minWidth: '90px' },
       { label: () => t('dataCenter.channelLog.merchantPv'), prop: 'merchant_pv', minWidth: '90px' },
-      { label: () => t('dataCenter.channelLog.merchantUv'), prop: 'merchant_uv', minWidth: '90px' },
+      // 与综合统计主表口径一致：商户UV(商) 按商户去重、商户UV(渠) 按渠道去重
+      { label: () => t('dataCenter.comprehensive.merchantUv'), prop: 'merchant_uv_by_merchant', minWidth: '110px' },
+      { label: () => t('dataCenter.comprehensive.merchantUvChannel'), prop: 'merchant_uv_by_channel', minWidth: '110px' },
       { label: () => t('dataCenter.channelLog.landPv'), prop: 'land_pv', minWidth: '90px' },
       { label: () => t('dataCenter.channelLog.landUv'), prop: 'land_uv', minWidth: '90px' },
       { label: () => t('dataCenter.channelLog.naviPv'), prop: 'navi_pv', minWidth: '90px' },

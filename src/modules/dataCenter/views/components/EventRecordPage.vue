@@ -500,16 +500,16 @@ const tableColumns: any[] = [
 ]
 
 const userAgentColumn: any = {
-  // UA 可能很长：单行截断 + 悬浮看全，避免把行高顶成两三倍
+  // UA 可能很长：渲染宽度跟随列宽，超出列宽才单行省略，悬浮看全
   label: () => t('dataCenter.userAgent'),
   prop: 'user_agent',
-  minWidth: '260px',
+  minWidth: '420px',
   showOverflowTooltip: false,
   cellRender: ({ row }: { row: DataCenterEventVo }) => {
     const ua = row.user_agent || '-'
     return (
       <ElTooltip content={ua} placement="top" showAfter={300}>
-        <span class="block max-w-[280px] truncate">{ua}</span>
+        <span class="block w-full truncate">{ua}</span>
       </ElTooltip>
     )
   },

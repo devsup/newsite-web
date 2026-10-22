@@ -103,6 +103,8 @@ dataCenter:
   comprehensive:
     title: 综合统计数据
     subtitle: 按天汇总渠道访问、商户点击、App 安装与下载；数据来自上报接口，约 1 秒内可见
+    todayOverview: 今日概览
+    todayOverviewHint: 固定统计今天，不随下方日期筛选变化
     groupChannel: 渠道访问
     groupLanding: 落地页
     groupNavi: 导航页

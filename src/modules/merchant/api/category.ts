@@ -25,6 +25,24 @@ export interface CategorySearchVo {
   [key: string]: any
 }
 
+/** 顶部Tab按天统计行 */
+export interface CategoryDailyVo {
+  /** 统计日期（Y-m-d） */
+  created_date?: string
+  /** 该 Tab 当天商户点击 PV */
+  merchant_pv?: number
+  /** 该 Tab 当天商户点击 UV */
+  merchant_uv?: number
+  /** 点击率（百分比数值） */
+  click_rate?: number
+  [key: string]: any
+}
+
+/** GET /admin/category/daily-stats - 顶部Tab按天统计 */
+export function dailyStats(categoryId: number, params: Record<string, any> = {}): Promise<ResponseStruct<PageList<CategoryDailyVo>>> {
+  return useHttp().get('/admin/category/daily-stats', { params: { ...params, category_id: categoryId } })
+}
+
 /** GET /admin/category/list - 顶部Tab分页列表 */
 export function page(data: CategorySearchVo): Promise<ResponseStruct<PageList<CategoryVo>>> {
   return useHttp().get('/admin/category/list', { params: data })

@@ -4,33 +4,18 @@ import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import type { CategoryTypeVo } from '~/merchant/api/categoryType'
 
 import { useDebounceFn } from '@vueuse/core'
-import { ElInputNumber, ElSwitch, ElTooltip } from 'element-plus'
+import { ElInputNumber, ElSwitch } from 'element-plus'
 import { deleteByIds, updateStatus, updateWeight } from '~/merchant/api/categoryType'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { Status } from '@/constants/status.ts'
 
-/**
- * 统计列统一显示占位符：后端当前不返回统计值。
- *
- * 这里刻意不显示 0——0 会被误读成「真实统计为 0」，
- * 用 -- + 悬浮说明表示「数据中心接入后展示」更准确。
- */
-function renderStatsPlaceholder(t: any) {
-  return (
-    <div class="flex-center">
-      <ElTooltip content={t('categoryType.statsPlaceholder')} placement="top" showAfter={100}>
-        <span style={{ color: 'var(--el-text-color-placeholder)', cursor: 'help' }}>--</span>
-      </ElTooltip>
-    </div>
-  )
-}
-
 export default function getTableColumns(
   dialog: UseDialogExpose,
   t: any,
   proTableRef?: Ref<MaProTableExpose>,
+  openDailyStats?: (row: CategoryTypeVo) => void,
 ): MaProTableColumns[] {
   const msg = useMessage()
   const statusLoading = ref<number>()
@@ -78,25 +63,25 @@ export default function getTableColumns(
       label: () => t('categoryType.merchantNumber'),
       prop: 'merchant_number',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(t),
+      cellRender: ({ row }) => String(Number((row as CategoryTypeVo).merchant_number ?? 0)),
     },
     {
       label: () => t('categoryType.merchantPv'),
       prop: 'merchant_pv',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(t),
+      cellRender: ({ row }) => String(Number((row as CategoryTypeVo).merchant_pv ?? 0)),
     },
     {
       label: () => t('categoryType.merchantUv'),
-      prop: 'merchant_uv',
+      prop: 'merchant_uv_by_merchant',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(t),
+      cellRender: ({ row }) => String(Number((row as CategoryTypeVo).merchant_uv_by_merchant ?? 0)),
     },
     {
       label: () => t('categoryType.clickRate'),
       prop: 'click_rate',
       width: '100px',
-      cellRender: () => renderStatsPlaceholder(t),
+      cellRender: ({ row }) => `${Number((row as CategoryTypeVo).click_rate ?? 0).toFixed(2)}%`,
     },
     {
       label: () => t('crud.status'),
@@ -141,10 +126,17 @@ export default function getTableColumns(
       type: 'operation',
       label: () => t('crud.operation'),
       fixed: 'right',
-      width: '180px',
+      width: '240px',
       operationConfigure: {
         type: 'tile',
         actions: [
+          {
+            name: 'dailyStats',
+            icon: 'material-symbols:bar-chart',
+            text: () => t('categoryType.dailyStats'),
+            disabled: () => !hasAuth('categoryType:index'),
+            onClick: ({ row }) => openDailyStats?.(row as CategoryTypeVo),
+          },
           {
             name: 'edit',
             icon: 'material-symbols:person-edit',

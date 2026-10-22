@@ -34,6 +34,9 @@ const options = ref<MerchantOptions>({
   layerTypes: [],
 })
 
+/** 今日商户点击合计（列表接口 summary，工具栏展示） */
+const pageSummary = ref({ merchant_pv: 0, merchant_uv_by_merchant: 0 })
+
 const maDialog: UseDialogExpose = useDialog({
   // 动态字段较多，宽度给足；用 width 而不是 lgWidth（MaDialog 的响应式断点只到 1920px）
   width: '1120px',
@@ -115,7 +118,17 @@ const tableOptions = ref<MaProTableOptions>({
     },
   },
   searchFormOptions: { labelWidth: '90px' },
-  requestOptions: { api: page },
+  requestOptions: {
+    api: async (params: any) => {
+      const response = await page(params)
+      // 列表接口同时返回今日商户点击合计，工具栏「总PV / 总UV」与列表数据一起刷新
+      if (response.code === ResultCode.SUCCESS && response.data?.summary) {
+        pageSummary.value = response.data.summary
+      }
+
+      return response
+    },
+  },
 })
 
 const schema = ref<MaProTableSchema>({
@@ -241,7 +254,14 @@ function handleDelete(ids: number[]): void {
       </template>
 
       <template #toolbarLeft>
-        <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
+        <div class="merchant-toolbar">
+          <MaBatchActions :count="selections.length" :actions="batchActions" @command="handleBatchCommand" />
+          <div class="merchant-today-stat">
+            <span>{{ t('merchantInfo.totalPv') }} <b>{{ pageSummary.merchant_pv }}</b></span>
+            <i class="merchant-today-stat__divider" />
+            <span>{{ t('merchantInfo.totalUv') }} <b>{{ pageSummary.merchant_uv_by_merchant }}</b></span>
+          </div>
+        </div>
       </template>
     </MaProTable>
 
@@ -266,6 +286,38 @@ function handleDelete(ids: number[]): void {
 </template>
 
 <style scoped lang="scss">
+/* 工具栏：左侧批量操作 + 今日点击合计 */
+.merchant-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.merchant-today-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 999px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  background: var(--el-fill-color-blank);
+
+  b {
+    margin-left: 4px;
+    color: var(--el-color-danger);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.merchant-today-stat__divider {
+  width: 1px;
+  height: 14px;
+  background: var(--el-border-color-lighter);
+}
+
 /* 商户表单弹窗：弹窗本体不滚动，滚动发生在表单区域内部.
    切换展示 / 弹窗类型时字段数量会变，若按内容撑高整窗，弹窗高度会跟着跳、
    底部「确定 / 取消」也会被顶出视口——所以这里用固定高度（不是 max-height），

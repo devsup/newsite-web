@@ -19,7 +19,9 @@ merchantMenu:
 
 merchantInfo:
   mainTitle: 商戶信息
-  subTitle: 維護商戶基本信息、展示信息與彈窗信息；切換商戶類型會動態調整區域與欄位，統計欄位暫為佔位
+  subTitle: 維護商戶基本信息、展示信息與彈窗信息；切換商戶類型會動態調整區域與欄位，商戶 PV/UV 按當天數據實時彙總
+  totalPv: 總PV
+  totalUv: 總UV
   id: ID
   name: 商戶名稱
   namePlaceholder: 請輸入商戶名稱
@@ -54,7 +56,6 @@ merchantInfo:
   showName: 展示名稱
   merchantPv: 商戶PV
   merchantUv: 商戶UV
-  statsPlaceholder: 統計功能將在數據中心統一接入
   basicInfo: 基本信息
   showInfoTitle: 展示信息
   popupInfoTitle: 彈窗信息
@@ -115,7 +116,7 @@ merchantInfo:
 
 category:
   mainTitle: 頂部Tab
-  subTitle: 配置導航頁頂部標籤；日統計後續隨數據中心統一接入
+  subTitle: 配置導航頁頂部標籤；商戶點擊統計按當天數據實時彙總
   name: 名稱
   namePlaceholder: 請輸入頂部Tab名稱
   weight: 排序值
@@ -126,13 +127,12 @@ category:
   config: 配置
   daily: 日統計
   areaTitle: 區域配置【{name}】
-  dailyPlaceholderTitle: 日統計【{name}】
-  dailyPlaceholderDesc: 日統計將在數據中心統一接入，本次僅保留入口佔位。
+  dailyStatsTitle: 日統計【{name}】
   remarkPlaceholder: 備註該頂部Tab的用途
 
 categoryType:
   mainTitle: 類目管理
-  subTitle: 維護商戶類目；統計欄位暫為佔位，後續隨數據中心統一接入
+  subTitle: 維護商戶類目；商戶數量與點擊統計按當天數據實時彙總
   name: 類目名稱
   namePlaceholder: 請輸入類目名稱
   weight: 排序值
@@ -142,7 +142,11 @@ categoryType:
   merchantPv: 商戶PV
   merchantUv: 商戶UV
   clickRate: 點擊率
-  statsPlaceholder: 統計功能將在數據中心統一接入
+  dailyStats: 日統計
+  dailyStatsTitle: 日統計 - {name}
+  statDate: 統計日期
+  startDate: 開始日期
+  endDate: 結束日期
   updatedBy: 更新人
   remarkPlaceholder: 備註該類目的用途
 

@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 import type { CategoryVo } from '~/merchant/api/category'
 
-import { deleteByIds, page } from '~/merchant/api/category'
+import { dailyStats, deleteByIds, page } from '~/merchant/api/category'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
@@ -15,7 +15,7 @@ import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import CategoryForm from './form.vue'
 import CategoryAreaManager from './components/CategoryAreaManager.vue'
-import DailyStatsPlaceholder from './components/DailyStatsPlaceholder.vue'
+import DailyStatsPanel from '~/merchant/components/DailyStatsPanel.vue'
 
 defineOptions({ name: 'merchant:category' })
 
@@ -35,13 +35,8 @@ const areaDialog: UseDialogExpose = useDialog({
   },
 })
 
-/** 日统计占位弹窗：等数据中心统一接入后再替换成真实统计 */
-const dailyDialog: UseDialogExpose = useDialog({
-  width: '520px',
-  ok: () => {
-    dailyDialog.close()
-  },
-})
+/** 日统计弹窗：关闭走右上角 X，内容由 DailyStatsPanel 自行拉取 */
+const dailyDialog: UseDialogExpose = useDialog({ width: '820px', footer: false })
 
 const maDialog: UseDialogExpose = useDialog({
   width: '600px',
@@ -103,8 +98,7 @@ function openArea(row: CategoryVo): void {
 
 function openDaily(row: CategoryVo): void {
   dailyCategory.value = row
-  dailyDialog.setTitle(t('category.dailyPlaceholderTitle', { name: row.name || '-' }))
-  dailyDialog.setAttr({ okText: t('crud.close') })
+  dailyDialog.setTitle(t('category.dailyStatsTitle', { name: row.name || '-' }))
   dailyDialog.open()
 }
 
@@ -184,7 +178,11 @@ function handleDelete(): void {
     </component>
 
     <component :is="dailyDialog.Dialog">
-      <DailyStatsPlaceholder :category="dailyCategory" />
+      <DailyStatsPanel
+        :name="dailyCategory?.name"
+        :target-id="Number(dailyCategory?.id || 0)"
+        :fetch-api="params => dailyStats(Number(dailyCategory?.id), params)"
+      />
     </component>
   </div>
 </template>

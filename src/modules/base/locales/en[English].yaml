@@ -216,16 +216,30 @@ workbench:
   updatedAt: 'Updated at {time}'
   compareYesterday: vs. yesterday
   trendTitle: Traffic trend
-  trendSubtitle: 'Channel visits and merchant clicks in the last {days} days'
-  trendDays7: Last 7 days
-  trendDays14: Last 14 days
-  trendDays30: Last 30 days
-  trendPv: Page views
-  trendUv: Unique visitors
-  trendMerchant: Merchant clicks
+  trendSubtitle: Channel, funnel and merchant trends in the last 7 days
+  trendChannelPv: Channel PV today
+  trendChannelUv: Channel UV today
+  trendLandPv: Landing PV today
+  trendLandUv: Landing UV today
+  trendGroupTraffic: Channel visits
+  trendGroupFunnel: Install conversion
+  trendGroupMerchant: Merchant clicks
+  trendNaviPv: Navigation PV today
+  trendNaviUv: Navigation UV today
+  trendInstallNum: Installs today
+  trendInstallDeducted: Deducted installs today
+  trendMerchantPv: Merchant click PV
+  trendMerchantUv: Merchant click UV
+  trendInstallRatio: Install rate
+  trendClickRatio: Click ratio
   topChannelTitle: Top 10 channels today
   topChannelSubtitle: Ranked by page views, including unique visitors
   topChannelEmpty: No channel traffic today
+  topMerchantTitle: Top 10 merchants today
+  topMerchantSubtitle: Ranked by clicks, including unique visitors
+  topMerchantEmpty: No merchant clicks today
+  topTabChannel: Channels
+  topTabMerchant: Merchants
   viewAll: View all
   quickEntryTitle: Quick access
   quickEntrySubtitle: Only pages allowed for the current account are shown

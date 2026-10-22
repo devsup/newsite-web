@@ -4,7 +4,7 @@ import type { PageList, ResponseStruct } from '#/global'
  * 商户类目（对应后端 App\Schema\CategoryTypeSchema）。
  *
  * 统计字段当前没有后端来源，列表统一显示 --；
- * 后续数据中心接入后再补 merchant_number / merchant_pv / merchant_uv / click_rate 等字段.
+ * 后续数据中心接入后再补 merchant_number / merchant_pv / merchant_uv_by_merchant / click_rate 等字段.
  */
 export interface CategoryTypeVo {
   id?: number
@@ -28,9 +28,27 @@ export interface CategoryTypeSearchVo {
   [key: string]: any
 }
 
+/** 类目按天统计行 */
+export interface CategoryTypeDailyVo {
+  /** 统计日期（Y-m-d） */
+  created_date?: string
+  /** 该类目当天商户点击 PV */
+  merchant_pv?: number
+  /** 该类目当天商户点击 UV */
+  merchant_uv?: number
+  /** 点击率（百分比数值） */
+  click_rate?: number
+  [key: string]: any
+}
+
 /** GET /admin/category-type/list - 类目分页列表 */
 export function page(data: CategoryTypeSearchVo): Promise<ResponseStruct<PageList<CategoryTypeVo>>> {
   return useHttp().get('/admin/category-type/list', { params: data })
+}
+
+/** GET /admin/category-type/daily-stats - 类目按天统计 */
+export function dailyStats(categoryTypeId: number, params: Record<string, any> = {}): Promise<ResponseStruct<PageList<CategoryTypeDailyVo>>> {
+  return useHttp().get('/admin/category-type/daily-stats', { params: { ...params, category_type_id: categoryTypeId } })
 }
 
 /** POST /admin/category-type - 新增类目 */

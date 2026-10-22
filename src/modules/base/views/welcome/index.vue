@@ -8,9 +8,9 @@
  - @Link   https://github.com/mineadmin
 -->
 <script setup lang="tsx">
-import type { DataCenterChannelVo, DataCenterDailyVo, DataCenterEventVo } from '~/dataCenter/api/dataCenter'
+import type { DataCenterChannelVo, DataCenterDailyVo, DataCenterEventVo, DataCenterMerchantVo } from '~/dataCenter/api/dataCenter'
 
-import { channelOfDay, channelRecordPage, overview } from '~/dataCenter/api/dataCenter'
+import { channelOfDay, channelRecordPage, merchantOfDay, overview } from '~/dataCenter/api/dataCenter'
 import { themeMode, useEcharts } from '@/hooks/useEcharts.ts'
 import hasAuth from '@/utils/permission/hasAuth.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
@@ -31,11 +31,16 @@ const canViewChannelLog = computed(() => hasAuth('dataCenter:channelLog:index'))
 
 const loading = ref(false)
 const lastUpdated = ref('')
-const trendDays = ref(7)
+/** 趋势固定最近 7 天（不再提供 7 / 14 / 30 天切换） */
+const TREND_DAYS = 7
 /** 近 N 天按天统计：今日 / 昨日对比与趋势图都用这一次请求，避免重复调用 */
 const dailyRows = ref<DataCenterDailyVo[]>([])
-/** 今日各渠道明细，用于「今日渠道 TOP 5」 */
+/** 今日各渠道明细，用于「今日渠道 TOP 10」 */
 const todayChannels = ref<DataCenterChannelVo[]>([])
+/** 今日各商户明细，用于「今日商户 TOP 10」 */
+const todayMerchants = ref<DataCenterMerchantVo[]>([])
+/** 排行卡片切换：渠道 / 商户 */
+const topType = ref<'channel' | 'merchant'>('merchant')
 /** 最近访问动态 */
 const recentRecords = ref<DataCenterEventVo[]>([])
 
@@ -53,8 +58,8 @@ const EMPTY_ROW: DataCenterDailyVo = {
   download_pv: 0,
   download_uv: 0,
   merchant_pv: 0,
-  merchant_uv: 0,
-  merchant_channel_uv: 0,
+  merchant_uv_by_merchant: 0,
+  merchant_uv_by_channel: 0,
   jump_pv: 0,
   install_ratio: 0,
   download_ratio: 0,
@@ -93,20 +98,33 @@ const greeting = computed(() => {
   return t('workbench.greetingEvening')
 })
 
-const displayName = computed(() => userInfo?.nickname || userInfo?.username || '-')
+const username = computed(() => userInfo?.username || '-')
+const nickname = computed(() => userInfo?.nickname || '')
 const avatarText = computed(() => (userInfo?.nickname || userInfo?.username || '?').charAt(0).toUpperCase())
 
-/** 角色与部门信息：可能有多个，展示成「角色：超管 · 部门：技术部」 */
+/** 角色信息：可能有多个，展示成「角色：超管」 */
 const userMeta = computed(() => {
   const roles = (userInfo?.roles ?? []).map(item => item.name).filter(Boolean)
-  const departments = (userInfo?.departments ?? []).map(item => item.name).filter(Boolean)
   return [
     { label: t('workbench.role'), value: roles.length > 0 ? roles.join('、') : '-' },
-    { label: t('workbench.department'), value: departments.length > 0 ? departments.join('、') : '-' },
   ]
 })
 
-const todayText = useDayjs().format('YYYY-MM-DD')
+/** 欢迎条时间：实时到秒，跟随系统时区 */
+const nowText = ref(useDayjs().format('YYYY-MM-DD HH:mm:ss'))
+let nowTimer: number | undefined
+
+onMounted(() => {
+  nowTimer = window.setInterval(() => {
+    nowText.value = useDayjs().format('YYYY-MM-DD HH:mm:ss')
+  }, 1000)
+})
+
+onBeforeUnmount(() => {
+  if (nowTimer) {
+    window.clearInterval(nowTimer)
+  }
+})
 
 function formatNumber(value?: number): string {
   return Number(value || 0).toLocaleString('zh-CN')
@@ -155,12 +173,49 @@ const metricCards = computed(() => {
   ]
 })
 
-/** 窄屏用的 HTML 图例，颜色与图表 series 保持一致 */
-const trendLegend = computed(() => [
-  { label: t('workbench.trendPv'), color: '#2563EB' },
-  { label: t('workbench.trendUv'), color: '#10B981' },
-  { label: t('workbench.trendMerchant'), color: '#F59E0B' },
-])
+/** 趋势分组：渠道流量 / 转化漏斗 / 商户转化（与参考站点一致） */
+type TrendGroup = 'traffic' | 'funnel' | 'merchant'
+
+const trendGroup = ref<TrendGroup>('traffic')
+
+interface TrendSeries {
+  /** i18n key */
+  label: string
+  color: string
+  /** DataCenterDailyVo 字段名 */
+  field: keyof DataCenterDailyVo
+  /** 百分比指标走右侧 Y 轴 */
+  percent?: boolean
+}
+
+const TREND_GROUPS: Record<TrendGroup, TrendSeries[]> = {
+  traffic: [
+    { label: 'workbench.trendChannelPv', color: '#06B6D4', field: 'channel_pv' },
+    { label: 'workbench.trendChannelUv', color: '#2563EB', field: 'channel_uv' },
+    { label: 'workbench.trendLandPv', color: '#10B981', field: 'land_pv' },
+    { label: 'workbench.trendLandUv', color: '#F59E0B', field: 'land_uv' },
+  ],
+  funnel: [
+    { label: 'workbench.trendNaviPv', color: '#8B5CF6', field: 'navi_pv' },
+    { label: 'workbench.trendNaviUv', color: '#C4B5FD', field: 'navi_uv' },
+    { label: 'workbench.trendInstallNum', color: '#EF4444', field: 'install_num' },
+    { label: 'workbench.trendInstallDeducted', color: '#F97316', field: 'install_deducted' },
+  ],
+  merchant: [
+    { label: 'workbench.trendMerchantPv', color: '#14B8A6', field: 'merchant_pv' },
+    { label: 'workbench.trendMerchantUv', color: '#F59E0B', field: 'merchant_uv_by_merchant' },
+    { label: 'workbench.trendInstallRatio', color: '#3B82F6', field: 'install_ratio', percent: true },
+    { label: 'workbench.trendClickRatio', color: '#EF4444', field: 'merchant_click_ratio', percent: true },
+  ],
+}
+
+/** 趋势图例：随分组切换，同时展示今日数值（百分比指标带 %） */
+const trendLegend = computed(() => TREND_GROUPS[trendGroup.value].map(item => ({
+  label: t(item.label),
+  color: item.color,
+  value: Number(summaryToday.value[item.field] || 0),
+  unit: item.percent ? '%' : '',
+})))
 
 /** 今日渠道 TOP 10（接口已按 PV 倒序，这里再排一次保证口径，同时展示 PV 与 UV） */
 const topChannels = computed(() => (
@@ -173,6 +228,19 @@ const topChannelMax = computed(() => Math.max(...topChannels.value.map(item => N
 
 function topChannelWidth(pv: number): string {
   return `${Math.max(4, Math.round((Number(pv) || 0) / topChannelMax.value * 100))}%`
+}
+
+/** 今日商户 TOP 10（按点击量倒序，前端再截前 10 条） */
+const topMerchants = computed(() => (
+  [...todayMerchants.value]
+    .sort((a, b) => Number(b.click_pv) - Number(a.click_pv))
+    .slice(0, 10)
+))
+
+const topMerchantMax = computed(() => Math.max(...topMerchants.value.map(item => Number(item.click_pv) || 0), 1))
+
+function topMerchantWidth(pv: number): string {
+  return `${Math.max(4, Math.round((Number(pv) || 0) / topMerchantMax.value * 100))}%`
 }
 
 /** 渠道访问记录只包含落地页 / 导航页 / 安装三类事件 */
@@ -232,6 +300,7 @@ async function loadAll(): Promise<void> {
     if (canViewStats.value) {
       tasks.push(loadOverview())
       tasks.push(loadTodayChannels())
+      tasks.push(loadTodayMerchants())
     }
     if (canViewRecords.value) {
       tasks.push(loadRecentRecords())
@@ -245,7 +314,7 @@ async function loadAll(): Promise<void> {
 }
 
 async function loadOverview(): Promise<void> {
-  const startDate = useDayjs().subtract(trendDays.value - 1, 'day').format('YYYY-MM-DD')
+  const startDate = useDayjs().subtract(TREND_DAYS - 1, 'day').format('YYYY-MM-DD')
   const response = await overview({ start_date: startDate, end_date: today })
   if (response.code === ResultCode.SUCCESS && Array.isArray(response.data?.list)) {
     dailyRows.value = response.data.list
@@ -260,20 +329,19 @@ async function loadTodayChannels(): Promise<void> {
   }
 }
 
+async function loadTodayMerchants(): Promise<void> {
+  // 当天各商户点击统计；后端已按点击量倒序，前端再截前 10 条
+  const response = await merchantOfDay(today)
+  if (response.code === ResultCode.SUCCESS && Array.isArray(response.data)) {
+    todayMerchants.value = response.data
+  }
+}
+
 async function loadRecentRecords(): Promise<void> {
   const response = await channelRecordPage({ page: 1, page_size: 10 })
   if (response.code === ResultCode.SUCCESS && Array.isArray(response.data?.list)) {
     recentRecords.value = response.data.list
   }
-}
-
-/** 切换趋势区间重新请求 overview；接口始终返回区间内每一天，今日 / 昨日对比值不受影响 */
-function changeTrendDays(days: number): void {
-  if (trendDays.value === days) {
-    return
-  }
-  trendDays.value = days
-  loadOverview().catch(() => {})
 }
 
 // ---------------------------------- 趋势图 ----------------------------------
@@ -283,66 +351,64 @@ const chart = useEcharts(chartEl, { theme: themeMode() })
 
 const chartOption = computed<any>(() => {
   const rows = ascRows.value
+  const group = TREND_GROUPS[trendGroup.value]
+  const hasPercent = group.some(item => item.percent)
   return {
-    color: ['#2563EB', '#10B981', '#F59E0B'],
+    color: group.map(item => item.color),
     tooltip: { trigger: 'axis' },
-    legend: {
-      top: 0,
-      right: 0,
-      icon: 'roundRect',
-      itemWidth: 8,
-      itemHeight: 8,
-      itemGap: 14,
-      textStyle: { fontSize: 12 },
-      data: [t('workbench.trendPv'), t('workbench.trendUv'), t('workbench.trendMerchant')],
-    },
-    grid: { left: 8, right: 24, top: 36, bottom: 0, containLabel: true },
+    // 图例统一用卡片上方的 HTML 图例（带今日值），关闭 echarts 内置图例避免重复
+    legend: { show: false },
+    // containLabel 会自动为坐标轴标签留空间，right 只留最小边距（右侧百分比轴很宽，不要重复留白）
+    grid: { left: 8, right: hasPercent ? 4 : 8, top: 16, bottom: 0, containLabel: true },
     xAxis: {
       type: 'category',
       boundaryGap: false,
       axisTick: { show: false },
       data: rows.map(row => useDayjs(row.stat_date).format('MM-DD')),
     },
-    yAxis: {
-      type: 'value',
-      minInterval: 1,
-      splitLine: { lineStyle: { type: 'dashed' } },
-    },
-    // 窄屏下 echarts 的图例会竖排压住坐标轴，直接关掉，改用图表上方的 HTML 图例
+    // 商户转化里混有「安装率 / 点击比」这类百分比，单独放右轴，避免把 PV/UV 曲线压扁
+    yAxis: hasPercent
+      ? [
+          {
+            type: 'value',
+            minInterval: 1,
+            splitLine: { lineStyle: { type: 'dashed' } },
+          },
+          {
+            type: 'value',
+            min: 0,
+            // 不固定上限：点击比可能超过 100%（如 500%），固定 max 会把曲线截断
+            axisLabel: { formatter: '{value}%' },
+            splitLine: { show: false },
+          },
+        ]
+      : {
+          type: 'value',
+          minInterval: 1,
+          splitLine: { lineStyle: { type: 'dashed' } },
+        },
+    // 窄屏下收紧边距与刻度，避免坐标轴文字挤在一起
     media: [
       {
         query: { maxWidth: 560 },
         option: {
-          legend: { show: false },
-          grid: { top: 8, bottom: 8, left: 4, right: 8 },
-          yAxis: { splitNumber: 3 },
+          grid: { top: 8, bottom: 8, left: 4, right: 4 },
+          yAxis: hasPercent
+            ? [{ splitNumber: 3 }, { splitNumber: 3 }]
+            : { splitNumber: 3 },
         },
       },
     ],
-    series: [
-      {
-        name: t('workbench.trendPv'),
-        type: 'line',
-        smooth: true,
-        showSymbol: false,
-        areaStyle: { opacity: 0.12 },
-        data: rows.map(row => Number(row.channel_pv || 0)),
-      },
-      {
-        name: t('workbench.trendUv'),
-        type: 'line',
-        smooth: true,
-        showSymbol: false,
-        data: rows.map(row => Number(row.channel_uv || 0)),
-      },
-      {
-        name: t('workbench.trendMerchant'),
-        type: 'line',
-        smooth: true,
-        showSymbol: false,
-        data: rows.map(row => Number(row.merchant_pv || 0)),
-      },
-    ],
+    series: group.map((item, index) => ({
+      name: t(item.label),
+      type: 'line',
+      smooth: true,
+      showSymbol: false,
+      yAxisIndex: item.percent ? 1 : 0,
+      // 只给第一条加面积，避免多条面积叠加后看不清
+      areaStyle: index === 0 ? { opacity: 0.12 } : undefined,
+      data: rows.map(row => Number(row[item.field] || 0)),
+    })),
   }
 })
 
@@ -393,29 +459,32 @@ onActivated(() => {
         </el-avatar>
         <div class="workbench-hero__intro">
           <div class="workbench-hero__greeting">
-            {{ greeting }}，{{ displayName }}
+            {{ greeting }}，<span class="workbench-hero__username">{{ username }}</span>
+            <span v-if="nickname && nickname !== username" class="workbench-hero__nickname">（{{ nickname }}）</span>
           </div>
           <div class="workbench-hero__meta">
             <span v-for="item in userMeta" :key="item.label" class="workbench-hero__meta-item">
               <span class="workbench-hero__meta-label">{{ item.label }}</span>{{ item.value }}
             </span>
-            <span class="workbench-hero__meta-item">{{ todayText }}</span>
+            <span class="workbench-hero__meta-item">{{ nowText }}</span>
           </div>
         </div>
       </div>
 
       <div class="workbench-hero__actions">
-        <el-button v-auth="'channel:index'" type="primary" @click="go('/channel')">
+        <el-button v-auth="'channel:index'" color="#059669" style="color: #fff" @click="go('/channel')">
           <ma-svg-icon name="material-symbols:conversion-path" :size="16" />
           <span class="ml-1">{{ t('workbench.entries.channel') }}</span>
         </el-button>
-        <el-button v-auth="'merchant:index'" @click="go('/merchantConfig/merchant')">
+        <el-button v-auth="'merchant:index'" color="#2563EB" style="color: #fff" @click="go('/merchantConfig/merchant')">
           <ma-svg-icon name="material-symbols:storefront-outline" :size="16" />
           <span class="ml-1">{{ t('workbench.entries.merchant') }}</span>
         </el-button>
         <el-button
           v-if="canViewStats"
           :loading="loading"
+          color="#D97706"
+          style="color: #fff"
           @click="loadAll"
         >
           <ma-svg-icon name="material-symbols:refresh" :size="16" />
@@ -427,16 +496,14 @@ onActivated(() => {
     <!-- 今日概览 -->
     <template v-if="canViewStats">
       <div class="workbench-section-head">
-        <div>
-          <div class="workbench-section-head__title">
-            {{ t('workbench.overviewTitle') }}
-          </div>
-          <div class="workbench-section-head__sub">
-            {{ t('workbench.overviewSubtitle') }}
-            <span v-if="lastUpdated" class="workbench-section-head__time">
-              {{ t('workbench.updatedAt', { time: lastUpdated }) }}
-            </span>
-          </div>
+        <div class="workbench-section-head__title">
+          {{ t('workbench.overviewTitle') }}
+        </div>
+        <div class="workbench-section-head__sub">
+          {{ t('workbench.overviewSubtitle') }}
+          <span v-if="lastUpdated" class="workbench-section-head__time">
+            {{ t('workbench.updatedAt', { time: lastUpdated }) }}
+          </span>
         </div>
       </div>
 
@@ -484,79 +551,126 @@ onActivated(() => {
                   {{ t('workbench.trendTitle') }}
                 </div>
                 <div class="workbench-card__sub">
-                  {{ t('workbench.trendSubtitle', { days: trendDays }) }}
+                  {{ t('workbench.trendSubtitle') }}
                 </div>
               </div>
-              <el-radio-group
-                :model-value="trendDays"
-                size="small"
-                @change="(value: any) => changeTrendDays(Number(value))"
-              >
-                <el-radio-button :value="7">
-                  {{ t('workbench.trendDays7') }}
-                </el-radio-button>
-                <el-radio-button :value="14">
-                  {{ t('workbench.trendDays14') }}
-                </el-radio-button>
-                <el-radio-button :value="30">
-                  {{ t('workbench.trendDays30') }}
-                </el-radio-button>
-              </el-radio-group>
+              <div class="workbench-trend__actions">
+                <el-radio-group
+                  :model-value="trendGroup"
+                  size="small"
+                  @change="(value: any) => trendGroup = value"
+                >
+                  <el-radio-button value="traffic">
+                    {{ t('workbench.trendGroupTraffic') }}
+                  </el-radio-button>
+                  <el-radio-button value="funnel">
+                    {{ t('workbench.trendGroupFunnel') }}
+                  </el-radio-button>
+                  <el-radio-button value="merchant">
+                    {{ t('workbench.trendGroupMerchant') }}
+                  </el-radio-button>
+                </el-radio-group>
+              </div>
             </div>
           </template>
           <div class="workbench-trend__legend">
             <span v-for="item in trendLegend" :key="item.label" class="workbench-trend__legend-item">
-              <i :style="{ backgroundColor: item.color }" />{{ item.label }}
+              <i :style="{ backgroundColor: item.color }" />
+              <span>{{ item.label }}</span>
+              <b>{{ item.value }}{{ item.unit }}</b>
             </span>
           </div>
           <div ref="chartEl" class="workbench-trend__chart" />
         </el-card>
 
-        <!-- 今日渠道 TOP 5 -->
+        <!-- 今日排行：渠道 / 商户可切换 -->
         <el-card class="workbench-card workbench-card--top" shadow="never">
           <template #header>
             <div class="workbench-card__head">
               <div>
                 <div class="workbench-card__title">
-                  {{ t('workbench.topChannelTitle') }}
+                  {{ topType === 'channel' ? t('workbench.topChannelTitle') : t('workbench.topMerchantTitle') }}
                 </div>
                 <div class="workbench-card__sub">
-                  {{ t('workbench.topChannelSubtitle') }}
+                  {{ topType === 'channel' ? t('workbench.topChannelSubtitle') : t('workbench.topMerchantSubtitle') }}
                 </div>
               </div>
-              <el-button
-                v-if="canViewChannelLog"
-                link
-                type="primary"
-                @click="go('/dataCenter/channelLog')"
-              >
-                {{ t('workbench.viewAll') }}
-              </el-button>
+              <div class="workbench-card__head-actions">
+                <el-radio-group v-model="topType" size="small">
+                  <el-radio-button value="merchant">
+                    {{ t('workbench.topTabMerchant') }}
+                  </el-radio-button>
+                  <el-radio-button value="channel">
+                    {{ t('workbench.topTabChannel') }}
+                  </el-radio-button>
+                </el-radio-group>
+                <el-tooltip
+                  v-if="topType === 'channel' ? canViewChannelLog : canViewStats"
+                  :content="t('workbench.viewAll')"
+                  placement="top"
+                  :show-after="200"
+                >
+                  <el-button
+                    link
+                    type="primary"
+                    @click="go(topType === 'channel' ? '/dataCenter/channelLog' : '/dataCenter/merchantLog')"
+                  >
+                    <ma-svg-icon name="material-symbols:arrow-forward-ios" :size="16" />
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
           </template>
 
-          <div v-if="topChannels.length > 0" class="workbench-top">
-            <div v-for="(item, index) in topChannels" :key="item.channel_id" class="workbench-top__item">
-              <span class="workbench-top__rank" :class="{ 'is-top': index < 3 }">{{ index + 1 }}</span>
-              <div class="workbench-top__main">
-                <div class="workbench-top__row">
-                  <span class="workbench-top__name">{{ item.channel_name || item.channel_code || `#${item.channel_id}` }}</span>
-                  <span class="workbench-top__stats">
-                    <span class="workbench-top__stat">
-                      <b>{{ formatNumber(item.channel_pv) }}</b>PV
+          <template v-if="topType === 'channel'">
+            <div v-if="topChannels.length > 0" class="workbench-top">
+              <div v-for="(item, index) in topChannels" :key="item.channel_id" class="workbench-top__item">
+                <span class="workbench-top__rank" :class="{ 'is-top': index < 3 }">{{ index + 1 }}</span>
+                <div class="workbench-top__main">
+                  <div class="workbench-top__row">
+                    <span class="workbench-top__name">{{ item.channel_name || item.channel_code || `#${item.channel_id}` }}</span>
+                    <span class="workbench-top__stats">
+                      <span class="workbench-top__stat">
+                        <b>{{ formatNumber(item.channel_pv) }}</b>PV
+                      </span>
+                      <span class="workbench-top__stat is-uv">
+                        <b>{{ formatNumber(item.channel_uv) }}</b>UV
+                      </span>
                     </span>
-                    <span class="workbench-top__stat is-uv">
-                      <b>{{ formatNumber(item.channel_uv) }}</b>UV
-                    </span>
-                  </span>
-                </div>
-                <div class="workbench-top__bar">
-                  <span class="workbench-top__bar-inner" :style="{ width: topChannelWidth(item.channel_pv) }" />
+                  </div>
+                  <div class="workbench-top__bar">
+                    <span class="workbench-top__bar-inner" :style="{ width: topChannelWidth(item.channel_pv) }" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <el-empty v-else :description="t('workbench.topChannelEmpty')" :image-size="72" />
+            <el-empty v-else :description="t('workbench.topChannelEmpty')" :image-size="72" />
+          </template>
+
+          <template v-else>
+            <div v-if="topMerchants.length > 0" class="workbench-top">
+              <div v-for="(item, index) in topMerchants" :key="item.merchant_id" class="workbench-top__item">
+                <span class="workbench-top__rank" :class="{ 'is-top': index < 3 }">{{ index + 1 }}</span>
+                <div class="workbench-top__main">
+                  <div class="workbench-top__row">
+                    <span class="workbench-top__name">{{ item.display_name || item.merchant_name || `#${item.merchant_id}` }}</span>
+                    <span class="workbench-top__stats">
+                      <span class="workbench-top__stat">
+                        <b>{{ formatNumber(item.click_pv) }}</b>PV
+                      </span>
+                      <span class="workbench-top__stat is-uv">
+                        <b>{{ formatNumber(item.click_uv) }}</b>UV
+                      </span>
+                    </span>
+                  </div>
+                  <div class="workbench-top__bar">
+                    <span class="workbench-top__bar-inner" :style="{ width: topMerchantWidth(item.click_pv) }" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <el-empty v-else :description="t('workbench.topMerchantEmpty')" :image-size="72" />
+          </template>
         </el-card>
       </div>
     </template>
@@ -613,14 +727,20 @@ onActivated(() => {
               {{ t('workbench.recentSubtitle') }}
             </div>
           </div>
-          <el-button
+          <el-tooltip
             v-if="canViewRecords"
-            link
-            type="primary"
-            @click="go('/dataCenter/channelRecord')"
+            :content="t('workbench.viewAll')"
+            placement="top"
+            :show-after="200"
           >
-            {{ t('workbench.viewAll') }}
-          </el-button>
+            <el-button
+              link
+              type="primary"
+              @click="go('/dataCenter/channelRecord')"
+            >
+              <ma-svg-icon name="material-symbols:arrow-forward-ios" :size="16" />
+            </el-button>
+          </el-tooltip>
         </div>
       </template>
 
@@ -693,6 +813,14 @@ onActivated(() => {
   color: var(--el-text-color-primary);
 }
 
+/* 昵称用括号包裹、弱化显示（跟在用户名后面） */
+.workbench-hero__nickname {
+  margin-left: 2px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--el-text-color-placeholder);
+}
+
 .workbench-hero__meta {
   display: flex;
   flex-wrap: wrap;
@@ -717,8 +845,9 @@ onActivated(() => {
 /* 区块标题 */
 .workbench-section-head {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  /* 标题与副标题同一行，间距 1rem，按基线对齐 */
+  gap: 16px;
+  align-items: baseline;
   margin: 0 12px 10px;
 }
 
@@ -729,7 +858,6 @@ onActivated(() => {
 }
 
 .workbench-section-head__sub {
-  margin-top: 4px;
   font-size: 14px;
   color: var(--el-text-color-regular);
 }
@@ -849,6 +977,14 @@ onActivated(() => {
   justify-content: space-between;
 }
 
+/* 卡片头部右侧：切换 tab + 查看全部 */
+.workbench-card__head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
 .workbench-card__title {
   font-size: 16px;
   font-weight: 600;
@@ -905,12 +1041,21 @@ onActivated(() => {
   min-height: 300px;
 }
 
-/* 只在小屏显示：宽屏的图例由 echarts 自己画在右上角 */
-.workbench-trend__legend {
-  display: none;
-  gap: 12px;
+/* 卡片头部右侧：分组切换 + 天数切换 */
+.workbench-trend__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
-  margin-top: 8px;
+}
+
+/* 图例统一显示在图表上方：圆点 + 今日文案 + 今日数值 */
+.workbench-trend__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  margin-top: 4px;
   font-size: 12px;
   color: var(--el-text-color-secondary);
 }
@@ -924,13 +1069,13 @@ onActivated(() => {
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 2px;
+    border-radius: 50%;
   }
-}
 
-@media (max-width: 560px) {
-  .workbench-trend__legend {
-    display: flex;
+  b {
+    color: var(--el-text-color-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 }
 

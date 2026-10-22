@@ -3,7 +3,8 @@ import type { MaProTableExpose, MaProTableOptions, MaProTableSchema } from '@min
 import type { Ref } from 'vue'
 import type { UseDialogExpose } from '@/hooks/useDialog.ts'
 
-import { deleteByIds, page } from '~/merchant/api/categoryType'
+import { dailyStats, deleteByIds, page } from '~/merchant/api/categoryType'
+import type { CategoryTypeVo } from '~/merchant/api/categoryType'
 import getSearchItems from './data/getSearchItems.tsx'
 import getTableColumns from './data/getTableColumns.tsx'
 import useDialog from '@/hooks/useDialog.ts'
@@ -13,6 +14,7 @@ import type { BatchAction } from '@/components/ma-batch-actions/index.vue'
 import { clearTableSelection } from '@/utils/table.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
 import CategoryTypeForm from './form.vue'
+import DailyStatsPanel from '~/merchant/components/DailyStatsPanel.vue'
 
 defineOptions({ name: 'merchant:categoryType' })
 
@@ -49,7 +51,6 @@ const options = ref<MaProTableOptions>({
   adaptionOffsetBottom: 161,
   header: {
     mainTitle: () => t('categoryType.mainTitle'),
-    // 统计字段暂为占位，等数据中心统一接入
     subTitle: () => t('categoryType.subTitle'),
   },
   tableOptions: {
@@ -75,8 +76,19 @@ const options = ref<MaProTableOptions>({
 
 const schema = ref<MaProTableSchema>({
   searchItems: getSearchItems(t),
-  tableColumns: getTableColumns(maDialog, t, proTableRef),
+  tableColumns: getTableColumns(maDialog, t, proTableRef, openDailyStats),
 })
+
+/** 类目日统计弹窗（只读，内容由 DailyStats 组件自行拉取） */
+const dailyStatsDialog: UseDialogExpose = useDialog({ width: '820px', footer: false })
+const dailyStatsCategory = ref<CategoryTypeVo | null>(null)
+
+/** 打开某个类目的日统计弹窗 */
+function openDailyStats(row: CategoryTypeVo): void {
+  dailyStatsCategory.value = row
+  dailyStatsDialog.setTitle(t('categoryType.dailyStatsTitle', { name: row.name || '-' }))
+  dailyStatsDialog.open()
+}
 
 function openAdd(): void {
   maDialog.setTitle(t('crud.add'))
@@ -138,6 +150,14 @@ function handleDelete(): void {
       <template #default="{ formType, data }">
         <CategoryTypeForm v-if="['add', 'edit'].includes(formType)" ref="formRef" :form-type="formType" :data="data" />
       </template>
+    </component>
+
+    <component :is="dailyStatsDialog.Dialog">
+      <DailyStatsPanel
+        :name="dailyStatsCategory?.name"
+        :target-id="Number(dailyStatsCategory?.id || 0)"
+        :fetch-api="params => dailyStats(Number(dailyStatsCategory?.id), params)"
+      />
     </component>
   </div>
 </template>

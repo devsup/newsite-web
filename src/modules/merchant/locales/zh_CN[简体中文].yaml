@@ -19,7 +19,9 @@ merchantMenu:
 
 merchantInfo:
   mainTitle: 商户信息
-  subTitle: 维护商户基本信息、展示信息与弹窗信息；切换商户类型会动态调整区域与字段，统计字段暂为占位
+  subTitle: 维护商户基本信息、展示信息与弹窗信息；切换商户类型会动态调整区域与字段，商户 PV/UV 按当天数据实时汇总
+  totalPv: 总PV
+  totalUv: 总UV
   id: ID
   name: 商户名称
   namePlaceholder: 请输入商户名称
@@ -54,7 +56,6 @@ merchantInfo:
   showName: 展示名称
   merchantPv: 商户PV
   merchantUv: 商户UV
-  statsPlaceholder: 统计功能将在数据中心统一接入
   basicInfo: 基本信息
   showInfoTitle: 展示信息
   popupInfoTitle: 弹窗信息
@@ -115,7 +116,7 @@ merchantInfo:
 
 category:
   mainTitle: 顶部Tab
-  subTitle: 配置导航页顶部标签；日统计后续随数据中心统一接入
+  subTitle: 配置导航页顶部标签；商户点击统计按当天数据实时汇总
   name: 名称
   namePlaceholder: 请输入顶部Tab名称
   weight: 排序值
@@ -126,13 +127,12 @@ category:
   config: 配置
   daily: 日统计
   areaTitle: 区域配置【{name}】
-  dailyPlaceholderTitle: 日统计【{name}】
-  dailyPlaceholderDesc: 日统计将在数据中心统一接入，本次仅保留入口占位。
+  dailyStatsTitle: 日统计【{name}】
   remarkPlaceholder: 备注该顶部Tab的用途
 
 categoryType:
   mainTitle: 类目管理
-  subTitle: 维护商户类目；统计字段暂为占位，后续随数据中心统一接入
+  subTitle: 维护商户类目；商户数量与点击统计按当天数据实时汇总
   name: 类目名称
   namePlaceholder: 请输入类目名称
   weight: 排序值
@@ -142,7 +142,11 @@ categoryType:
   merchantPv: 商户PV
   merchantUv: 商户UV
   clickRate: 点击率
-  statsPlaceholder: 统计功能将在数据中心统一接入
+  dailyStats: 日统计
+  dailyStatsTitle: 日统计 - {name}
+  statDate: 统计日期
+  startDate: 开始日期
+  endDate: 结束日期
   updatedBy: 更新人
   remarkPlaceholder: 备注该类目的用途
 

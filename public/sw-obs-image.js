@@ -19,6 +19,11 @@
 let config = { key: '', origins: [] }
 
 const CACHE_NAME = 'obs-images-v2'
+// 配置缓存：Service Worker 被浏览器回收后重启，内存里的密钥会丢失，
+// 从缓存恢复后再决定是否解密，避免「页面打开一段时间后图片全部变破图」。
+const CONFIG_CACHE = 'obs-image-config'
+const CONFIG_KEY = '/__obs-image-config__'
+let configLoading = null
 
 const MIME_BY_EXT = {
   jpg: 'image/jpeg',
@@ -50,10 +55,53 @@ self.addEventListener('message', (event) => {
     .filter(Boolean)
 
   config = { key: String(data.key || ''), origins }
+  configLoading = null
+
+  // 持久化配置：SW 空闲被回收后重启时内存状态会清空，从缓存恢复才能继续解密。
+  // 密钥本来就随前端产物分发，存 Cache 不额外增加暴露面。
+  event.waitUntil(
+    caches.open(CONFIG_CACHE)
+      .then(cache => cache.put(CONFIG_KEY, new Response(JSON.stringify(config), {
+        headers: { 'Content-Type': 'application/json' },
+      })))
+      .catch(() => {}),
+  )
 
   // 回执：页面在挂载前要确认密钥已生效，否则首屏图片请求会拿到密文（显示加载失败）
   event.source?.postMessage({ type: 'obs-image-config-ack' })
 })
+
+/**
+ * 确保内存里有配置：优先用 message 下发的最新值，没有则从 Cache 恢复。
+ *
+ * @returns {Promise<{key: string, origins: string[]}>}
+ */
+function ensureConfig() {
+  if (config.key) {
+    return Promise.resolve(config)
+  }
+  if (!configLoading) {
+    configLoading = caches.open(CONFIG_CACHE)
+      .then(cache => cache.match(CONFIG_KEY))
+      .then(async (cached) => {
+        if (!cached) {
+          return config
+        }
+        const data = await cached.json()
+        config = {
+          key: String(data.key || ''),
+          origins: Array.isArray(data.origins) ? data.origins.filter(Boolean) : [],
+        }
+        return config
+      })
+      .catch(() => config)
+      .finally(() => {
+        configLoading = null
+      })
+  }
+
+  return configLoading
+}
 
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (event) => {
@@ -80,11 +128,24 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 只处理配置过的图片域名（OBS 或 CDN），其它图片（图标、第三方图）完全不碰
-  if (!config.key || !config.origins.includes(url.origin)) {
+  if (config.key) {
+    if (!config.origins.includes(url.origin)) {
+      return
+    }
+    event.respondWith(respondWithDecrypted(url))
+
     return
   }
 
-  event.respondWith(respondWithDecrypted(url))
+  // SW 重启后内存配置为空：先从 Cache 恢复，再决定是否接管
+  event.respondWith((async () => {
+    const loaded = await ensureConfig()
+    if (!loaded.key || !loaded.origins.includes(url.origin)) {
+      return fetch(request)
+    }
+
+    return respondWithDecrypted(url)
+  })())
 })
 
 async function respondWithDecrypted(url) {
