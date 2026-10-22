@@ -107,8 +107,8 @@ function renderDayTable(channel: DataCenterChannelSummaryVo): VNode {
         <ElTableColumn prop="download_uv" min-width="100" label={t('dataCenter.channelLog.downloadUv')} />
         <ElTableColumn prop="install_num" min-width="120" label={t('dataCenter.channelLog.installNum')} />
         <ElTableColumn prop="install_deducted" min-width="120" label={t('dataCenter.channelLog.installDeducted')} />
-        <ElTableColumn prop="click_ratio" min-width="135" label={t('dataCenter.channelLog.clickRatio')} />
-        <ElTableColumn prop="install_ratio" min-width="135" label={t('dataCenter.channelLog.installRatio')} />
+        <ElTableColumn prop="click_ratio" min-width="150" label={t('dataCenter.channelLog.clickRatio')} />
+        <ElTableColumn prop="install_ratio" min-width="150" label={t('dataCenter.channelLog.installRatio')} />
         <ElTableColumn
           label={t('crud.operation')}
           width="140"
@@ -155,13 +155,14 @@ const tableColumns: any[] = [
   {
     label: () => t('dataCenter.channelLog.clickRatio'),
     prop: 'click_ratio',
-    minWidth: '135px',
+    // 比率可能出现 6 位整数 + 两位小数（如 230232.50%），留足宽度避免省略号
+    minWidth: '150px',
     cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.click_ratio || '0.00%',
   },
   {
     label: () => t('dataCenter.channelLog.installRatio'),
     prop: 'install_ratio',
-    minWidth: '135px',
+    minWidth: '150px',
     cellRender: ({ row }: { row: DataCenterChannelSummaryVo }) => row.install_ratio || '0.00%',
   },
 ]

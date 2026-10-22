@@ -3,9 +3,9 @@
  *
  * 与后端 App\Library\Crypto\PayloadCipher 一一对应，格式完全一致：
  *
- * 
+ *
  * 密文 = base64( MAGIC + iv(12) + tag(16) + ciphertext )
- * 
+ *
  *
  * MAGIC 默认 PAY1（配置项 PAYLOAD_CIPHER_MAGIC / VITE_PAYLOAD_CIPHER_MAGIC），
  *   用来区分「密文」和「普通字符串」，改版本号前后端必须一起改；

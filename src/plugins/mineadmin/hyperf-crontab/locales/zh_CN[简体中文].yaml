@@ -15,7 +15,7 @@ mineCrontab:
   menu:
     crontabManage: 定时任务
     index: 定时任务列表
-    description: '管理系统定时任务：查看运行状态、立即执行、编辑任务与运行日志'
+    description: 管理系统定时任务：查看运行状态、立即执行、编辑任务与运行日志
     save: 添加定时任务
     update: 编辑定时任务
     delete: 删除定时任务

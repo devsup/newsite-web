@@ -20,7 +20,7 @@
  * const categories = await requestApi<TopFooterCategory[]>('/api/v1/top-footer/list', {
  *   channelCode: route.query.code as string,
  * })
- * 
+ *
  *
  * 开关是按模块的（模块 = 后端 app/Http 下的目录）：VITE_CRYPT_ENABLED_API /
  * VITE_CRYPT_ENABLED_ADMIN，与后端 CRYPT_ENABLED_<MODULE> 一一对应，两边一起开或一起关。

@@ -133,6 +133,26 @@ dataCenter:
     merchantDetail: Merchant detail
     channelCount: Channels with data
     merchantCount: Merchants clicked
+    # Metric tooltips: describe which report data each figure is made of
+    merchantPvTip: Merchant click reports, where every repeat click by the same visitor counts.
+    jumpPvTip: Jump-link reports; jumps only, not counted as channel visits.
+    merchantUvTip: Sum of unique visitors per merchant today, deduplicated by merchant + IP.
+    merchantUvChannelTip: Unique visitors of merchant clicks today, deduplicated by channel + IP; one IP clicking several merchants in the same channel counts once.
+    channelPvTip: Landing PV + navigation PV, excluding downloads and installs.
+    channelUvTip: Unique visitors per channel today, deduplicated by IP and summed across channels.
+    merchantClickRatioTip: Navigation PV ÷ navigation UV.
+    naviPvTip: Navigation page visit reports.
+    naviUvTip: Unique navigation visitors per channel today, deduplicated by IP.
+    landPvTip: Landing page visit reports.
+    landUvTip: Unique landing visitors per channel today, deduplicated by IP.
+    downloadPvTip: App download reports.
+    downloadUvTip: Unique download visitors per channel today, deduplicated by IP.
+    downloadRatioTip: Download PV ÷ landing PV.
+    installNumTip: App install reports.
+    installDeductedTip: Installs judged as deducted by the channel deduction rule (base + ratio).
+    installRatioTip: Installs ÷ landing UV.
+    channelCountTip: Channels with any report data today.
+    merchantCountTip: Merchants clicked today.
     sourceChannel: Source channel
     merchantJump: Jump merchant
     channelDialogDesc: 'Channel stats: view channel statistics and merchant jump details'

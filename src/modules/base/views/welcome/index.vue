@@ -134,14 +134,16 @@ function formatTime(value?: string): string {
   return value ? useDayjs(value).format('MM-DD HH:mm') : '-'
 }
 
-/** 较昨日增减：昨日为 0 时不给百分比，避免出现「+Infinity%」 */
+/** 较昨日增减：昨日为 0 时改显示绝对增量（0 不能作分母，否则会得到 +100% 这种假百分比） */
 interface DeltaResult { value: string, direction: 'up' | 'down' | 'flat' }
 
 function delta(current: number, previous: number): DeltaResult {
+  // 昨日为 0：按绝对增量展示（如昨日 0 → 今日 400,000 显示「+400,000」），
+  // 既保留「比昨天多了多少」的信息，又避免 0 作分母产生失真的百分比
   if (!previous) {
     return current > 0
-      ? { value: '+100%', direction: 'up' }
-      : { value: '—', direction: 'flat' }
+      ? { value: `+${current.toLocaleString('zh-CN')}`, direction: 'up' }
+      : { value: '0', direction: 'flat' }
   }
   const rate = ((current - previous) / previous) * 100
   if (Math.abs(rate) < 0.05) {
@@ -472,6 +474,16 @@ onActivated(() => {
       </div>
 
       <div class="workbench-hero__actions">
+        <!-- 刷新放第一位，白底与两个彩色入口区分，避免抢主操作的视觉 -->
+        <el-button
+          v-if="canViewStats"
+          :loading="loading"
+          class="workbench-hero__refresh"
+          @click="loadAll"
+        >
+          <ma-svg-icon v-if="!loading" name="material-symbols:refresh" :size="16" />
+          <span class="ml-1">{{ t('workbench.refresh') }}</span>
+        </el-button>
         <el-button v-auth="'channel:index'" color="#059669" style="color: #fff" @click="go('/channel')">
           <ma-svg-icon name="material-symbols:conversion-path" :size="16" />
           <span class="ml-1">{{ t('workbench.entries.channel') }}</span>
@@ -479,16 +491,6 @@ onActivated(() => {
         <el-button v-auth="'merchant:index'" color="#2563EB" style="color: #fff" @click="go('/merchantConfig/merchant')">
           <ma-svg-icon name="material-symbols:storefront-outline" :size="16" />
           <span class="ml-1">{{ t('workbench.entries.merchant') }}</span>
-        </el-button>
-        <el-button
-          v-if="canViewStats"
-          :loading="loading"
-          color="#D97706"
-          style="color: #fff"
-          @click="loadAll"
-        >
-          <ma-svg-icon name="material-symbols:refresh" :size="16" />
-          <span class="ml-1">{{ t('workbench.refresh') }}</span>
         </el-button>
       </div>
     </section>
@@ -840,6 +842,19 @@ onActivated(() => {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+}
+
+/* 刷新按钮：浅色模式下白底，暗色模式跟随主题底色，避免白底浅字看不清 */
+.workbench-hero__refresh.el-button {
+  color: var(--el-text-color-primary);
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
+}
+
+.workbench-hero__refresh.el-button:hover {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+  border-color: var(--el-color-primary-light-5);
 }
 
 /* 区块标题 */

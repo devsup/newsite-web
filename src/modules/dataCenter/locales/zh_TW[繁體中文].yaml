@@ -133,6 +133,26 @@ dataCenter:
     merchantDetail: 商戶明細
     channelCount: 有資料渠道
     merchantCount: 有點擊商戶
+    # 指標口徑氣泡：說明每個數字由哪些上報資料組成
+    merchantPvTip: 商戶點擊上報次數（merchant-click-report），同一訪客重複點擊按次數累計。
+    jumpPvTip: 跳轉鏈接上報次數（jump-link-report），只計跳轉，不計入渠道訪問。
+    merchantUvTip: 當天各商戶按「商戶 + IP」去重後的訪客數之和，同一 IP 點不同商戶分別計數。
+    merchantUvChannelTip: 當天商戶點擊按「渠道 + IP」去重後的訪客數，同一 IP 在同一渠道點多個商戶只算 1。
+    channelPvTip: 落地頁訪問 PV + 導航頁訪問 PV，不含下載與安裝。
+    channelUvTip: 當天同一渠道按 IP 去重後的訪客數，各渠道分別去重後求和。
+    merchantClickRatioTip: 導航頁 PV ÷ 導航頁 UV，反映導航頁人均訪問次數。
+    naviPvTip: 導航頁訪問上報次數（navigation-report）。
+    naviUvTip: 當天同一渠道的導航頁訪問按 IP 去重後的訪客數。
+    landPvTip: 落地頁訪問上報次數（landing-report）。
+    landUvTip: 當天同一渠道的落地頁訪問按 IP 去重後的訪客數。
+    downloadPvTip: App 下載上報次數（download-report）。
+    downloadUvTip: 當天同一渠道的下載上報按 IP 去重後的訪客數。
+    downloadRatioTip: 下載 PV ÷ 落地頁 PV。
+    installNumTip: App 安裝上報次數（app-install-report）。
+    installDeductedTip: 按渠道扣量規則（扣量基數 + 扣量係數）判定為扣量的安裝數。
+    installRatioTip: 安裝量 ÷ 落地頁 UV。
+    channelCountTip: 當天有任意上報資料的渠道數量。
+    merchantCountTip: 當天有商戶點擊的商戶數量。
     sourceChannel: 來源渠道
     merchantJump: 跳轉商戶
     channelDialogDesc: 渠道統計，展示渠道統計數據並支持查看商戶跳轉明細
