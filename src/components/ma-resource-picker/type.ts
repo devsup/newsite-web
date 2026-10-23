@@ -21,8 +21,6 @@ export interface Resource {
   storage_key?: string
   /** 桶内绝对路径 obs://bucket/key */
   storage_uri?: string
-  /** 视频首帧缩略图地址（后端用 ffmpeg 抽帧，只对视频且有缩略图时有值） */
-  thumb_url?: string
 }
 
 export interface FileType extends MTabsOptionItems<string> {

@@ -175,9 +175,49 @@ const queryParams = ref<Record<string, any>>({
 /** 视频预览地址（空串表示弹窗关闭） */
 const videoPreviewUrl = ref('')
 
-/** 是否视频（视频没有封面，展示播放按钮、支持预览播放） */
+/** 是否图片 */
+function isImage(resource: Resource): boolean {
+  return !!resource?.mime_type?.startsWith('image')
+}
+
+/** 是否视频（首帧由浏览器 <video> 自己渲染，不依赖后端抽帧 / ffmpeg，展示播放按钮并支持预览播放） */
 function isVideo(resource: Resource): boolean {
   return !!resource?.mime_type?.startsWith('video')
+}
+
+/**
+ * 让浏览器加载视频并把画面停在首帧.
+ *
+ * 参考站点（../site 的 ma-resource-picker）的做法：不生成缩略图，资源库列表直接渲染
+ * <video muted playsinline>，元数据就绪后 seek 到 0.1 秒，浏览器会解码并显示该帧；
+ * seeked 后立即 pause，避免自动播放、也让后续点击选择不受影响。
+ */
+function primeVideoFrame(event: Event): void {
+  const video = event.target as HTMLVideoElement | null
+  if (!video) {
+    return
+  }
+
+  video.muted = true
+  video.playsInline = true
+  video.pause()
+
+  if (video.duration && video.duration > 0.1 && video.currentTime < 0.1) {
+    try {
+      video.currentTime = 0.1
+      return
+    }
+    catch {
+    }
+  }
+
+  video.currentTime = 0
+}
+
+/** seek 完成后停住画面，避免视频继续播放 */
+function freezeVideoFrame(event: Event): void {
+  const video = event.target as HTMLVideoElement | null
+  video?.pause()
 }
 
 function openVideoPreview(resource: Resource): void {
@@ -263,14 +303,7 @@ function getButtonLabel(btn: Resources.Button): string {
  * @param resource
  */
 function getCover(resource: Resource): string | undefined {
-  if (resource?.mime_type?.startsWith('image')) {
-    return resource.url
-  }
-  // 视频有首帧缩略图就显示封面（没有则退回显示文件名 + 播放按钮）
-  if (resource?.mime_type?.startsWith('video')) {
-    return resource.thumb_url || undefined
-  }
-  return undefined
+  return isImage(resource) ? (resource.url || undefined) : undefined
 }
 
 /**
@@ -619,7 +652,7 @@ onMounted(async () => {
               @dblclick="handleDbClick(resource)" @contextmenu="(e: MouseEvent) => executeContextmenu(e, resource)"
             >
               <div class="resource-item__cover">
-                <template v-if="getCover(resource)">
+                <template v-if="isImage(resource)">
                   <!--
                       用原生 img 而不是 el-image：
                       ① el-image 的 lazy 依赖 IntersectionObserver 认滚动容器，在 OverlayScrollbars 内层失效、图片请求根本不发（列表一片空白）；
@@ -634,6 +667,19 @@ onMounted(async () => {
                     @error="($event.target as HTMLImageElement).style.display = 'none'"
                   >
                 </template>
+                <!-- 视频：浏览器自己解码首帧（参考站点做法，不依赖 ffmpeg / 后端缩略图） -->
+                <template v-else-if="isVideo(resource)">
+                  <video
+                    :src="resource.url"
+                    class="resource-item__video"
+                    muted
+                    playsinline
+                    preload="metadata"
+                    @loadedmetadata="primeVideoFrame"
+                    @loadeddata="primeVideoFrame"
+                    @seeked="freezeVideoFrame"
+                  />
+                </template>
                 <template v-else>
                   <div
                     class="relative m-[8px] h-[calc(100%-16px)] w-[calc(100%-16px)] flex items-center justify-center overflow-hidden"
@@ -644,7 +690,7 @@ onMounted(async () => {
                   </div>
                 </template>
               </div>
-              <div v-if="getCover(resource)" class="resource-item__name cursor-default">
+              <div v-if="isImage(resource) || isVideo(resource)" class="resource-item__name cursor-default">
                 {{ resource.origin_name }}
               </div>
               <!-- 视频始终显示播放按钮，便于快速和图片区分；点按钮预览播放 -->
@@ -806,6 +852,11 @@ onMounted(async () => {
 }
 .resource-item__cover{
   @apply absolute bottom-0 left-0 h-full w-full;
+}
+.resource-item__video{
+  /* 视频首帧铺满封面区域；pointer-events 交给父级处理，点击卡片仍是「选中」而不是播放 */
+  @apply block h-full w-full object-cover;
+  pointer-events: none;
 }
 .resource-item__name{
   @apply absolute bottom-0 left-0 h-24px w-[calc(100%-20px)] overflow-hidden bg-gray:60 px-10px text-12px leading-24px whitespace-nowrap text-ellipsis c-white;
