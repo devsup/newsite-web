@@ -13,6 +13,8 @@ export interface SettingItemVo {
   input_type?: string
   config_select_data?: null | SettingOption[]
   sort?: number
+  /** 配置分组：1 = 站点配置，2 = 系统配置（需 setting:system 权限） */
+  group_type?: number
   remark?: string
 }
 

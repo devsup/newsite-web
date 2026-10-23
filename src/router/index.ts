@@ -16,6 +16,7 @@ import hasAuth from '@/utils/permission/hasAuth.ts'
 import hasRole from '@/utils/permission/hasRole.ts'
 import hasUser from '@/utils/permission/hasUser.ts'
 import { isEmpty } from 'radash'
+import { i18n } from '@/i18n'
 
 const { isLoading } = useNProgress()
 
@@ -52,6 +53,12 @@ router.beforeEach(async (to, from, next) => {
 
 router.afterEach(async (to) => {
   isLoading.value = false
+
+  // 浏览器标题 = 系统设置的站点名称 + 当前路由标题（站点名异步加载，useSettingStore 会再刷新一次）
+  useSettingStore().setTitle(
+    to.meta?.i18n ? i18n.global.t(to.meta.i18n as string) : ((to.meta?.title as string) || ''),
+  )
+
   const keepAliveStore = useKeepAliveStore()
   const iframeKeepAliveStore = useIframeKeepAliveStore()
 

@@ -216,14 +216,35 @@ const useSettingStore = defineStore(
     }
 
     // 设置网页标题
-    function setTitle(routeTitle: string) {
-      title.value = `${import.meta.env.VITE_APP_TITLE} - ${routeTitle}`
+    // 当前路由标题（不含站点名），站点名异步加载完成后用它重新拼标题
+    const currentRouteTitle = ref<string>('')
+
+    /** 用系统设置的站点名称 + 当前路由标题刷新浏览器标题 */
+    function applyTitle(siteName: string): void {
+      if (!currentRouteTitle.value) {
+        return
+      }
+      title.value = `${siteName || (import.meta.env.VITE_APP_TITLE as string) || 'SiteAdmin'} - ${currentRouteTitle.value}`
       document.title = title.value
+    }
+
+    // 设置网页标题：站点名称异步取系统设置（useSiteStore），避免与它形成模块循环依赖
+    async function setTitle(routeTitle: string) {
+      currentRouteTitle.value = routeTitle
+      const { useSiteStore } = await import('@/store/modules/useSiteStore.ts')
+      applyTitle(useSiteStore().name)
+    }
+
+    /** 站点名称加载完成后刷新标题（保留当前路由标题） */
+    async function refreshTitle() {
+      const { useSiteStore } = await import('@/store/modules/useSiteStore.ts')
+      applyTitle(useSiteStore().name)
     }
 
     initColorMode()
     return {
       title,
+      refreshTitle,
       colorMode,
       initColorMode,
       setUserBarState,

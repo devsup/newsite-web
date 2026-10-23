@@ -130,6 +130,14 @@ export const useSiteStore = defineStore('site', () => {
           catch {
             // 隐私模式下 localStorage 可能不可写，加载页退回默认品牌名即可
           }
+          // 路由切换时标题先用默认品牌名拼过，拿到站点名后再刷新一次
+          try {
+            const { default: useSettingStore } = await import('@/store/modules/useSettingStore.ts')
+            await useSettingStore().refreshTitle()
+          }
+          catch {
+            // 标题刷新失败不影响页面渲染
+          }
         }
       }
       catch {

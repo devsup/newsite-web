@@ -18,6 +18,16 @@ en:
   groupSwitch: Switch
   groupImage: Image Upload
   groupOther: Other Settings
+  groupSiteUrl: Site & Attachment URL
+  groupLogin: Login Security
+  groupCryptReport: API Encryption & Report Security
+  groupDataRetention: Data Retention & Query
+  groupRedirectIp: Redirect & IP Database
+  groupBaota: BaoTa Panel
+  groupObs: Object Storage (OBS)
+  groupSystemOther: Other System Settings
+  tabSite: Site Settings
+  tabSystem: System Settings
   subtitle: Edit values in the form directly; add or modify a setting with the buttons above
   goChannel: Go to Channel →
   landingRebuildTip: Changing the landing background, package URLs or download switches does not refresh the generated landing pages — go to Channel, click Rebuild Landings, then purge the landing domain cache on your CDN
@@ -56,6 +66,16 @@ zh_CN:
   groupSwitch: 开关
   groupImage: 图片上传
   groupOther: 其他配置
+  groupSiteUrl: 站点与附件地址
+  groupLogin: 登录安全
+  groupCryptReport: 接口加密与上报安全
+  groupDataRetention: 数据保留与查询
+  groupRedirectIp: 跳转与 IP 库
+  groupBaota: 宝塔面板
+  groupObs: 对象存储（OBS）
+  groupSystemOther: 其他系统配置
+  tabSite: 站点配置
+  tabSystem: 系统配置
   subtitle: 直接在表单里修改配置值，新增或修改配置项请用上方按钮
   goChannel: 去渠道管理 →
   landingRebuildTip: 改动「落地页背景图 / 苹果包 / 安卓包 / 下载开关」后，已生成的渠道落地页不会自动更新：需到「渠道管理」点「重建落地页」，再到 CDN 平台刷新落地页域名的缓存
@@ -94,6 +114,16 @@ zh_TW:
   groupSwitch: 開關
   groupImage: 圖片上傳
   groupOther: 其他設定
+  groupSiteUrl: 站點與附件地址
+  groupLogin: 登錄安全
+  groupCryptReport: 介面加密與上報安全
+  groupDataRetention: 資料保留與查詢
+  groupRedirectIp: 跳轉與 IP 庫
+  groupBaota: 寶塔面板
+  groupObs: 物件儲存（OBS）
+  groupSystemOther: 其他系統設定
+  tabSite: 站點配置
+  tabSystem: 系統配置
   subtitle: 直接在表單裡修改配置值，新增或修改配置項請用上方按鈕
   goChannel: 去通路管理 →
   landingRebuildTip: 改動「落地頁背景圖 / 蘋果包 / 安卓包 / 下載開關」後，已生成的通路落地頁不會自動更新：需到「通路管理」點「重建落地頁」，再到 CDN 平台刷新落地頁網域的快取
@@ -134,6 +164,7 @@ import MaKeyValue from '@/components/ma-key-value/index.vue'
 import useDialog from '@/hooks/useDialog.ts'
 import { useMessage } from '@/hooks/useMessage.ts'
 import { ResultCode } from '@/utils/ResultCode.ts'
+import hasAuth from '@/utils/permission/hasAuth.ts'
 
 defineOptions({ name: 'setting' })
 
@@ -157,6 +188,103 @@ const items = ref<SettingItemVo[]>([])
  * 行高被图片撑起来后其它控件都悬在中间。按控件类型分组后，每组内控件高度一致、排布整齐。
  * 组标题样式与渠道/商户表单的分组一致（主色左边条 + 下划线）。
  */
+/**
+ * 配置页签：1 = 站点配置（运营日常维护）；2 = 系统配置（上报 / 跳转 / 加密等，需 setting:system 权限）.
+ *
+ * 系统配置 tab 只对拥有权限的账号显示；后端 index 也会按权限过滤，避免无权限账号从接口拿到敏感配置。
+ */
+const TABS = [
+  { name: 'site', title: 'tabSite', group: 1 },
+  { name: 'system', title: 'tabSystem', group: 2 },
+] as const
+
+const activeTab = ref<string>('site')
+
+/** 当前账号可见的页签（系统配置需要单独授权） */
+const visibleTabs = computed(() => TABS.filter(tab => tab.group === 1 || hasAuth('setting:system')))
+
+/** 当前页签下的配置项（后端通过 group_type 区分，新增配置项不需要改前端） */
+const tabItems = computed(() => {
+  const group = TABS.find(tab => tab.name === activeTab.value)?.group ?? 1
+  return items.value.filter(item => (Number(item.group_type) || 1) === group)
+})
+
+/**
+ * 系统配置的功能块分组.
+ *
+ * 站点配置沿用「按控件类型」分组（输入/单选/开关/图片），系统配置按业务功能分块：
+ * 登录安全 / 接口加密 / 上报安全与缓存 / 数据保留与查询 / 跳转与 IP 库 / 宝塔 / OBS。
+ * 每个功能块是一张跨整行的卡片，块内仍然按「开关在前、输入在后」排，视觉上整齐。
+ */
+const SYSTEM_GROUP_DEFS: Array<{ title: string, keys: string[] }> = [
+  {
+    title: 'groupSiteUrl',
+    keys: ['app_url', 'attachment_url'],
+  },
+  {
+    title: 'groupLogin',
+    keys: ['login_max_attempts', 'login_ip_max_attempts', 'login_decay_seconds', 'totp_encrypt_key'],
+  },
+  {
+    // 接口加密与上报安全合并成一张卡：两者都属于「对外接口 / 上报链路」的安全配置
+    title: 'groupCryptReport',
+    keys: [
+      'crypt_enabled_api',
+      'crypt_enabled_reports',
+      'payload_cipher_key',
+      'payload_cipher_key_api',
+      'payload_cipher_key_admin',
+      'payload_cipher_key_channel',
+      'payload_cipher_key_landing',
+      'report_require_sign',
+      'report_sign_ttl',
+      'report_attribution_ttl',
+      'report_channel_cache_ttl',
+      'report_sign_secret',
+      'report_base_url',
+      'payload_cipher_magic',
+    ],
+  },
+  {
+    title: 'groupDataRetention',
+    keys: [
+      'report_event_query_max_days',
+      'report_event_retention_days',
+      'report_uv_retention_days',
+      'report_stat_retention_days',
+      'report_log_retention_days',
+      'report_cleanup_batch',
+    ],
+  },
+  {
+    title: 'groupRedirectIp',
+    keys: ['redirect_log_enabled', 'ip_location_mmdb_path', 'ip_location_download_token', 'ip_location_download_url', 'ip_location_download_timeout', 'ip_location_download_connect_timeout'],
+  },
+  {
+    title: 'groupBaota',
+    keys: ['baota_verify_ssl', 'baota_encrypt_key'],
+  },
+  {
+    title: 'groupObs',
+    keys: [
+      'obs_access_key',
+      'obs_secret_key',
+      'obs_bucket',
+      'obs_region',
+      'obs_endpoint',
+      'obs_public_url',
+      'obs_sse',
+      'obs_acl',
+      'obs_content_key',
+    ],
+  },
+]
+
+/** 开关排在输入框前面，同类型保持接口返回顺序 */
+function switchFirst(a: SettingItemVo, b: SettingItemVo): number {
+  return Number(b.input_type === 'switch') - Number(a.input_type === 'switch')
+}
+
 const GROUP_DEFS: Array<{ title: string, types: string[] }> = [
   { title: 'groupInput', types: ['input', ''] },
   { title: 'groupTextarea', types: ['textarea'] },
@@ -183,29 +311,53 @@ const DEFAULT_MAX_COLUMNS = 3
  */
 const MIN_COL_WIDTH: Record<string, number> = {
   imageUpload: 260,
-  switch: 260,
-  select: 320,
-  textarea: 520,
-  radio: 560,
-  checkbox: 560,
+  switch: 340,
+  select: 540,
+  textarea: 740,
+  radio: 780,
+  checkbox: 780,
 }
-const DEFAULT_MIN_COL_WIDTH = 420
+// 单列总宽 = label 200 + 控件 320 + 编辑/删除图标约 40；
+// 之前只按控件宽算，三列会挤到 label 被截断，现在按整列宽判断
+const DEFAULT_MIN_COL_WIDTH = 560
 
 /** 分组容器的实际可用宽度：列数要跟着屏幕走，不能写死 */
 const sectionsRef = ref<HTMLElement>()
 const containerWidth = ref(0)
+let sectionsObserver: ResizeObserver | null = null
 
-onMounted(() => {
+/**
+ * 容器 ref 回调：切换页签时活动容器会重新挂载，这里重新测量并监听宽度.
+ *
+ * 用函数 ref 而不是 ref="sectionsRef"：模板在 v-for 的页签里，ElTabs 会把非活动页签也保留在 DOM，
+ * 普通 ref 可能拿到隐藏容器（宽度 0），列数会算错。
+ */
+function setSectionsRef(el: unknown): void {
+  if (!(el instanceof HTMLElement)) {
+    return
+  }
+
+  sectionsRef.value = el
+  observeSections()
+}
+
+/** 观察当前页签的分组容器，窗口 / 侧边栏 / 页签变化时实时重算列数 */
+function observeSections(): void {
   const el = sectionsRef.value
   if (!el) {
     return
   }
-  const observer = new ResizeObserver((entries) => {
+
+  sectionsObserver?.disconnect()
+  containerWidth.value = el.getBoundingClientRect().width
+  sectionsObserver = new ResizeObserver((entries) => {
     containerWidth.value = entries[0]?.contentRect.width ?? 0
   })
-  observer.observe(el)
-  onBeforeUnmount(() => observer.disconnect())
-})
+  sectionsObserver.observe(el)
+}
+
+watch(activeTab, () => nextTick(observeSections))
+onBeforeUnmount(() => sectionsObserver?.disconnect())
 
 /**
  * 哪些分组跨整行：项数多的、图片（与模板里的 class 判断保持同一套逻辑）.
@@ -214,21 +366,49 @@ onMounted(() => {
  * 所以让它和相邻的小组（如「单选」）并排各占一半。
  */
 function isWideGroup(group: { items: SettingItemVo[] }): boolean {
+  // 系统配置每个功能块都跨整行：块内配置多、且开关与输入混排，两列并排会显得拥挤
+  if (activeTab.value === 'system') {
+    return true
+  }
+
   const type = group.items[0]?.input_type ?? 'input'
   return group.items.length > 6 || type === 'imageUpload'
 }
 
 /** 按 GROUP_DEFS 的控件类型归组；后端以后新增的类型收进「其他配置」，空组不渲染 */
 const groupedItems = computed(() => {
+  // 系统配置：按业务功能块分组（跨整行），块内开关在前
+  if (activeTab.value === 'system') {
+    const groups = SYSTEM_GROUP_DEFS
+      .map(def => ({
+        title: t(def.title),
+        items: tabItems.value
+          .filter(item => def.keys.includes(item.key))
+          .sort(switchFirst),
+      }))
+      .filter(group => group.items.length > 0)
+
+    const known = new Set(SYSTEM_GROUP_DEFS.flatMap(def => def.keys))
+    const others = tabItems.value
+      .filter(item => !known.has(item.key))
+      .sort(switchFirst)
+    if (others.length > 0) {
+      groups.push({ title: t('groupSystemOther'), items: others })
+    }
+
+    return groups
+  }
+
+  // 站点配置：沿用按控件类型分组（输入框 32px、图片 120px 混排会撑乱行高）
   const groups = GROUP_DEFS
     .map(def => ({
       title: t(def.title),
-      items: items.value.filter(item => def.types.includes(item.input_type ?? '')),
+      items: tabItems.value.filter(item => def.types.includes(item.input_type ?? '')),
     }))
     .filter(group => group.items.length > 0)
 
   const known = new Set(GROUP_DEFS.flatMap(def => def.types))
-  const others = items.value.filter(item => !known.has(item.input_type ?? ''))
+  const others = tabItems.value.filter(item => !known.has(item.input_type ?? ''))
   if (others.length > 0) {
     groups.push({ title: t('groupOther'), items: others })
   }
@@ -257,9 +437,11 @@ const lastOddHalfGroupTitle = computed(() => {
  *    不跨行的组只占一半宽（如「多行文本」3 项），按容器宽度算会算出 3 列把文本域压成竖条。
  */
 function groupColumns(group: { title: string, items: SettingItemVo[] }): number {
-  const type = group.items[0]?.input_type ?? 'input'
-  const max = MAX_COLUMNS[type] ?? DEFAULT_MAX_COLUMNS
-  const min = MIN_COL_WIDTH[type] ?? DEFAULT_MIN_COL_WIDTH
+  // 系统配置块内是开关 + 输入混排，按默认输入项宽度算列数（不再看第一项类型）
+  const isSystem = activeTab.value === 'system'
+  const type = isSystem ? 'input' : (group.items[0]?.input_type ?? 'input')
+  const max = isSystem ? 3 : (MAX_COLUMNS[type] ?? DEFAULT_MAX_COLUMNS)
+  const min = isSystem ? DEFAULT_MIN_COL_WIDTH : (MIN_COL_WIDTH[type] ?? DEFAULT_MIN_COL_WIDTH)
   const gap = type === 'imageUpload' ? 20 : 40
   const totalWidth = containerWidth.value || 1200
   // 不跨行的组占「容器宽 - 24 列间距」的一半
@@ -304,7 +486,22 @@ function createEmptyDraft(): SettingItemVo {
     input_type: 'input',
     config_select_data: [],
     sort: 0,
+    // 在「数据与跳转」页签新增的配置项也归到该分组，保存后不会跑到基础设置里
+    group_type: activeTab.value === 'system' ? 2 : 1,
     remark: '',
+  }
+}
+
+/**
+ * 开关只允许点开关本体切换.
+ *
+ * el-form-item 的 label 是 <label>，点击默认会激活关联控件；对开关来说这很反直觉
+ * （点名字就改配置），所以这里对开关项阻止默认行为与冒泡，输入框等其它控件不受影响。
+ */
+function onLabelClick(item: SettingItemVo, event: MouseEvent): void {
+  if (item.input_type === 'switch') {
+    event.preventDefault()
+    event.stopPropagation()
   }
 }
 
@@ -490,7 +687,7 @@ useEventListener(window, 'resize', syncCardHeight)
       </template>
 
       <!-- 落地页是静态文件：这些配置改完不会自动反映到已生成的渠道落地页上，所以常驻一条紧凑提示 -->
-      <div class="landing-tip">
+      <div v-if="activeTab === 'site'" class="landing-tip">
         <ma-svg-icon name="material-symbols:info-outline-rounded" :size="16" class="landing-tip__icon" />
         <span class="landing-tip__text">{{ t('landingRebuildTip') }}</span>
         <el-button link type="primary" class="landing-tip__action" @click="goChannel">
@@ -498,117 +695,134 @@ useEventListener(window, 'resize', syncCardHeight)
         </el-button>
       </div>
 
-      <el-form class="site-setting__form" label-width="150px">
-        <div ref="sectionsRef" class="site-setting__sections">
-          <div
-            v-for="group in groupedItems"
-            :key="group.title"
-            class="site-setting__section"
-            :class="{
-              'site-setting__section--wide': isWideGroup(group) || group.title === lastOddHalfGroupTitle,
-              'site-setting__section--images': group.items[0]?.input_type === 'imageUpload',
-            }"
-          >
-            <div class="site-setting__section-title">
-              {{ group.title }}
-            </div>
-            <div
-              class="site-setting__grid"
-              :style="{ gridTemplateColumns: `repeat(${groupColumns(group)}, minmax(0, 1fr))` }"
-            >
-              <el-form-item v-for="item in group.items" :key="item.key">
-                <template #label>
-                  <span>{{ item.name }}</span>
-                </template>
-
-                <!-- 图片、开关、单选/多选这类控件尺寸固定，容器不用占满 420px，否则图标会离控件很远 -->
-                <div class="w-full flex items-start gap-x-2">
-                  <div
-                    class="site-setting__control min-w-0"
-                    :class="{
-                      'site-setting__control--auto': ['switch', 'radio', 'checkbox'].includes(item.input_type ?? ''),
-                      'site-setting__control--image': item.input_type === 'imageUpload',
-                    }"
-                  >
-                    <el-input
-                      v-if="item.input_type === 'input'"
-                      v-model="item.value"
-                      clearable
-                      :placeholder="t('inputPlaceholder', { name: item.name })"
-                    />
-
-                    <el-input
-                      v-else-if="item.input_type === 'textarea'"
-                      v-model="item.value"
-                      type="textarea"
-                      :rows="3"
-                      :placeholder="t('inputPlaceholder', { name: item.name })"
-                    />
-
-                    <el-select
-                      v-else-if="item.input_type === 'select'"
-                      v-model="item.value"
-                      clearable
-                      :placeholder="t('selectPlaceholder', { name: item.name })"
-                    >
-                      <el-option v-for="opt in optionsOf(item)" :key="opt.value" :label="opt.label" :value="opt.value" />
-                    </el-select>
-
-                    <el-radio-group v-else-if="item.input_type === 'radio'" v-model="item.value">
-                      <el-radio v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
-                        {{ opt.label }}
-                      </el-radio>
-                    </el-radio-group>
-
-                    <el-checkbox-group v-else-if="item.input_type === 'checkbox'" v-model="item.value">
-                      <el-checkbox v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
-                        {{ opt.label }}
-                      </el-checkbox>
-                    </el-checkbox-group>
-
-                    <el-switch
-                      v-else-if="item.input_type === 'switch'"
-                      v-model="item.value"
-                      :active-value="optionsOf(item)[0]?.value ?? '1'"
-                      :inactive-value="optionsOf(item)[1]?.value ?? '0'"
-                    />
-
-                    <!-- 图片：走资源库选择 / 上传，不允许手填地址 -->
-                    <ma-upload-image
-                      v-else-if="item.input_type === 'imageUpload'"
-                      v-model="item.value"
-                      :size="96"
-                    />
-
-                    <el-input v-else v-model="item.value" clearable />
-                  </div>
-
-                  <div class="site-setting__actions flex shrink-0 items-center" style="min-height: 32px;">
-                    <el-button
-                      v-auth="['setting:save']"
-                      link
-                      type="primary"
-                      :title="t('edit')"
-                      @click="openEdit(item, items.indexOf(item))"
-                    >
-                      <ma-svg-icon name="material-symbols:edit-outline-rounded" :size="18" />
-                    </el-button>
-                    <el-button
-                      v-auth="['setting:delete']"
-                      link
-                      type="danger"
-                      :title="t('remove')"
-                      @click="removeItem(item, items.indexOf(item))"
-                    >
-                      <ma-svg-icon name="material-symbols:delete-outline-rounded" :size="18" />
-                    </el-button>
-                  </div>
+      <el-tabs v-model="activeTab" class="site-setting__tabs">
+        <el-tab-pane v-for="tab in visibleTabs" :key="tab.name" :label="t(tab.title)" :name="tab.name">
+          <el-form class="site-setting__form" label-width="200px">
+            <div v-if="activeTab === tab.name" :ref="setSectionsRef" class="site-setting__sections">
+              <div
+                v-for="group in groupedItems"
+                :key="group.title"
+                class="site-setting__section"
+                :class="{
+                  'site-setting__section--wide': isWideGroup(group) || group.title === lastOddHalfGroupTitle,
+                  'site-setting__section--images': group.items[0]?.input_type === 'imageUpload',
+                }"
+              >
+                <div class="site-setting__section-title">
+                  {{ group.title }}
                 </div>
-              </el-form-item>
+                <div
+                  class="site-setting__grid"
+                  :style="{ gridTemplateColumns: `repeat(${groupColumns(group)}, minmax(0, 1fr))` }"
+                >
+                  <el-form-item v-for="item in group.items" :key="item.key">
+                    <template #label>
+                      <span
+                        class="inline-flex items-center gap-1"
+                        :class="{ 'cursor-default': item.input_type === 'switch' }"
+                        @click="onLabelClick(item, $event)"
+                      >
+                        {{ item.name }}
+                        <el-tooltip v-if="item.remark" :content="item.remark" placement="top" :show-after="200">
+                          <ma-svg-icon
+                            name="material-symbols:info-outline-rounded"
+                            :size="14"
+                            class="text-[var(--el-text-color-secondary)]"
+                          />
+                        </el-tooltip>
+                      </span>
+                    </template>
+
+                    <!-- 图片、开关、单选/多选这类控件尺寸固定，容器不用占满 420px，否则图标会离控件很远 -->
+                    <div class="w-full flex items-start gap-x-2">
+                      <div
+                        class="site-setting__control min-w-0"
+                        :class="{
+                          'site-setting__control--auto': ['switch', 'radio', 'checkbox'].includes(item.input_type ?? ''),
+                          'site-setting__control--image': item.input_type === 'imageUpload',
+                        }"
+                      >
+                        <el-input
+                          v-if="item.input_type === 'input'"
+                          v-model="item.value"
+                          clearable
+                          :placeholder="t('inputPlaceholder', { name: item.name })"
+                        />
+
+                        <el-input
+                          v-else-if="item.input_type === 'textarea'"
+                          v-model="item.value"
+                          type="textarea"
+                          :rows="3"
+                          :placeholder="t('inputPlaceholder', { name: item.name })"
+                        />
+
+                        <el-select
+                          v-else-if="item.input_type === 'select'"
+                          v-model="item.value"
+                          clearable
+                          :placeholder="t('selectPlaceholder', { name: item.name })"
+                        >
+                          <el-option v-for="opt in optionsOf(item)" :key="opt.value" :label="opt.label" :value="opt.value" />
+                        </el-select>
+
+                        <el-radio-group v-else-if="item.input_type === 'radio'" v-model="item.value">
+                          <el-radio v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
+                            {{ opt.label }}
+                          </el-radio>
+                        </el-radio-group>
+
+                        <el-checkbox-group v-else-if="item.input_type === 'checkbox'" v-model="item.value">
+                          <el-checkbox v-for="opt in optionsOf(item)" :key="opt.value" :value="opt.value">
+                            {{ opt.label }}
+                          </el-checkbox>
+                        </el-checkbox-group>
+
+                        <el-switch
+                          v-else-if="item.input_type === 'switch'"
+                          v-model="item.value"
+                          :active-value="optionsOf(item)[0]?.value ?? '1'"
+                          :inactive-value="optionsOf(item)[1]?.value ?? '0'"
+                        />
+
+                        <!-- 图片：走资源库选择 / 上传，不允许手填地址 -->
+                        <ma-upload-image
+                          v-else-if="item.input_type === 'imageUpload'"
+                          v-model="item.value"
+                          :size="96"
+                        />
+
+                        <el-input v-else v-model="item.value" clearable />
+                      </div>
+
+                      <div class="site-setting__actions flex shrink-0 items-center" style="min-height: 32px;">
+                        <el-button
+                          v-auth="['setting:save']"
+                          link
+                          type="primary"
+                          :title="t('edit')"
+                          @click="openEdit(item, items.indexOf(item))"
+                        >
+                          <ma-svg-icon name="material-symbols:edit-outline-rounded" :size="18" />
+                        </el-button>
+                        <el-button
+                          v-auth="['setting:delete']"
+                          link
+                          type="danger"
+                          :title="t('remove')"
+                          @click="removeItem(item, items.indexOf(item))"
+                        >
+                          <ma-svg-icon name="material-symbols:delete-outline-rounded" :size="18" />
+                        </el-button>
+                      </div>
+                    </div>
+                  </el-form-item>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </el-form>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
 
       <!-- 配置项多时要滚到底部，这里再放一个保存，省得再滚回顶部；
            上方加一条分隔线与表单隔开，按钮居中 -->
@@ -675,7 +889,7 @@ useEventListener(window, 'resize', syncCardHeight)
 /* 控件固定宽度：输入框被 flex-1 拉满时，右侧的编辑/删除图标会被顶到列尾、离字段很远；
    固定 420px 后图标紧跟在控件后面，图片类字段也不会拖出一条长空白 */
 .site-setting__control {
-  width: 420px;
+  width: 320px;
   max-width: 100%;
 }
 
@@ -720,6 +934,20 @@ useEventListener(window, 'resize', syncCardHeight)
   max-width: none;
 }
 
+/* 页签：基础设置 / 数据与跳转，页签头与下方分组卡片留一点间距 */
+.site-setting__tabs {
+  :deep(.el-tabs__header) {
+    // tab 与下方分组卡片之间留够间距，避免卡片悬停上浮时贴到 tab 下划线
+    margin-bottom: 24px;
+  }
+
+  // Element 默认给 el-tabs__content 加了 overflow: hidden，会裁掉分组卡片
+  // 悬停上浮 1px 的边框与阴影（表现为「上面那条线没了」），这里放开
+  :deep(.el-tabs__content) {
+    overflow: visible;
+  }
+}
+
 // 两列布局：列间距（左右）96px、行间距 12px；窄屏自动退成一列。
 // 用 grid 而不是 el-row/el-col + gutter——gutter 走负 margin，gutter 一大就会把内容顶出卡片、出现横向滚动。
 .site-setting__grid {
@@ -737,6 +965,8 @@ useEventListener(window, 'resize', syncCardHeight)
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 24px;
   align-items: start;
+  // 顶部留 6px：分组卡片悬停会上浮 1px 并加深阴影，没有这段留白时上边框会贴住容器边界被裁掉
+  padding-top: 6px;
   // 铺满卡片内容区，不要再留左右边距
   width: 100%;
 }
